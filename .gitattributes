@@ -1,0 +1,8 @@
+# Normalize all text files to use LF in the repo
+* text=auto
+
+# Binary files should never have line-ending changes
+*.png binary
+*.jpg binary
+*.pdf binary
+*.ico binary
