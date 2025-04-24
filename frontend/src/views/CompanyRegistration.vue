@@ -56,7 +56,7 @@
                             <!-- This div groups the "Registrar Empresa" button and the "¿Ya tiene una empresa?" link and pushes them to the bottom -->
                             <div class="mt-auto">
                                 <button type="submit" class="btn btn-dark mb-2">Registrar Empresa</button>
-                                <p class="mt-2 mb-0">¿Ya tiene una empresa? <a href="/login">Ingrese</a></p>
+                                <p class="mt-2 mb-0">¿Ya tiene una empresa? <router-link to="/login">Ingrese</router-link></p>
                             </div>
                         </div>
                     </fieldset>
@@ -140,37 +140,36 @@
 </template>
 
 <script>
-    export default {
-        name: 'CompanyRegistration',
-        data() {
-            return {
-                company: {
-                    legalEntityId: '',
-                    name: '',
-                    description: '',
-                    paymentType: '',
-                    maxBenefits: '',
-                    direction: {
-                        province: '',
-                        canton: '',
-                        district: '',
-                        neighborhood: '',
-                        otherSigns: ''
-                    },
-                    contact: {
-                        email: '',
-                        phoneNumber: ''
-                    }
+export default {
+    name: 'CompanyRegistration',
+    data() {
+        return {
+            company: {
+                legalEntityId: '',
+                name: '',
+                description: '',
+                paymentType: '',
+                maxBenefits: '',
+                direction: {
+                    province: '',
+                    canton: '',
+                    district: '',
+                    neighborhood: '',
+                    otherSigns: ''
+                },
+                contact: {
+                    email: '',
+                    phoneNumber: ''
                 }
             }
-        },
-
-        methods: {
-            handleRegisterCompany() {
-                console.log(this.company)
-            }
+        }
+    },
+    methods: {
+        handleRegisterCompany() {
+            console.log(this.company)
         }
     }
+}
 </script>
 
 <style scoped>
