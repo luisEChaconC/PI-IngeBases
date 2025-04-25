@@ -106,7 +106,7 @@
                             <!-- "Otras Señas" textarea -->
                             <div class="mb-3">
                                 <label for="otherSigns" class="form-label">Otras Señas</label>
-                                <textarea class="form-control" id="otherSigns" v-model="company.direction.otherSigns" rows="4" required></textarea>
+                                <textarea class="form-control" id="additionalDetails" v-model="company.direction.additionalDetails" rows="4" required></textarea>
                             </div>
                         </div>
                     </fieldset>
@@ -155,7 +155,7 @@ export default {
                     canton: '',
                     district: '',
                     neighborhood: '',
-                    otherSigns: ''
+                    additionalDetails: ''
                 },
                 contact: {
                     email: '',
