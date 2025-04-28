@@ -44,8 +44,11 @@
               <input type="text" class="form-control" id="role" v-model="employee.role" disabled />
             </div>
               <div class="mb-3">
-                <label for="grossSalary" class="form-label">Salario Bruto en Colones</label>
+                <label for="grossSalary" class="form-label">Salario Bruto</label>
+                <div class="input-group">
+                <span class="input-group-text">₡</span>
                 <input type="number" class="form-control" id="grossSalary" v-model="employee.grossSalary" disabled />
+                </div>
               </div>
               <div class="mb-3">
                 <label for="phone" class="form-label">Número de Teléfono</label>
