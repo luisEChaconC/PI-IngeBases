@@ -1,6 +1,12 @@
+import ViewEmployeeProfileEmployer from '../views/ViewEmployeeProfileEmployer.vue'
 import { createRouter, createWebHistory } from 'vue-router'
-
-const routes = []
+const routes = [
+    {
+        path: '/view-employee-profile-employer',
+        name: 'ViewEmployeeProfileEmployer',
+        component: ViewEmployeeProfileEmployer
+      }
+]
 
 const router = createRouter({
     history: createWebHistory(),
