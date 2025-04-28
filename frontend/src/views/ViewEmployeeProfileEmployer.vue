@@ -58,14 +58,33 @@
           </div>
           <div class="d-flex justify-content-start mt-3 gap-2">
             <button type="button" class="btn btn-dark">Editar</button>
-            <button type="button" class="btn btn-danger" @click="confirmDelete">Eliminar</button>
+            <button type="button" class="btn btn-danger" @click="openModal">Eliminar</button>
+
           </div>
         </div>
       </div>
-    </div>
+      <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true" ref="deleteModal">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header bg-danger text-white">
+            <h5 class="modal-title" id="deleteModalLabel">Confirmar Eliminación</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+          </div>
+          <div class="modal-body">
+            ¿Seguro que deseas eliminar este perfil de la Empresa?
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
+            <button type="button" class="btn btn-danger" @click="confirmDelete">Sí, eliminar</button>
+          </div>
+        </div>
+     </div>
+   </div>
+ </div>
   </template>
   
   <script>
+  import { Modal } from 'bootstrap'; 
   export default {
     name: 'ViewEmployeeProfile',
     data() {
@@ -82,15 +101,21 @@
           email: 'juan.meliroj@gmail.com',
           phone: '8672-6138',
           password: '********'
-        }
+        },
+        deleteModalInstance: null // null iniciation
       }
     },
     methods: {
-      confirmDelete() {
-        const confirmed = confirm('¿Seguro que deseas eliminar este perfil de la Empresa?');
-        if (confirmed) {
-          alert('Perfil eliminado');
+      openModal() {
+        if (!this.deleteModalInstance) {
+          this.deleteModalInstance = new Modal(this.$refs.deleteModal);// create instance if is null
         }
+        this.deleteModalInstance.show();// shows if delete button is clicked
+      },
+      confirmDelete() {
+        this.deleteModalInstance.hide();// hides modal if confirms delete
+        
+        alert('Perfil eliminado');
       }
     }
   }
@@ -104,4 +129,3 @@
     gap: 0.5rem; 
   }
   </style>
-  
