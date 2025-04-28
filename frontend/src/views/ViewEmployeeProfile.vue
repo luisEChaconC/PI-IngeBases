@@ -78,7 +78,7 @@
           role: 'Supervisor',
           contractType: 'Tiempo completo',
           grossSalary: 1275600,
-          email: 'john.smith@gmail.com',
+          email: 'juan.moliroj@gmail.com',
           phone: '8672-6138',
           password: '********'
         }
