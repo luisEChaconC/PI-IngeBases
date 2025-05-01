@@ -1,153 +1,59 @@
 <template>
-  <div class="container d-flex align-items-center justify-content-center vh-100">
-    <div class="row g-2 justify-content-center">
-      <!-- Profile card -->
-      <div v-if="showOption('viewProfile')" :class="[getColumnSize(), {'softwareManagerCard': employeeType === 'softwareManager'}]">
-        <div class="card text-center h-100 shadow-sm">
-          <div class="card-body d-flex flex-column justify-content-between">
-            <h2 class="card-title">Perfil</h2>
-            <button class="btn btn-dark align-self-start mt-auto" >Ir al sitio</button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Worked-hours card -->
-      <div v-if="showOption('viewWorkedHours')" :class="getColumnSize()">
-        <div class="card text-center h-100 shadow-sm">
-          <div class="card-body d-flex flex-column justify-content-between">
-            <h2 class="card-title">Horas<br>Laboradas</h2>
-            <button class="btn btn-dark align-self-start mt-auto" >Ir al sitio</button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Generate payroll card -->
-      <div v-if="showOption('viewGeneratePayroll')" :class="getColumnSize()">
-        <div class="card text-center h-100 shadow-sm">
-          <div class="card-body d-flex flex-column justify-content-between">
-            <h2 class="card-title">Generar<br>Planillas</h2>
-            <button class="btn btn-dark align-self-start mt-auto" >Ir al sitio</button>
-          </div>
-        </div>
-      </div>
-
-       <!-- Hours card -->
-       <div v-if="showOption('viewHours')" :class="getColumnSize()">
-        <div class="card text-center h-100 shadow-sm">
-          <div class="card-body d-flex flex-column justify-content-between">
-            <h2 class="card-title">Horas</h2>
-            <button class="btn btn-dark align-self-start mt-auto" >Ir al sitio</button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Payments card -->
-      <div v-if="showOption('viewPayments')" :class="getColumnSize()">
-        <div class="card text-center h-100 shadow-sm">
-          <div class="card-body d-flex flex-column justify-content-between">
-            <h2 class="card-title">Pagos</h2>
-            <button class="btn btn-dark align-self-start mt-auto" >Ir al sitio</button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Company card -->
-      <div v-if="showOption('viewCompany')" :class="getColumnSize()">
-        <div class="card text-center h-100 shadow-sm">
-          <div class="card-body d-flex flex-column justify-content-between">
-            <h2 class="card-title">Empresa</h2>
-            <button class="btn btn-dark align-self-start mt-auto" >Ir al sitio</button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Employees card -->
-      <div v-if="showOption('viewEmployees')" :class="getColumnSize()">
-        <div class="card text-center h-100 shadow-sm">
-          <div class="card-body d-flex flex-column justify-content-between">
-            <h2 class="card-title">Empleados</h2>
-            <button class="btn btn-dark align-self-start mt-auto" >Ir al sitio</button>
-          </div>
-        </div>
-      </div>
-      
-      <!-- Benefits card -->
-      <div v-if="showOption('viewBenefits')" :class="getColumnSize()">
-        <div class="card text-center h-100 shadow-sm">
-          <div class="card-body d-flex flex-column justify-content-between">
-            <h2 class="card-title">Beneficios</h2>
-            <button class="btn btn-dark align-self-start mt-auto" >Ir al sitio</button>
-          </div>
-        </div>
-      </div>
-
-     
-
-      <!-- Request-Hour-Correction card -->
-      <div v-if="showOption('viewRequestHourCorrection')" :class="getColumnSize()">
-        <div class="card text-center h-100 shadow-sm">
-          <div class="card-body d-flex flex-column justify-content-between">
-            <h2 class="card-title mb-3">Solicitar<br>Corrección<br>en Horas</h2>
-            <button class="btn btn-dark align-self-start mt-auto" >Ir al sitio</button>
-          </div>
-        </div>
-      </div>
-
-     
-
-      <!-- Reports and payments card -->
-      <div v-if="showOption('viewReportsPayments')" :class="getColumnSize()">
-        <div class="card text-center h-100 shadow-sm">
-          <div class="card-body d-flex flex-column justify-content-between">
-            <h2 class="card-title">Reportes y<br>Pagos</h2>
-            <button class="btn btn-dark align-self-start mt-auto" >Ir al sitio</button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Role assignment card -->
-      <div v-if="showOption('viewRoleAssignment')" :class="getColumnSize()">
-        <div class="card text-center h-100 shadow-sm">
-          <div class="card-body d-flex flex-column justify-content-between">
-            <h2 class="card-title">Asignación<br>de Roles</h2>
-            <button class="btn btn-dark align-self-start mt-auto" >Ir al sitio</button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Company Management card -->
-      <div v-if="showOption('viewCompanyManagement')" :class="[getColumnSize(), {'softwareManagerCard': employeeType === 'softwareManager'}]">
-        <div class="card text-center h-100 shadow-sm">
-          <div class="card-body d-flex flex-column justify-content-between">
-            <h2 class="card-title">Gestión de<br>empresas</h2>
-            <button class="btn btn-dark align-self-start mt-auto" >Ir al sitio</button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Reports card -->
-      <div v-if="showOption('viewCompanyManagement')" :class="[getColumnSize(), {'softwareManagerCard': employeeType === 'softwareManager'}]">
-        <div class="card text-center h-100 shadow-sm">
-          <div class="card-body d-flex flex-column justify-content-between">
-            <h2 class="card-title">Reportes</h2>
-            <button class="btn btn-dark align-self-start mt-auto" >Ir al sitio</button>
-          </div>
-        </div>
-      </div>
-
-    
-
-      <!-- Payroll History card -->
-      <div v-if="showOption('viewPayrollHistory')" :class="getColumnSize()">
-        <div class="card text-center h-100 shadow-sm">
-          <div class="card-body d-flex flex-column justify-content-between">
-            <h2 class="card-title">Historial de<br>Planillas</h2>
-            <button class="btn btn-dark align-self-start mt-auto" >Ir al sitio</button>
-          </div>
-        </div>
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="#">Menú</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarOptions">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarOptions">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+          <!-- Show options depending on the role-->
+          <li v-if="showOption('viewProfile')" class="nav-item">
+            <a class="nav-link" href="#">Perfil</a>
+          </li>
+          <li v-if="showOption('viewWorkedHours')" class="nav-item">
+            <a class="nav-link" href="#">Horas Laboradas</a>
+          </li>
+          <li v-if="showOption('viewGeneratePayroll')" class="nav-item">
+            <a class="nav-link" href="#">Generar Planillas</a>
+          </li>
+          <li v-if="showOption('viewHours')" class="nav-item">
+            <a class="nav-link" href="#">Horas</a>
+          </li>
+          <li v-if="showOption('viewPayments')" class="nav-item">
+            <a class="nav-link" href="#">Pagos</a>
+          </li>
+          <li v-if="showOption('viewCompany')" class="nav-item">
+            <a class="nav-link" href="#">Empresa</a>
+          </li>
+          <li v-if="showOption('viewEmployees')" class="nav-item">
+            <a class="nav-link" href="#">Empleados</a>
+          </li>
+          <li v-if="showOption('viewBenefits')" class="nav-item">
+            <a class="nav-link" href="#">Beneficios</a>
+          </li>
+          <li v-if="showOption('viewRequestHourCorrection')" class="nav-item">
+            <a class="nav-link" href="#">Corrección Horas</a>
+          </li>
+          <li v-if="showOption('viewReportsPayments')" class="nav-item">
+            <a class="nav-link" href="#">Reportes y Pagos</a>
+          </li>
+          <li v-if="showOption('viewRoleAssignment')" class="nav-item">
+            <a class="nav-link" href="#">Asignación de Roles</a>
+          </li>
+          <li v-if="showOption('viewCompanyManagement')" class="nav-item">
+            <a class="nav-link" href="#">Gestión de Empresas</a>
+          </li>
+          <li v-if="showOption('viewReports')" class="nav-item">
+            <a class="nav-link" href="#">Reportes</a>
+          </li>
+          <li v-if="showOption('viewPayrollHistory')" class="nav-item">
+            <a class="nav-link" href="#">Historial de Planillas</a>
+          </li>
+        </ul>
       </div>
     </div>
-  </div>
+  </nav>
 </template>
 
 <script>
@@ -155,7 +61,7 @@ export default {
   name: "MainMenu",
   data() {
     return {
-      employeeType: "softwareManager", // change different roles
+      employeeType: "supervisor", // change different roles
     };
   },
   methods: {
@@ -204,19 +110,6 @@ export default {
 
       return permissions[this.employeeType].includes(option);
     },
-
-    getColumnSize() {
-    // Define column size based on the type of employee
-      const colSizes = {
-        employee: "col-md-6", // 2x2 display
-        employer: "col-md-4", // 2x3 display
-        supervisor: "col-md-4", // 2x3 display
-        softwareManager: "col-md-4", // 1x3 display
-        payrollManager: "col-md-4", // 2x3 display
-      };
-    return colSizes[this.employeeType] || "col-md-4"; // Default size
-    },
-
   },
 };
 </script>
@@ -226,50 +119,22 @@ export default {
   height: 100vh;
 }
 
-.card {
-  cursor: pointer;
-  transition: transform 0.2s ease;
-  width: 85%;
-}
-
-.softwareManagerCard {
-  width: 100%; /* % is used to adjust fill*/
-  width: 400px;
-  margin-left: 30px;
-}
-
-.card-title {
-  font-weight: bold;
-  color: #000000;
-  text-align: left;
-  flex-grow: 1;
-  margin-bottom: 45px;
-  margin-top: 10px;
-  margin-left: 8px;
-  min-height: 75px;
-}
-
-.card-body {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  height: 100%;
-}
-.card:hover {
-  transform: scale(1.05);
-  background-color: rgb(235, 234, 234);
-  border-color: black;
-}
 
 .row {
   row-gap: 30px;
 }
 
-.btn-dark {
-  color: white;
-  padding-left:40px;
-  padding-right:40px;
-  margin-left: 8px;
-  margin-bottom: 8px;
+.navbar {
+  margin-bottom: 20px;
 }
+
+.navbar-brand {
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.navbar-nav .nav-item {
+  margin-right: 20px;
+}
+
 </style>
