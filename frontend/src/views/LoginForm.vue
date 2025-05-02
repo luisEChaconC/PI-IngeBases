@@ -1,9 +1,10 @@
 <template>
   <div class="container vh-100 d-flex flex-column align-items-center justify-content-center">
-    <div class="card w-100" style="max-width: 400px;">
+    <div class="card w-100" style="max-width: 400px">
       <div class="card-body text-center text-md-start">
         <h2 class="card-title mb-4">Iniciar Sesión</h2>
         <form @submit.prevent="handleLogin">
+          <!-- Email Input -->
           <div class="mb-3">
             <label for="email" class="form-label">Correo electrónico</label>
             <input
@@ -11,13 +12,15 @@
               v-model="email"
               type="email"
               required
-              placeholder="correo@ejemplo.com"
               class="form-control"
+              :class="{ 'is-invalid': errorMessage}"
             />
-            <div v-if="errorEmail" class="text-danger small mt-1">
-              {{ errorEmail }}
+            <div v-if="errorMessage" class="invalid-feedback">
+              {{ errorMessage }}
             </div>
           </div>
+
+          <!-- Password Input -->
           <div class="mb-3">
             <label for="password" class="form-label">Contraseña</label>
             <input
@@ -25,14 +28,15 @@
               v-model="password"
               type="password"
               required
-              placeholder="••••••••"
               class="form-control"
+              :class="{ 'is-invalid': errorMessage}"
             />
-            <div v-if="errorPassword" class="text-danger small mt-1">
-              {{ errorPassword }}
+            <div v-if="errorMessage" class="invalid-feedback">
+              {{ errorMessage }}
             </div>
           </div>
 
+          <!-- Submit Button -->
           <div class="row justify-content-center justify-content-md-start mb-3">
             <div class="col-12 col-md-6">
               <button type="submit" class="btn btn-dark w-100">
@@ -40,7 +44,6 @@
               </button>
             </div>
           </div>
-
         </form>
       </div>
     </div>
@@ -54,48 +57,63 @@
 </template>
 
 <script>
+import axios from "axios";
+
 export default {
-  name: 'LoginForm',
+  name: "LoginForm",
   data() {
     return {
-      email: '',
-      password: '',
-      errorEmail: '',
-      errorPassword: ''
-    }
+      email: "",
+      password: "",
+      errorMessage: ""
+    };
   },
   methods: {
-    handleLogin() {
-      // resetear errores
-      this.errorEmail = ''
-      this.errorPassword = ''
+    async handleLogin() {
+      // Reset error message
+      this.errorMessage = "";
 
-      console.log('Intentando iniciar sesión con', this.email)
+      try {
+        // Make a request to the backend
+        const response = await axios.get("https://localhost:5000/api/User/GetUserByEmail", {
+          params: { email: this.email }
+        });
 
-      // datos simulados en DB
-      const existingEmail = 'admin@gmail.com'
-      const existingPassword = 'admin'
+        if (response.status === 200) {
+          const user = response.data;
 
-      if (this.email !== existingEmail) {
-        this.errorEmail = 'Usuario no está registrado.'
-        return
+          // Validate password
+          if (this.password !== user.password) {
+            this.errorMessage = "Correo electrónico o contraseña incorrectos.";
+            return;
+          }
+
+          // Mock successful login redirection
+          alert("Se inició sesión con éxito! Redirigiendo al menú principal...");
+          console.log("Login exitoso → redirigiendo al menú principal");
+          // this.$router.push({ name: "MainMenu" });
+        }
+      } catch (error) {
+        if (error.response) {
+          // Handle expected errors without logging them to the console
+          if (error.response.status === 404) {
+            this.errorMessage = "Correo electrónico o contraseña incorrectos.";
+          } else if (error.response.status === 500) {
+            this.errorMessage = "Ocurrió un error en el servidor. Inténtelo más tarde.";
+          }
+        } else {
+          // Log unexpected errors (e.g., network issues)
+          this.errorMessage = "No se pudo conectar con el servidor.";
+        }
       }
-      if (this.password !== existingPassword) {
-        this.errorPassword = 'Contraseña incorrecta. Inténtelo nuevamente.'
-        return
-      }
-
-      alert('Se inicio sesion con exito!')
-      console.log('Login exitoso → redirigiendo al menú principal')
-      // aquí iría: this.$router.push({ name: 'MainMenu' })
     },
     handleRegister() {
-      alert('Se deberia reenviar a otra vista!')
-      console.log('Navegar a Registro de Usuario → luego Registro de Empresa')
-      // aquí iría: this.$router.push({ name: 'UserRegister' })
+      alert("Se debería reenviar a otra vista!");
+      console.log("Navegar a Registro de Usuario → luego Registro de Empresa");
+      // this.$router.push({ name: "UserRegister" });
     }
   }
-}
+};
 </script>
 
 <style scoped></style>
