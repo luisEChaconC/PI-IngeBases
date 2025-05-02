@@ -1,6 +1,15 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import BenefitList from '@/components/BenefitList.vue' 
 
-const routes = []
+const routes =
+[
+    {
+        path: '/benefits',
+        name: 'Benefits',
+        component: BenefitList
+    }
+
+]
 
 const router = createRouter({
     history: createWebHistory(),
