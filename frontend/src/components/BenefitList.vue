@@ -28,7 +28,7 @@
             <tbody>
                 <tr v-for="(benefit, index) in benefits" :key="index">
                     <td>{{ benefit.name }}</td>
-                    <td>{{ benefit.status }}</td>
+                    <td>{{ benefit.isActive ? 'Activo' : 'Inactivo' }}</td>
                 </tr>
             </tbody>
         </table>
@@ -36,17 +36,28 @@
 </template>
 
 <script setup>
-    import { ref } from 'vue'
+    import axios from "axios";
+    import { ref, onMounted } from 'vue'
 
     const maxBenefits = ref(3)
 
-    const benefits = ref([
-        { name: 'Seguro privado', status: 'Activo' },
-        { name: 'Plan dental', status: 'Activo' },
-        { name: 'Gimnasio', status: 'Inactivo' },
-        { name: 'Plan oftalmologico', status: 'Activo' },
-        { name: 'Bonos extraordinarios', status: 'Inactivo' }
-    ])
+    const benefits = ref([])
+
+    // Backend connection
+
+    const getBenefits = async () => {
+        try {
+            const response = await axios.get("https://localhost:51507/api/benefit")
+            benefits.value = response.data
+        } catch (error) {
+            console.error("Not able to obtain the benefits:", error)
+        }
+    }
+    // When it the component starts
+    onMounted(() => {
+        getBenefits()
+    })
+
 </script>
 
 <style scoped>
