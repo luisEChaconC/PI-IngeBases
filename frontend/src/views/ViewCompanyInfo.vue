@@ -11,9 +11,9 @@
                 <input type="text" class="form-control" id="name" v-model="company.name" disabled />
               </div>
               <div class="mb-3">
-                <label for="address" class="form-label">Dirección</label>
-                <input type="text" class="form-control" id="address" v-model="company.address" disabled />
-              </div>
+              <label for="address" class="form-label">Dirección</label>
+              <input type="text" class="form-control" id="address" :value="fullAddress" disabled/>
+            </div>
               <div class="mb-3">
                 <label for="paymentType" class="form-label">Tipo de pago</label>
                 <input type="email" class="form-control" id="paymentType" v-model="company.paymentType" disabled />
@@ -51,20 +51,60 @@
   </template>
   
   <script>
+  import axios from 'axios';
   export default {
-    name: 'ViewCompanyInfo',
+    name: 'ViewCompanyInfo', 
     data() {
       return {
         company: {
-          name: 'Blitz S.A.',
-          address: 'San Pedro, San José',
-          phoneNumber: '8886-4575',
-          paymentType: 'mensual',
-          legalId: '112345674',
-          employeesCount: 50,
-          email: 'blitz@company.com'
-        }
+          name: "",
+          province: "",
+          canton: "",
+          district: "",
+          neighborhood: "",
+          additionalDirectionDetails: "",
+          legalId: "",
+          employeesCount: 0,
+          paymentType: "",
+          email:""
+        },
+        companies: [] 
       };
+    },
+
+    methods: {
+      getCompanies() {
+      axios.get("http://localhost:5000/api/company")
+        .then((response) => {
+          this.companies = response.data;
+          console.log("Received companies:", this.companies);
+          this.setCompanyById('dcf3a816-e997-46bc-87e9-19d8ffa92f60'); // temporary hardcoded ID
+        })
+        .catch((error) => {
+          console.error("Error: could not get companies ", error);
+        });
+      },
+    
+   
+      setCompanyById(companyId) {
+        const foundCompany = this.companies.find(company => company.id === companyId);
+        console.log("Company found:", foundCompany); 
+        if (foundCompany) {
+          this.company = foundCompany;
+        } else {
+          console.warn("Could not find company with ID:", companyId);
+        }
+      }
+    },
+    created: function() {
+      this.getCompanies();
+    },
+
+    computed: {
+      fullAddress() {
+        const { province, canton, district, neighborhood, additionalDirectionDetails} = this.company;
+        return [province, canton, district, neighborhood, additionalDirectionDetails].filter(Boolean).join(', ');
+      }
     }
   };
   </script>
