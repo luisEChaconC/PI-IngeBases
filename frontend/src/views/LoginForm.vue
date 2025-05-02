@@ -4,6 +4,12 @@
       <div class="card-body text-center text-md-start">
         <h2 class="card-title mb-4">Iniciar Sesión</h2>
         <form @submit.prevent="handleLogin">
+          <div 
+            v-if="errorMessage" 
+            class="alert alert-danger my-3 p-3"
+          >
+            {{ errorMessage }}
+          </div>
           <!-- Email Input -->
           <div class="mb-3">
             <label for="email" class="form-label">Correo electrónico</label>
@@ -15,9 +21,6 @@
               class="form-control"
               :class="{ 'is-invalid': errorMessage}"
             />
-            <div v-if="errorMessage" class="invalid-feedback">
-              {{ errorMessage }}
-            </div>
           </div>
 
           <!-- Password Input -->
@@ -31,9 +34,6 @@
               class="form-control"
               :class="{ 'is-invalid': errorMessage}"
             />
-            <div v-if="errorMessage" class="invalid-feedback">
-              {{ errorMessage }}
-            </div>
           </div>
 
           <!-- Submit Button -->
