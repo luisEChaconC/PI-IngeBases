@@ -1,6 +1,7 @@
 <template>
-    <div class="container mt-4">
+    <div class="container mt-4 mb-4">
         <form @submit.prevent="handleRegisterCompany">
+            <!-- First row -->
             <div class="row">
                 <!-- Left Column -->
                 <div class="col-md-6 mb-4">
@@ -51,12 +52,6 @@
                                     <input type="number" class="form-control" id="maxBenefits" v-model="company.maxBenefits" required>
                                     <div class="form-text text-muted">Cantidad máxima de beneficios que un empleado puede escoger</div>
                                 </div>
-                            </div>
-
-                            <!-- This div groups the "Registrar Empresa" button and the "¿Ya tiene una empresa?" link and pushes them to the bottom -->
-                            <div class="mt-auto">
-                                <button type="submit" class="btn btn-dark mb-2">Registrar Empresa</button>
-                                <p class="mt-2 mb-0">¿Ya tiene una empresa? <router-link to="/login">Ingrese</router-link></p>
                             </div>
                         </div>
                     </fieldset>
@@ -133,6 +128,14 @@
                             </div>
                         </div>
                     </fieldset>
+                </div>
+            </div>
+
+            <!-- Second row -->
+            <div class="row mt-4">
+                <div class="col-12 d-flex justify-content-between align-items-center">
+                    <p class="mb-0">¿Ya tiene una empresa? <router-link to="/login">Ingrese</router-link></p>
+                    <button type="submit" class="btn btn-dark btn-lg">Registrar Empresa</button>
                 </div>
             </div>
         </form>
