@@ -28,9 +28,9 @@ var builder = WebApplication.CreateBuilder(args);
  
  app.UseHttpsRedirection();
  
- app.UseAuthorization();
- 
  app.UseCors();
+ 
+ app.UseAuthorization();
  
  app.MapControllers();
  
