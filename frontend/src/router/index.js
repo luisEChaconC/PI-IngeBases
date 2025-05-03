@@ -1,11 +1,11 @@
-import AddEmployee from '../views/AddEmployee.vue'
+import EmployeesList from '../views/EmployeesList.vue'
 import { createRouter, createWebHistory } from 'vue-router'
 
 const routes = [
     {
-        path: '/add-employee',
-        name: 'AddEmployee',
-        component: AddEmployee
+        path: '/employees-list',
+        name: 'EmployeesList',
+        component: EmployeesList
       }
 ]
 
