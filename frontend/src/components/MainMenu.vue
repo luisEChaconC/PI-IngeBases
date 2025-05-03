@@ -1,7 +1,7 @@
 <template>
-  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+  <nav class="navbar navbar-expand-lg navbar-light bg-light custom-navbar">
     <div class="container-fluid">
-      <a class="navbar-brand" href="#">Menú</a>
+      <a class="navbar-brand" href="#">Inicio</a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarOptions">
         <span class="navbar-toggler-icon"></span>
       </button>
@@ -30,7 +30,7 @@
             <a class="nav-link" href="#">Empleados</a>
           </li>
           <li v-if="showOption('viewBenefits')" class="nav-item">
-            <a class="nav-link" href="#">Beneficios</a>
+            <router-link to="/benefits" class="nav-link">Beneficios</router-link>
           </li>
           <li v-if="showOption('viewRequestHourCorrection')" class="nav-item">
             <a class="nav-link" href="#">Corrección Horas</a>
@@ -129,12 +129,30 @@ export default {
 }
 
 .navbar-brand {
-  font-size: 24px;
-  font-weight: bold;
+  font-size: 30px;
+  margin-right: 30px;
 }
+
+.navbar-brand:hover {
+  text-decoration: underline;
+  transition: all 0.3s ease;
+  padding: 8px 16px; 
+}
+
 
 .navbar-nav .nav-item {
-  margin-right: 20px;
+  margin-right: 30px;
+  font-size: 30px;
 }
 
+.navbar .nav-link:hover {
+  text-decoration: underline;
+  transition: all 0.3s ease;
+  padding: 8px 16px; 
+}
+
+.custom-navbar {
+  background-color: #d3d3d3c0 !important;
+  border-bottom: 1px solid #e0e0e0;
+}
 </style>
