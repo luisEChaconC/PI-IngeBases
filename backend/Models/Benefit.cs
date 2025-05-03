@@ -1,3 +1,5 @@
+using backend.Models;
+
 namespace backend.Models
 {
     public class Benefit
@@ -15,3 +17,4 @@ namespace backend.Models
     }
 
 }
+
