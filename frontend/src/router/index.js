@@ -1,11 +1,21 @@
 import SelectChangeBenefit from '../views/SelectChangeBenefit.vue'
 import { createRouter, createWebHistory } from 'vue-router'
-const routes = [
+import BenefitList from '@/components/BenefitList.vue' 
+
+const routes =
+[
+    {
+        path: '/benefits',
+        name: 'Benefits',
+        component: BenefitList
+    },
+
     {
         path: '/select-change-benefit',
         name: 'SelectChangeBenefit',
         component: SelectChangeBenefit
-      }
+    }
+
 ]
 
 const router = createRouter({
