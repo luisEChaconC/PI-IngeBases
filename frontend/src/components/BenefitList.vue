@@ -47,7 +47,7 @@
 
     const getBenefits = async () => {
         try {
-            const response = await axios.get("https://localhost:51507/api/benefit")
+            const response = await axios.get("https://localhost:5000/api/benefit")
             benefits.value = response.data
         } catch (error) {
             console.error("Not able to obtain the benefits:", error)
