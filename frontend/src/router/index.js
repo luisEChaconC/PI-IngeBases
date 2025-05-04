@@ -4,16 +4,13 @@ import BenefitList from '@/components/BenefitList.vue'
 
 const routes =
 [
+    { path: '/login', name: 'LoginForm', component: Login },
     {
         path: '/benefits',
         name: 'Benefits',
         component: BenefitList
     }
 
-]
-
-const routes = [
-    { path: '/login', name: 'LoginForm', component: Login }
 ]
 
 const router = createRouter({
