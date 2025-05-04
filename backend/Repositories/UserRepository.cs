@@ -3,23 +3,68 @@ using Microsoft.Data.SqlClient;
 
 namespace backend.Repositories
 {
+    /// <summary>
+    /// Repository for managing operations related to the Users table.
+    /// </summary>
     public class UserRepository
     {
         private SqlConnection _connection; // SQL connection object
         private string _connectionString; // Connection string for the database
 
-        // Constructor to initialize the connection string and SQL connection
+        /// <summary>
+        /// Constructor to initialize the connection string and SQL connection.
+        /// </summary>
         public UserRepository()
         {
             // Create a configuration builder to retrieve the connection string
             var builder = WebApplication.CreateBuilder();
             _connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-            
+
             // Initialize the SQL connection with the connection string
             _connection = new SqlConnection(_connectionString);
         }
 
-        // Method to retrieve a user by their email address
+        /// <summary>
+        /// Inserts a new user into the Users table.
+        /// </summary>
+        /// <param name="user">The user model containing the data to insert.</param>
+        /// <returns>The database-generated ID of the new user.</returns>
+        public string CreateUser(UserModel user)
+        {
+            string userId = string.Empty;
+
+            // SQL query to insert a new user and return the generated ID
+            var query = @"
+                INSERT INTO Users (Email, Password, IsAdmin)
+                OUTPUT INSERTED.Id
+                VALUES (@Email, @Password, @IsAdmin)";
+
+            // Create a SQL command with the query and connection
+            using (var command = new SqlCommand(query, _connection))
+            {
+                // Add parameters to the query to prevent SQL injection
+                command.Parameters.AddWithValue("@Email", user.Email);
+                command.Parameters.AddWithValue("@Password", user.Password);
+                command.Parameters.AddWithValue("@IsAdmin", user.IsAdmin);
+
+                // Open the database connection
+                _connection.Open();
+
+                // Execute the query and get the inserted ID
+                userId = command.ExecuteScalar()?.ToString() ?? string.Empty;
+
+                // Close the database connection
+                _connection.Close();
+            }
+
+            return userId;
+        }
+
+        /// <summary>
+        /// Retrieves a user by their email address.
+        /// </summary>
+        /// <param name="email">The email address of the user to retrieve.</param>
+        /// <returns>A UserModel object if the user is found; otherwise, null.</returns>
         public UserModel GetUserByEmail(string email)
         {
             // SQL query to select a user by email
@@ -43,7 +88,7 @@ namespace backend.Repositories
                         // Map the data from the reader to a UserModel object
                         var user = new UserModel
                         {
-                            Id = (int)reader["Id"], // Retrieve the user ID
+                            Id = reader["Id"].ToString(), // Retrieve the user ID as string
                             Email = reader["Email"].ToString(), // Retrieve the email
                             Password = reader["Password"].ToString(), // Retrieve the password
                             IsAdmin = (bool)reader["IsAdmin"] // Retrieve the admin status
