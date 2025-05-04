@@ -52,7 +52,6 @@
 
     const maxBenefits = ref(3)
 
-<<<<<<< HEAD
     const translateType = (type) => {
         switch (type) {
             case 'API': return 'API';
@@ -65,12 +64,6 @@
     const benefits = ref([])
 
     // Backend connection
-=======
-    const benefits = ref([])
-
-    // Backend connection
-
->>>>>>> develop
     const getBenefits = async () => {
         try {
             const response = await axios.get("https://localhost:5000/api/benefit")
@@ -79,10 +72,6 @@
             console.error("Not able to obtain the benefits:", error)
         }
     }
-<<<<<<< HEAD
-
-=======
->>>>>>> develop
     // When it the component starts
     onMounted(() => {
         getBenefits()
