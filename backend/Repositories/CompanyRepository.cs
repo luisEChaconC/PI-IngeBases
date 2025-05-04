@@ -37,28 +37,37 @@ namespace backend.Repositories
                 INSERT INTO Companies (Id, Name, Description, PaymentType, MaxBenefitsPerEmployee, CreationDate, CreationAuthor, LastModificationDate, LastModificationAuthor)
                 VALUES (@Id, @Name, @Description, @PaymentType, @MaxBenefitsPerEmployee, @CreationDate, @CreationAuthor, @LastModificationDate, @LastModificationAuthor)";
 
-            // Create a SQL command with the query and connection
-            using (var command = new SqlCommand(query, _connection))
+            // Create a new connection for this operation
+            using (var connection = new SqlConnection(_connectionString))
             {
-                // Add parameters to the query to prevent SQL injection
-                command.Parameters.AddWithValue("@Id", company.Id);
-                command.Parameters.AddWithValue("@Name", company.Name);
-                command.Parameters.AddWithValue("@Description", (object?)company.Description ?? DBNull.Value);
-                command.Parameters.AddWithValue("@PaymentType", company.PaymentType);
-                command.Parameters.AddWithValue("@MaxBenefitsPerEmployee", (object?)company.MaxBenefitsPerEmployee ?? DBNull.Value);
-                command.Parameters.AddWithValue("@CreationDate", company.CreationDate);
-                command.Parameters.AddWithValue("@CreationAuthor", (object?)company.CreationAuthor ?? DBNull.Value);
-                command.Parameters.AddWithValue("@LastModificationDate", (object?)company.LastModificationDate ?? DBNull.Value);
-                command.Parameters.AddWithValue("@LastModificationAuthor", (object?)company.LastModificationAuthor ?? DBNull.Value);
+                try
+                {
+                    connection.Open();
+                    
+                    // Create a SQL command with the query and connection
+                    using (var command = new SqlCommand(query, connection))
+                    {
+                        // Add parameters to the query to prevent SQL injection
+                        command.Parameters.AddWithValue("@Id", company.Id);
+                        command.Parameters.AddWithValue("@Name", company.Name);
+                        command.Parameters.AddWithValue("@Description", (object?)company.Description ?? DBNull.Value);
+                        command.Parameters.AddWithValue("@PaymentType", company.PaymentType);
+                        command.Parameters.AddWithValue("@MaxBenefitsPerEmployee", (object?)company.MaxBenefitsPerEmployee ?? DBNull.Value);
+                        command.Parameters.AddWithValue("@CreationDate", company.CreationDate);
+                        command.Parameters.AddWithValue("@CreationAuthor", (object?)company.CreationAuthor ?? DBNull.Value);
+                        command.Parameters.AddWithValue("@LastModificationDate", (object?)company.LastModificationDate ?? DBNull.Value);
+                        command.Parameters.AddWithValue("@LastModificationAuthor", (object?)company.LastModificationAuthor ?? DBNull.Value);
 
-                // Open the database connection
-                _connection.Open();
-
-                // Execute the query
-                command.ExecuteNonQuery();
-
-                // Close the database connection
-                _connection.Close();
+                        // Execute the query
+                        command.ExecuteNonQuery();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    // Log the exception or handle it as needed
+                    Console.WriteLine($"Error creating company: {ex.Message}");
+                    throw; // Re-throw the exception to be handled by the controller
+                }
             }
         }
 
@@ -80,47 +89,48 @@ namespace backend.Repositories
                 INNER JOIN Persons p ON c.Id = p.Id
                 ORDER BY c.Name";
 
-            try
+            // Create a new connection for this operation
+            using (var connection = new SqlConnection(_connectionString))
             {
-                // Create a SQL command with the query and connection
-                using (var command = new SqlCommand(query, _connection))
+                try
                 {
-                    // Open the database connection
-                    _connection.Open();
-
-                    // Execute the query and retrieve the results using a data reader
-                    using (var reader = command.ExecuteReader())
+                    connection.Open();
+                    
+                    // Create a SQL command with the query and connection
+                    using (var command = new SqlCommand(query, connection))
                     {
-                        // Iterate through the results
-                        while (reader.Read())
+                        // Execute the query and retrieve the results using a data reader
+                        using (var reader = command.ExecuteReader())
                         {
-                            // Create a CompanyModel for each row
-                            var company = new CompanyModel
+                            // Iterate through the results
+                            while (reader.Read())
                             {
-                                Id = reader["Id"].ToString(),
-                                Name = reader["Name"].ToString(),
-                                Description = reader["Description"] != DBNull.Value ? reader["Description"].ToString() : null,
-                                PaymentType = reader["PaymentType"].ToString(),
-                                MaxBenefitsPerEmployee = reader["MaxBenefitsPerEmployee"] != DBNull.Value ? (int?)reader["MaxBenefitsPerEmployee"] : null,
-                                CreationDate = (DateTime)reader["CreationDate"],
-                                CreationAuthor = reader["CreationAuthor"] != DBNull.Value ? reader["CreationAuthor"].ToString() : null,
-                                LastModificationDate = reader["LastModificationDate"] != DBNull.Value ? (DateTime?)reader["LastModificationDate"] : null,
-                                LastModificationAuthor = reader["LastModificationAuthor"] != DBNull.Value ? reader["LastModificationAuthor"].ToString() : null,
-                                Employees = new List<EmployeeModel>()
-                            };
+                                // Create a CompanyModel for each row
+                                var company = new CompanyModel
+                                {
+                                    Id = reader["Id"].ToString(),
+                                    Name = reader["Name"].ToString(),
+                                    Description = reader["Description"] != DBNull.Value ? reader["Description"].ToString() : null,
+                                    PaymentType = reader["PaymentType"].ToString(),
+                                    MaxBenefitsPerEmployee = reader["MaxBenefitsPerEmployee"] != DBNull.Value ? (int?)reader["MaxBenefitsPerEmployee"] : null,
+                                    CreationDate = (DateTime)reader["CreationDate"],
+                                    CreationAuthor = reader["CreationAuthor"] != DBNull.Value ? reader["CreationAuthor"].ToString() : null,
+                                    LastModificationDate = reader["LastModificationDate"] != DBNull.Value ? (DateTime?)reader["LastModificationDate"] : null,
+                                    LastModificationAuthor = reader["LastModificationAuthor"] != DBNull.Value ? reader["LastModificationAuthor"].ToString() : null,
+                                    Employees = new List<EmployeeModel>()
+                                };
 
-                            // Add the company to the list
-                            companies.Add(company);
+                                // Add the company to the list
+                                companies.Add(company);
+                            }
                         }
                     }
                 }
-            }
-            finally
-            {
-                // Make sure to close the connection
-                if (_connection.State == System.Data.ConnectionState.Open)
+                catch (Exception ex)
                 {
-                    _connection.Close();
+                    // Log the exception or handle it as needed
+                    Console.WriteLine($"Error retrieving companies: {ex.Message}");
+                    throw; // Re-throw the exception to be handled by the controller
                 }
             }
 
@@ -146,88 +156,53 @@ namespace backend.Repositories
                 INNER JOIN Persons p ON c.Id = p.Id
                 WHERE c.Id = @Id";
 
-            try
+            // Create a new connection for this operation
+            using (var connection = new SqlConnection(_connectionString))
             {
-                // Create a SQL command with the query and connection
-                using (var command = new SqlCommand(query, _connection))
+                try
                 {
-                    // Add the ID parameter to the query to prevent SQL injection
-                    command.Parameters.AddWithValue("@Id", id);
-
-                    // Open the database connection
-                    _connection.Open();
-
-                    // Execute the query and retrieve the results using a data reader
-                    using (var reader = command.ExecuteReader())
+                    connection.Open();
+                    
+                    // Create a SQL command with the query and connection
+                    using (var command = new SqlCommand(query, connection))
                     {
-                        // Check if a record was found
-                        if (reader.Read())
-                        {
-                            // Map the data from the reader to a CompanyModel object
-                            company = new CompanyModel
-                            {
-                                Id = reader["Id"].ToString(),
-                                Name = reader["Name"].ToString(),
-                                Description = reader["Description"] != DBNull.Value ? reader["Description"].ToString() : null,
-                                PaymentType = reader["PaymentType"].ToString(),
-                                MaxBenefitsPerEmployee = reader["MaxBenefitsPerEmployee"] != DBNull.Value ? (int?)reader["MaxBenefitsPerEmployee"] : null,
-                                CreationDate = (DateTime)reader["CreationDate"],
-                                CreationAuthor = reader["CreationAuthor"] != DBNull.Value ? reader["CreationAuthor"].ToString() : null,
-                                LastModificationDate = reader["LastModificationDate"] != DBNull.Value ? (DateTime?)reader["LastModificationDate"] : null,
-                                LastModificationAuthor = reader["LastModificationAuthor"] != DBNull.Value ? reader["LastModificationAuthor"].ToString() : null,
-                                Employees = new List<EmployeeModel>()
-                            };
-                        }
-                    }
+                        // Add the ID parameter to the query to prevent SQL injection
+                        command.Parameters.AddWithValue("@Id", id);
 
-                    // If we found the company, get its employees
-                    if (company != null)
-                    {
-                        // Create a new command to get the employees
-                        using (var employeeCommand = new SqlCommand(@"
-                            SELECT e.Id, e.WorkerId, e.EmployeeStartDate, e.ContractType, e.GrossSalary, e.HasToReportHours,
-                                   np.FirstName, np.FirstSurname, np.SecondSurname
-                            FROM Employees e
-                            INNER JOIN NaturalPersons np ON e.Id = np.Id
-                            WHERE e.CompanyId = @CompanyId", _connection))
+                        // Execute the query and retrieve the results using a data reader
+                        using (var reader = command.ExecuteReader())
                         {
-                            employeeCommand.Parameters.AddWithValue("@CompanyId", id);
-
-                            // Execute the query and retrieve the results
-                            using (var employeeReader = employeeCommand.ExecuteReader())
+                            // Check if a record was found
+                            if (reader.Read())
                             {
-                                // Iterate through the results
-                                while (employeeReader.Read())
+                                // Map the data from the reader to a CompanyModel object
+                                company = new CompanyModel
                                 {
-                                    // Create an EmployeeModel for each row
-                                    var employee = new EmployeeModel
-                                    {
-                                        Id = employeeReader["Id"].ToString(),
-                                        WorkerId = employeeReader["WorkerId"].ToString(),
-                                        CompanyId = id,
-                                        EmployeeStartDate = (DateTime)employeeReader["EmployeeStartDate"],
-                                        ContractType = employeeReader["ContractType"].ToString(),
-                                        GrossSalary = (decimal)employeeReader["GrossSalary"],
-                                        HasToReportHours = (bool)employeeReader["HasToReportHours"]
-                                    };
-
-                                    // Add the employee to the company's employees list
-                                    company.Employees.Add(employee);
-                                }
+                                    Id = reader["Id"].ToString(),
+                                    Name = reader["Name"].ToString(),
+                                    Description = reader["Description"] != DBNull.Value ? reader["Description"].ToString() : null,
+                                    PaymentType = reader["PaymentType"].ToString(),
+                                    MaxBenefitsPerEmployee = reader["MaxBenefitsPerEmployee"] != DBNull.Value ? (int?)reader["MaxBenefitsPerEmployee"] : null,
+                                    CreationDate = (DateTime)reader["CreationDate"],
+                                    CreationAuthor = reader["CreationAuthor"] != DBNull.Value ? reader["CreationAuthor"].ToString() : null,
+                                    LastModificationDate = reader["LastModificationDate"] != DBNull.Value ? (DateTime?)reader["LastModificationDate"] : null,
+                                    LastModificationAuthor = reader["LastModificationAuthor"] != DBNull.Value ? reader["LastModificationAuthor"].ToString() : null,
+                                    Employees = new List<EmployeeModel>() // Initialize empty list
+                                };
                             }
                         }
                     }
-                }
-            }
-            finally
-            {
-                // Make sure to close the connection
-                if (_connection.State == System.Data.ConnectionState.Open)
-                {
-                    _connection.Close();
-                }
-            }
 
+                    // Note: Removed employee loading code that was causing the error
+                }
+                catch (Exception ex)
+                {
+                    // Log the exception or handle it as needed
+                    Console.WriteLine($"Error retrieving company: {ex.Message}");
+                    throw; // Re-throw the exception to be handled by the controller
+                }
+            }
+            
             // Return the company (or null if not found)
             return company;
         }

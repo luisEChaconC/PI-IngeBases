@@ -122,8 +122,9 @@ namespace backend.Controllers
             }
             catch (Exception ex)
             {
-                // Return a 500 Internal Server Error response with a generic error message
-                return StatusCode(StatusCodes.Status500InternalServerError, new { message = "An error occurred while retrieving companies." });
+                // Return a 500 Internal Server Error response with the error message
+                return StatusCode(StatusCodes.Status500InternalServerError, 
+                    new { message = "An error occurred while retrieving companies.", error = ex.Message });
             }
         }
 
@@ -153,8 +154,9 @@ namespace backend.Controllers
             }
             catch (Exception ex)
             {
-                // Return a 500 Internal Server Error response with a generic error message
-                return StatusCode(StatusCodes.Status500InternalServerError, new { message = "An error occurred while retrieving the company." });
+                // Return a 500 Internal Server Error response with the error message
+                return StatusCode(StatusCodes.Status500InternalServerError, 
+                    new { message = "An error occurred while retrieving the company.", error = ex.Message });
             }
         }
     }
