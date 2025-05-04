@@ -1,5 +1,6 @@
 import ViewEmployeeProfile from '../views/ViewEmployeeProfile.vue'
 import { createRouter, createWebHistory } from 'vue-router'
+import BenefitList from '@/components/BenefitList.vue' 
 
 const routes = [
     {
