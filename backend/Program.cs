@@ -4,9 +4,9 @@ var builder = WebApplication.CreateBuilder(args);
  {
      options.AddDefaultPolicy(policy =>
      {
-        policy.WithOrigins("http://localhost:8080")
-            .AllowAnyMethod()
-            .AllowAnyHeader();
+         policy.WithOrigins("http://localhost:8080")
+               .AllowAnyMethod()
+               .AllowAnyHeader();
      });
  });
  
