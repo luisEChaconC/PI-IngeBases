@@ -9,7 +9,11 @@ INSERT INTO EmployeeTypes (Id, Name) VALUES
 -- Beneficios
 INSERT INTO Benefits (Id, Name, Description, IsActive, Type, LinkAPI, FixedPercentage, FixedAmount, RequiredMonthsWorked)
 VALUES
+<<<<<<< HEAD
 (NEWID(), 'Health Insurance', 'Full medical coverage', 1, 'papa', NULL, NULL, 25000, 6),
+=======
+(NEWID(), 'Health Insurance', 'Full medical coverage', 1, 'FixedAmount', NULL, NULL, 25000, 6),
+>>>>>>> develop
 (NEWID(), 'Gym Membership', 'Monthly gym access', 1, 'FixedPercentage', NULL, 50, NULL, 3),
 (NEWID(), 'Learning Platform', 'Access to online courses', 1, 'API', 'https://learning.api', NULL, NULL, 0);
 
