@@ -12,9 +12,9 @@
                 </select>
             </div>
             <div class="col text-end">
-                <button class="btn btn-dark">
+                <router-link to="/benefit/create" class="btn btn-dark">
                     + Nuevo beneficio
-                </button>
+                </router-link>
             </div>
         </div>
 
