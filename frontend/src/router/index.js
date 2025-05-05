@@ -1,6 +1,7 @@
 import SelectChangeBenefit from '../views/SelectChangeBenefit.vue'
 import { createRouter, createWebHistory } from 'vue-router'
 import BenefitList from '@/components/BenefitList.vue' 
+import Benefit from '@/components/BenefitView.vue'
 
 const routes =
 [
@@ -14,6 +15,13 @@ const routes =
         path: '/select-change-benefit',
         name: 'SelectChangeBenefit',
         component: SelectChangeBenefit
+    },
+
+    {
+        path: '/benefit/:id',
+        name: 'Benefit',
+        component: Benefit,
+        props: true
     }
 
 ]
