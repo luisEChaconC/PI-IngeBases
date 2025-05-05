@@ -12,9 +12,9 @@
                 </select>
             </div>
             <div class="col text-end">
-                <button class="btn btn-dark">
+                <router-link to="/benefit/create" class="btn btn-dark">
                     + Nuevo beneficio
-                </button>
+                </router-link>
             </div>
         </div>
 
@@ -52,10 +52,18 @@
 
     const maxBenefits = ref(3)
 
+    const translateType = (type) => {
+        switch (type) {
+            case 'API': return 'API';
+            case 'FixedAmount': return 'Monto fijo';
+            case 'FixedPercentage': return 'Porcentaje fijo';
+            default: return 'Desconocido';
+        }
+    }
+
     const benefits = ref([])
 
     // Backend connection
-
     const getBenefits = async () => {
         try {
             const response = await axios.get("https://localhost:5000/api/benefit")
