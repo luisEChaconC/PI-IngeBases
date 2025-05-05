@@ -20,15 +20,26 @@
 
         <table class="table table-bordered">
             <thead class="table-light">
-                <tr>
+                <tr class="text-center align-middle">
                     <th>Nombre</th>
                     <th>Estado</th>
+                    <th>Tipo</th>
+                    <th>Ver</th>
                 </tr>
             </thead>
-            <tbody>
+            <tbody class="text-center align-middle">
                 <tr v-for="(benefit, index) in benefits" :key="index">
                     <td>{{ benefit.name }}</td>
                     <td>{{ benefit.isActive ? 'Activo' : 'Inactivo' }}</td>
+                    <td>{{ translateType(benefit.type) }}</td>
+                    <td class="text-center align-middle">
+                        <router-link
+                            :to="`/benefit/${benefit.id}`"
+                            class="btn btn-dark"
+                        >
+                            +
+                        </router-link>
+                    </td>
                 </tr>
             </tbody>
         </table>
