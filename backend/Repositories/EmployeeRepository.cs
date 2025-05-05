@@ -69,7 +69,7 @@ namespace backend.Repositories
                     CASE 
                         WHEN s.Id IS NOT NULL THEN 'Supervisor'
                         WHEN pm.Id IS NOT NULL THEN 'Payroll Manager'
-                        ELSE 'Employee'
+                        ELSE 'Collaborator'
                     END AS Position
                 FROM Employees e
                 INNER JOIN NaturalPersons np ON e.Id = np.Id
