@@ -22,6 +22,18 @@ namespace backend.Controllers
             return _benefitService.GetBenefits();
         }
 
+        [HttpGet("{id}")]
+        public ActionResult<Benefit> GetById(Guid id)
+        {
+            var benefits = _benefitService.GetBenefits();
+            var benefit = benefits.FirstOrDefault(b => b.Id == id.ToString());
+
+            if (benefit == null)
+                return NotFound();
+
+            return Ok(benefit);
+        }
+
         [HttpPost]
         public async Task<ActionResult<bool>> CreateBenefit(Benefit benefit)
         {
