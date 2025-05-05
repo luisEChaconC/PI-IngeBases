@@ -9,7 +9,7 @@
             Nuevo Empleado
           </a>
         </div>
-        <div class="table-responsive" style="max-height: 600px; overflow-y: auto;">
+        <div class="table-responsive" style="max-height: 600px overflow-y: auto">
           <table class="table table-striped table-bordered">
             <thead class="table-dark sticky-header">
               <tr>
@@ -42,31 +42,49 @@
 </template>
 
 <script>
-import axios from 'axios';
+import axios from 'axios'
 
 export default {
   name: 'EmployeesList',
   data() {
     return {
       employees: [] // Initialize as an empty array
-    };
+    }
   },
   methods: {
     async fetchEmployees() {
       try {
-        const companyId = 'E0731D81-5309-40C6-8927-B5929DCDEB55'; // Replace with the actual company ID once we gather the information of the current user
-        const response = await axios.post('/api/Employee/GetEmployeesByCompanyId', { companyId });
-        this.employees = response.data;
+        const companyId = 'E0731D81-5309-40C6-8927-B5929DCDEB55' // Replace with the actual company ID
+        const response = await axios.get('https://localhost:5000/api/Employee/GetEmployeesByCompanyId', {
+          params: { companyId: companyId }
+        })
+        // Translate positions to Spanish
+        this.employees = response.data.map(employee => ({
+          ...employee,
+          position: this.translatePosition(employee.position)
+        }))
       } catch (error) {
-        console.error('Error fetching employees:', error);
-        this.employees = []; // Reset employees in case of an error
+        console.error('Error fetching employees:', error)
+        this.employees = [] // Reset employees in case of an error
+      }
+    },
+    translatePosition(position) {
+      switch (position) {
+        case 'Supervisor':
+          return 'Supervisor'
+        case 'Payroll Manager':
+          return 'Encargado de planilla'
+        case 'Collaborator':
+          return 'Colaborador'
+        default:
+          return 'Desconocido' // Default for unexpected values
       }
     }
   },
   mounted() {
-    this.fetchEmployees(); // Fetch employees when the component is mounted
+    this.fetchEmployees() // Fetch employees when the component is mounted
   }
-};
+}
 </script>
 
 <style scoped>
@@ -79,7 +97,7 @@ export default {
   position: sticky;
   top: 0;
   z-index: 2;
-  background-color: #343a40; /* Matches the table-dark background */
+  background-color: #343a40 /* Matches the table-dark background */;
   color: white;
 }
 </style>
