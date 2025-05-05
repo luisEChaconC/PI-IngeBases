@@ -30,6 +30,9 @@
                   </button>
                 </td>
               </tr>
+              <tr v-if="employees.length === 0">
+                <td colspan="4" class="text-center">No se encontraron empleados.</td>
+              </tr>
             </tbody>
           </table>
         </div>
@@ -39,38 +42,29 @@
 </template>
 
 <script>
+import axios from 'axios';
+
 export default {
   name: 'EmployeesList',
   data() {
     return {
-      employees: [
-        { fullName: 'Juan Pérez González', legalId: '1-101-123456', position: 'Colaborador' },
-        { fullName: 'María Rodríguez López', legalId: '1-102-654321', position: 'Supervisor' },
-        { fullName: 'Carlos Jiménez Vargas', legalId: '1-103-789123', position: 'Encargado de Planilla' },
-        { fullName: 'Ana María Solís', legalId: '1-104-456789', position: 'Colaborador' },
-        { fullName: 'Luis Fernández Mora', legalId: '1-105-321654', position: 'Supervisor' },
-        { fullName: 'Sofía Castro Rojas', legalId: '1-106-987654', position: 'Encargado de Planilla' },
-        { fullName: 'Pedro Ramírez Soto', legalId: '1-107-123789', position: 'Colaborador' },
-        { fullName: 'Laura Vargas Chacón', legalId: '1-108-654987', position: 'Supervisor' },
-        { fullName: 'Andrés Mora Paniagua', legalId: '1-109-789456', position: 'Encargado de Planilla' },
-        { fullName: 'Gabriela Sánchez Quesada', legalId: '1-110-456123', position: 'Colaborador' },
-        { fullName: 'Diego López Herrera', legalId: '1-111-321987', position: 'Supervisor' },
-        { fullName: 'Carolina Méndez Salazar', legalId: '1-112-987321', position: 'Encargado de Planilla' },
-        { fullName: 'Jorge Castro Ureña', legalId: '1-113-123654', position: 'Colaborador' },
-        { fullName: 'Natalia Rojas Vargas', legalId: '1-114-654123', position: 'Supervisor' },
-        { fullName: 'Ricardo Gómez Solano', legalId: '1-115-789321', position: 'Encargado de Planilla' },
-        { fullName: 'Isabel Fernández Mora', legalId: '1-116-456987', position: 'Colaborador' },
-        { fullName: 'Manuel Jiménez Soto', legalId: '1-117-321456', position: 'Supervisor' },
-        { fullName: 'Paula Vargas Chacón', legalId: '1-118-987654', position: 'Encargado de Planilla' },
-        { fullName: 'Esteban Ramírez Quesada', legalId: '1-119-123987', position: 'Colaborador' },
-        { fullName: 'Daniela Solís Herrera', legalId: '1-120-654789', position: 'Supervisor' },
-        { fullName: 'José Pérez González', legalId: '1-121-789654', position: 'Encargado de Planilla' },
-        { fullName: 'Mariana Rodríguez López', legalId: '1-122-456321', position: 'Colaborador' },
-        { fullName: 'Felipe Jiménez Vargas', legalId: '1-123-321789', position: 'Supervisor' },
-        { fullName: 'Camila Solís Rojas', legalId: '1-124-987123', position: 'Encargado de Planilla' },
-        { fullName: 'Oscar Fernández Mora', legalId: '1-125-123654', position: 'Colaborador' }
-      ]
+      employees: [] // Initialize as an empty array
     };
+  },
+  methods: {
+    async fetchEmployees() {
+      try {
+        const companyId = 'E0731D81-5309-40C6-8927-B5929DCDEB55'; // Replace with the actual company ID once we gather the information of the current user
+        const response = await axios.post('/api/Employee/GetEmployeesByCompanyId', { companyId });
+        this.employees = response.data;
+      } catch (error) {
+        console.error('Error fetching employees:', error);
+        this.employees = []; // Reset employees in case of an error
+      }
+    }
+  },
+  mounted() {
+    this.fetchEmployees(); // Fetch employees when the component is mounted
   }
 };
 </script>
