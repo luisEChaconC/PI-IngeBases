@@ -57,5 +57,50 @@ namespace backend.Repositories
                 _connection.Close();
             }
         }
+
+        public List<dynamic> GetEmployeesByCompanyId(string companyId)
+        {
+            var employees = new List<dynamic>();
+
+            var query = @"
+                SELECT 
+                    np.FirstName + ' ' + np.FirstSurname + ' ' + np.SecondSurname AS FullName,
+                    p.LegalId,
+                    CASE 
+                        WHEN s.Id IS NOT NULL THEN 'Supervisor'
+                        WHEN pm.Id IS NOT NULL THEN 'Payroll Manager'
+                        ELSE 'Employee'
+                    END AS Position
+                FROM Employees e
+                INNER JOIN NaturalPersons np ON e.Id = np.Id
+                INNER JOIN Persons p ON np.Id = p.Id
+                LEFT JOIN Supervisors s ON e.Id = s.Id
+                LEFT JOIN PayrollManagers pm ON e.Id = pm.Id
+                WHERE e.CompanyId = @CompanyId";
+
+            using (var command = new SqlCommand(query, _connection))
+            {
+                command.Parameters.AddWithValue("@CompanyId", companyId);
+
+                _connection.Open();
+
+                using (var reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        employees.Add(new
+                        {
+                            FullName = reader["FullName"].ToString(),
+                            LegalId = reader["LegalId"].ToString(),
+                            Position = reader["Position"].ToString()
+                        });
+                    }
+                }
+
+                _connection.Close();
+            }
+
+            return employees;
+        }
     }
 }
