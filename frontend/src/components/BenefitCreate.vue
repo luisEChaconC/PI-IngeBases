@@ -97,8 +97,6 @@
     eligibleEmployeeTypes: []
   })
   
-  const employeeTypesInput = ref('')
-
 
   const employeeTypeOptions = [
     { value: 'FullTime', label: 'Tiempo completo' },
@@ -107,12 +105,6 @@
     ]
     
   const saveBenefit = async () => {
-
-    benefit.value.eligibleEmployeeTypes = employeeTypesInput.value
-      .split(',')
-      .map(t => t.trim())
-      .filter(t => t !== '')
-  
     try {
       await axios.post('https://localhost:5000/api/benefit', benefit.value)
       alert('Beneficio guardado exitosamente')

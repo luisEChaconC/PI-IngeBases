@@ -15,10 +15,8 @@ namespace backend.Models
         public string? PhoneNumber { get; set; }
 
         [StringLength(150, ErrorMessage = "Email cannot exceed 150 characters.")]
-        [EmailAddress(ErrorMessage = "Invalid email format.")]
         public string? Email { get; set; }
 
-        [Required(ErrorMessage = "PersonId is required.")]
         public string PersonId { get; set; }
 
         public ContactModel()

@@ -7,7 +7,6 @@ namespace backend.Models
 {
     public class Benefit
     {
-        [JsonIgnore]
         public string? Id { get; set; }
 
         [Required(ErrorMessage = "El nombre es obligatorio.")]
