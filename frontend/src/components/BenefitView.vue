@@ -1,5 +1,15 @@
 <template>
+    
+
+  <h3 class="fw-bold mb-4 text-center">Beneficio</h3>
     <div class="container d-flex justify-content-center align-items-center mt-5">
+        <router-link
+          to="/benefits"
+          class="btn btn-outline-secondary position-absolute top-0 start-0 m-3"
+          title="Volver a la lista de beneficios"
+        >
+          ← Volver
+        </router-link>
       <div class="card shadow-sm p-4 rounded-4" style="width: 400px;">
         <h3 class="fw-bold mb-4">Beneficio</h3>
   
@@ -15,7 +25,7 @@
   
         <div class="mb-3">
           <label class="form-label">Tipo</label>
-          <input v-model="benefit.type" type="text" class="form-control" disabled />
+          <input :value="translatedType" type="text" class="form-control" disabled />
         </div>
        
         <div v-if="benefit.type === 'API'" class="mb-3">
@@ -23,14 +33,20 @@
           <input v-model="benefit.linkAPI" type="text" class="form-control" disabled />
         </div>
 
-        <div v-if="benefit.type === 'Percentage'" class="mb-3">
+        <div v-if="benefit.type === 'FixedPercentage'" class="mb-3">
           <label class="form-label">Porcentaje fijo (%)</label>
-          <input v-model="benefit.fixedPercentage" type="number" class="form-control" disabled />
+          <div class="input-group">
+            <input :value="benefit.fixedPercentage" type="number" class="form-control" disabled />
+            <span class="input-group-text">%</span>
+          </div>
         </div>
 
-        <div v-if="benefit.type === 'Amount'" class="mb-3">
+        <div v-if="benefit.type === 'FixedAmount'" class="mb-3">
           <label class="form-label">Monto fijo</label>
-          <input v-model="benefit.fixedAmount" type="number" class="form-control" disabled />
+          <div class="input-group">
+            <span class="input-group-text">₡</span>
+            <input :value="benefit.fixedAmount" type="number" class="form-control" disabled />
+          </div>
         </div>
   
         <div class="mb-3">
@@ -55,7 +71,7 @@
   </template>
   
   <script setup>
-  import { onMounted, ref } from 'vue'
+  import { computed, onMounted, ref } from 'vue'
   import { useRoute } from 'vue-router'
   import axios from 'axios'
   
@@ -69,6 +85,15 @@
       benefit.value = response.data
     } catch (error) {
       console.error('Error loading benefit:', error)
+    }
+  })
+
+  const translatedType = computed(() => {
+    switch (benefit.value.type) {
+      case 'API': return 'API'
+      case 'FixedAmount': return 'Monto Fijo'
+      case 'FixedPercentage': return 'Porcentaje Fijo'
+      default: return benefit.value.type
     }
   })
   </script>
