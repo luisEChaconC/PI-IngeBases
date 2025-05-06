@@ -17,6 +17,7 @@ const routes =
         { path: '/benefit/:id', name: 'Benefit', component: Benefit, props: true },
         { path: '/benefit/create', name: 'CreateBenefit', component: BenefitCreate },
         { path: '/select-change-benefit', name: 'SelectChangeBenefit', component: SelectChangeBenefit },
+        { path: '/view-company-info', name: 'ViewCompanyInfo', component: ViewCompanyInfo },
     ]
 
 
