@@ -10,8 +10,8 @@
                             
                             <!-- This div groups the title and subtitle of the fieldset -->
                             <div class="mb-4">
-                                <legend class="card-title h4 fw-bold mb-2">Regístrese Primero</legend>
-                                <h6 class="card-subtitle text-muted">Ingrese su información personal antes de registrar su empresa</h6>
+                                <legend class="card-title h4 fw-bold mb-2">Regístrese</legend>
+                                <h6 class="card-subtitle text-muted">Ingrese su información personal</h6>
                             </div>
                             
                             <!-- This div groups the "Nombre", "Primer Apellido" and "Segundo Apellido" inputs -->
