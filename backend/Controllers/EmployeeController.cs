@@ -10,7 +10,7 @@ namespace backend.Controllers
     [ApiController]
     public class EmployeeController : ControllerBase
     {
-        private readonly EmployeeRepository _employeeHandler;
+        private readonly EmployeeRepository _employeeRepository;
         private readonly SupervisorController _supervisorController;
         private readonly PayrollManagerController _payrollManagerController;
         private readonly PersonController _personController;
@@ -20,7 +20,7 @@ namespace backend.Controllers
 
         public EmployeeController()
         {
-            _employeeHandler = new EmployeeRepository();
+            _employeeRepository = new EmployeeRepository();
             _supervisorController = new SupervisorController();
             _payrollManagerController = new PayrollManagerController();
             _personController = new PersonController();
@@ -45,7 +45,7 @@ namespace backend.Controllers
                     return BadRequest(ModelState);
                 }
 
-                _employeeHandler.CreateEmployee(employee);
+                _employeeRepository.CreateEmployee(employee);
 
                 return Created("", new { id = employee.Id, message = "Employee created successfully" });
             }
@@ -127,6 +127,38 @@ namespace backend.Controllers
             if (employeeResult == null || employeeResult.StatusCode != StatusCodes.Status201Created)
             {
                 throw new Exception("Failed to create employee.");
+            }
+        }
+
+        /// <summary>
+        /// HTTP GET endpoint to retrieve employees by company ID.
+        /// </summary>
+        /// <param name="companyId">The ID of the company.</param>
+        /// <returns>A list of employees associated with the specified company.</returns>
+        [HttpGet]
+        [Route("GetEmployeesByCompanyId")]
+        public IActionResult GetEmployeesByCompanyId(string companyId)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(companyId))
+                {
+                    return BadRequest(new { message = "Company ID is required." });
+                }
+
+                // Retrieve employees from the repository
+                var employees = _employeeRepository.GetEmployeesByCompanyId(companyId);
+
+                if (employees == null || !employees.Any())
+                {
+                    return NotFound(new { message = "No employees found for the specified company ID." });
+                }
+
+                return Ok(employees);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new { message = "An error occurred while retrieving employees.", error = ex.Message });
             }
         }
 

@@ -10,12 +10,12 @@ namespace backend.Controllers
     [ApiController]
     public class UserController : ControllerBase
     {
-        private UserRepository _userHandler; // Repository to handle database operations for users
+        private UserRepository _userRepository; // Repository to handle database operations for users
 
         // Constructor to initialize the user repository
         public UserController()
         {
-            _userHandler = new UserRepository(); // Initialize the user repository
+            _userRepository = new UserRepository(); // Initialize the user repository
         }
 
         // HTTP GET endpoint to retrieve a user by their email
@@ -26,7 +26,7 @@ namespace backend.Controllers
             try
             {
                 // Call the repository method to get the user by email
-                UserModel user = _userHandler.GetUserByEmail(email);
+                UserModel user = _userRepository.GetUserByEmail(email);
 
                 // If no user is found, return a 404 Not Found response with a message
                 if (user == null)
@@ -86,7 +86,7 @@ namespace backend.Controllers
                 }
 
                 // Call the repository method to create the user
-                string userId = _userHandler.CreateUser(user);
+                string userId = _userRepository.CreateUser(user);
 
                 // Return 201 Created response with a success message
                 return Created("", new {id = userId, message = "User created successfully" });
