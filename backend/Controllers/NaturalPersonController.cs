@@ -9,12 +9,12 @@ namespace backend.Controllers
     [ApiController]
     public class NaturalPersonController : ControllerBase
     {
-        private readonly NaturalPersonRepository _naturalPersonHandler; // Repository to handle database operations for natural persons
+        private readonly NaturalPersonRepository _naturalPersonRepository; // Repository to handle database operations for natural persons
 
         // Constructor to initialize the repositories
         public NaturalPersonController()
         {
-            _naturalPersonHandler = new NaturalPersonRepository(); // Initialize the natural person repository
+            _naturalPersonRepository = new NaturalPersonRepository(); // Initialize the natural person repository
         }
 
         /// <summary>
@@ -35,7 +35,7 @@ namespace backend.Controllers
                 }
 
                 // Call the repository method to create the natural person
-                _naturalPersonHandler.CreateNaturalPerson(naturalPerson);
+                _naturalPersonRepository.CreateNaturalPerson(naturalPerson);
 
                 // Return 201 Created response with the ID and a success message
                 return Created("", new { id = naturalPerson.Id, message = "Natural person created successfully" });

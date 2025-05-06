@@ -10,8 +10,8 @@ namespace backend.Controllers
     [ApiController]
     public class CompanyController : ControllerBase
     {
-        private readonly CompanyRepository _companyHandler; // Repository to handle database operations for companies
-
+        private readonly CompanyRepository _companyRepository; // Repository to handle database operations for companies
+        
         private readonly PersonController _personController; // Controller to handle person operations
         private readonly ContactController _contactController; // Controller to handle contact operations
         // Constructor to initialize the repositories
@@ -19,7 +19,7 @@ namespace backend.Controllers
         {
             var personRepo = new PersonRepository();
             var contactRepo = new ContactRepository();
-            _companyHandler = new CompanyRepository(personRepo, contactRepo); // Initialize the company repository
+           _companyRepository = new CompanyRepository(personRepo, contactRepo); // Initialize the company repository
 
             _personController = new PersonController(); // Initialize the person controller
             _contactController = new ContactController(); // Initialize the contact controller
@@ -43,7 +43,7 @@ namespace backend.Controllers
                 }
 
                 // Call the repository method to create the company
-                _companyHandler.CreateCompany(company);
+                _companyRepository.CreateCompany(company);
 
                 // Return 201 Created response with the ID and a success message
                 return Created("", new { id = company.Id, message = "Company created successfully" });
@@ -118,7 +118,7 @@ namespace backend.Controllers
             try
             {
                 // Call the repository method to get all companies
-                var companies = _companyHandler.GetCompanies();
+                var companies = _companyRepository.GetCompanies();
 
                 // Return 200 OK response with the companies
                 return Ok(companies);
@@ -143,7 +143,7 @@ namespace backend.Controllers
             try
             {
                 // Call the repository method to get the company by ID
-                var company = _companyHandler.GetCompanyById(id);
+                var company = _companyRepository.GetCompanyById(id);
 
                 // Check if the company was found
                 if (company == null)

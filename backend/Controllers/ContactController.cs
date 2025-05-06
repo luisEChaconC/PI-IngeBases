@@ -10,12 +10,12 @@ namespace backend.Controllers
     [ApiController]
     public class ContactController : ControllerBase
     {
-        private readonly ContactRepository _contactHandler; // Repository to handle database operations for contacts
+        private readonly ContactRepository _contactRepository; // Repository to handle database operations for contacts
 
         // Constructor to initialize the contact repository
         public ContactController()
         {
-            _contactHandler = new ContactRepository(); // Initialize the contact repository
+            _contactRepository = new ContactRepository(); // Initialize the contact repository
         }
 
         /// <summary>
@@ -36,7 +36,7 @@ namespace backend.Controllers
                 }
 
                 // Call the repository method to create the contact
-                string contactId = _contactHandler.CreateContact(contact);
+                string contactId = _contactRepository.CreateContact(contact);
 
                 // Return 201 Created response with the ID and a success message
                 return Created("", new { id = contactId, message = "Contact created successfully" });
