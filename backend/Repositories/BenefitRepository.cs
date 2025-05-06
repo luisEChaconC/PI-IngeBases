@@ -52,18 +52,17 @@ namespace backend.Services
             return employeeTypes;
         }
 
-        private Guid? GetEmployeeTypeIdByName(string name)
+        private Guid? GetEmployeeTypeIdByName(string employeeTypeName, SqlConnection connection)
         {
-            var query = "SELECT Id FROM EmployeeTypes WHERE Name = @Name";
-            using var cmd = new SqlCommand(query, _connection);
-            cmd.Parameters.AddWithValue("@Name", name);
+            const string query = "SELECT Id FROM EmployeeTypes WHERE Name = @Name";
 
-            _connection.Open();
-            var result = cmd.ExecuteScalar();
-            _connection.Close();
+            using var command = new SqlCommand(query, connection);
+            command.Parameters.AddWithValue("@Name", employeeTypeName);
 
-            return result != null ? (Guid?)Guid.Parse(result.ToString()) : null;
+            var result = command.ExecuteScalar();
+            return result != null ? (Guid?)result : null;
         }
+
 
         public List<Benefit> GetBenefits()
         {
@@ -97,43 +96,51 @@ namespace backend.Services
             var benefitId = Guid.NewGuid();
 
             const string insertBenefitQuery = @"
-                INSERT INTO Benefits
-                (Id, Name, Description, IsActive, Type, LinkAPI, FixedPercentage, FixedAmount, RequiredMonthsWorked)
-                VALUES
-                (@Id, @Name, @Description, @IsActive, @Type, @LinkAPI, @FixedPercentage, @FixedAmount, @RequiredMonthsWorked)";
+        INSERT INTO Benefits
+        (Id, Name, Description, IsActive, Type, LinkAPI, FixedPercentage, FixedAmount, RequiredMonthsWorked)
+        VALUES
+        (@Id, @Name, @Description, @IsActive, @Type, @LinkAPI, @FixedPercentage, @FixedAmount, @RequiredMonthsWorked)";
 
-            using var command = new SqlCommand(insertBenefitQuery, _connection);
-            command.Parameters.AddWithValue("@Id", benefitId);
-            command.Parameters.AddWithValue("@Name", benefit.Name);
-            command.Parameters.AddWithValue("@Description", benefit.Description);
-            command.Parameters.AddWithValue("@IsActive", benefit.IsActive);
-            command.Parameters.AddWithValue("@Type", benefit.Type);
-            command.Parameters.AddWithValue("@LinkAPI", (object?)benefit.LinkAPI ?? DBNull.Value);
-            command.Parameters.AddWithValue("@FixedPercentage", benefit.FixedPercentage);
-            command.Parameters.AddWithValue("@FixedAmount", benefit.FixedAmount);
-            command.Parameters.AddWithValue("@RequiredMonthsWorked", benefit.RequiredMonthsWorked);
-
-            _connection.Open();
-            var success = command.ExecuteNonQuery() > 0;
-
-            foreach (var empType in benefit.EligibleEmployeeTypes)
+            using (var connection = new SqlConnection(_connection.ConnectionString))
             {
-                var empTypeId = GetEmployeeTypeIdByName(empType);
-                if (empTypeId != null)
+                connection.Open();
+
+                using (var command = new SqlCommand(insertBenefitQuery, connection))
                 {
-                    var relQuery = @"
+                    command.Parameters.AddWithValue("@Id", benefitId);
+                    command.Parameters.AddWithValue("@Name", benefit.Name);
+                    command.Parameters.AddWithValue("@Description", benefit.Description ?? "");
+                    command.Parameters.AddWithValue("@IsActive", benefit.IsActive);
+                    command.Parameters.AddWithValue("@Type", benefit.Type);
+                    command.Parameters.AddWithValue("@LinkAPI", (object?)benefit.LinkAPI ?? DBNull.Value);
+                    command.Parameters.AddWithValue("@FixedPercentage", (object?)benefit.FixedPercentage ?? DBNull.Value);
+                    command.Parameters.AddWithValue("@FixedAmount", (object?)benefit.FixedAmount ?? DBNull.Value);
+                    command.Parameters.AddWithValue("@RequiredMonthsWorked", benefit.RequiredMonthsWorked);
+
+                    var success = command.ExecuteNonQuery() > 0;
+
+                    // Insertar relaciones con tipos de empleado
+                    foreach (var empType in benefit.EligibleEmployeeTypes)
+                    {
+                        var empTypeId = GetEmployeeTypeIdByName(empType, connection); // <-- pasa la conexión
+                        if (empTypeId != null)
+                        {
+                            const string relQuery = @"
                         INSERT INTO EmployeeTypesXBenefits (EmployeeTypeId, BenefitId)
                         VALUES (@EmpTypeId, @BenefitId)";
 
-                    using var relCmd = new SqlCommand(relQuery, _connection);
-                    relCmd.Parameters.AddWithValue("@EmpTypeId", empTypeId);
-                    relCmd.Parameters.AddWithValue("@BenefitId", benefitId);
-                    relCmd.ExecuteNonQuery();
+                            using var relCmd = new SqlCommand(relQuery, connection);
+                            relCmd.Parameters.AddWithValue("@EmpTypeId", empTypeId);
+                            relCmd.Parameters.AddWithValue("@BenefitId", benefitId);
+                            relCmd.ExecuteNonQuery();
+                        }
+                    }
+
+                    return success;
                 }
             }
-
-            _connection.Close();
-            return success;
         }
+
+
     }
 }

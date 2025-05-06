@@ -9,12 +9,12 @@ namespace backend.Controllers
     [ApiController]
     public class SupervisorController : ControllerBase
     {
-        private readonly SupervisorRepository _supervisorHandler; // Repository to handle database operations for supervisors
+        private readonly SupervisorRepository _supervisorRepository; // Repository to handle database operations for supervisors
 
         // Constructor to initialize the supervisor repository
         public SupervisorController()
         {
-            _supervisorHandler = new SupervisorRepository(); // Initialize the supervisor repository
+            _supervisorRepository = new SupervisorRepository(); // Initialize the supervisor repository
         }
 
         /// <summary>
@@ -35,7 +35,7 @@ namespace backend.Controllers
                 }
 
                 // Call the repository method to create the supervisor
-                _supervisorHandler.CreateSupervisor(supervisor);
+                _supervisorRepository.CreateSupervisor(supervisor);
 
                 // Return 201 Created response with a success message
                 return Created("", new {id = supervisor.Id, message = "Supervisor created successfully" });
