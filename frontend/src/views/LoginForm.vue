@@ -73,6 +73,7 @@
 
 <script>
 import axios from "axios"; // Importing Axios for making HTTP requests
+import currentUserService from "@/services/currentUserService";
 
 export default {
   name: "LoginForm", // Component name
@@ -108,6 +109,9 @@ export default {
             this.errorMessage = "Correo electrónico o contraseña incorrectos.";
             return; // Exit the function
           }
+
+          // Use the global service instance to fetch and save user information
+          await currentUserService.fetchAndSaveCurrentUserInformationToLocalStorage(this.email);
 
           // Simulate a successful login and redirect to the main menu
           alert("Se inició sesión con éxito! Redirigiendo al menú principal...");
