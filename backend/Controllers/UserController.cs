@@ -52,7 +52,7 @@ namespace backend.Controllers
             try
             {
                 // Call the repository method to get the user by email
-                object user = _userHandler.GetUserInformationByEmail(email);
+                object user = _userRepository.GetUserInformationByEmail(email);
 
                 // If no user is found, return a 404 Not Found response with a message
                 if (user == null)
