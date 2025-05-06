@@ -19,6 +19,10 @@ namespace backend.Models
         public string PaymentType { get; set; }
 
         public List<EmployeeModel> ?Employees { get; set; }
+        
+        public int EmployeeCount { get; set; }
+        
+        public string? LegalId { get; set; }
 
         public int? MaxBenefitsPerEmployee { get; set; }
 
