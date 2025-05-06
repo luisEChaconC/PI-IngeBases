@@ -17,8 +17,10 @@
               <tr v-for="(company, index) in companies" :key="index">
                 <td>{{ company.name }}</td>
                 <td>{{ company.creationAuthor }}</td> 
-                <td>{{ company.id }}</td>
-                <td>{{ company.employees ? company.employees.length : 0 }}</td>
+                <td>{{ company.legalId }}</td>
+
+                <td>{{ company.employeeCount }}</td>
+
               </tr>
             </tbody>
           </table>
