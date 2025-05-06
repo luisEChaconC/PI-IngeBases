@@ -52,7 +52,7 @@
   
 <script>
 import axios from 'axios';
-
+import currentUserService from '../services/currentUserService.js';
 export default {
   name: 'ViewCompanyInfo',
   data() {
@@ -106,6 +106,8 @@ export default {
   },
 
   created() {
+    const currentUserInformation = currentUserService.getCurrentUserInformationFromLocalStorage();
+    console.log("Current user information:", currentUserInformation);
     this.getCompanyById('62d57b2c-c081-4155-912d-abfc8d6cd6a0'); // Changed ID
   },
 

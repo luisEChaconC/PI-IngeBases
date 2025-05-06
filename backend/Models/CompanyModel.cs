@@ -18,7 +18,7 @@ namespace backend.Models
         [RegularExpression("^(Monthly|Biweekly|Weekly)$", ErrorMessage = "PaymentType must be 'Monthly', 'Biweekly', or 'Weekly'.")]
         public string PaymentType { get; set; }
 
-        public List<EmployeeModel> ?Employees { get; set; }
+        public List<dynamic> ?Employees { get; set; }
 
         public int? MaxBenefitsPerEmployee { get; set; }
 
@@ -43,7 +43,6 @@ namespace backend.Models
             Name = string.Empty;
             Description = null;
             PaymentType = string.Empty;
-            Employees = new List<EmployeeModel>();
             MaxBenefitsPerEmployee = null;
             CreationDate = DateTime.Now;
             CreationAuthor = null;
@@ -51,9 +50,10 @@ namespace backend.Models
             LastModificationAuthor = null;
             Person = null;
             Contact = null;
+            Employees = null;
         }
 
-        public CompanyModel(string id, string name, string? description, string paymentType, List<EmployeeModel> employees, int? maxBenefitsPerEmployee, DateTime creationDate, string? creationAuthor, DateTime? lastModificationDate, string? lastModificationAuthor)
+        public CompanyModel(string id, string name, string? description, string paymentType, List<dynamic> employees, int? maxBenefitsPerEmployee, DateTime creationDate, string? creationAuthor, DateTime? lastModificationDate, string? lastModificationAuthor)
         {
             Id = id;
             Name = name;

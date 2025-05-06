@@ -82,7 +82,7 @@ namespace backend.Controllers
             try
             {
                 // Call the repository method to get the person by ID
-                var person = _personHandler.GetPersonById(id);
+                var person = _personRepository.GetPersonById(id);
 
                 // Check if the person was found
                 if (person == null)

@@ -19,7 +19,8 @@ namespace backend.Controllers
         {
             var personRepo = new PersonRepository();
             var contactRepo = new ContactRepository();
-           _companyRepository = new CompanyRepository(personRepo, contactRepo); // Initialize the company repository
+            var employeeRepo = new EmployeeRepository(); // Initialize the employee repository
+           _companyRepository = new CompanyRepository(personRepo, contactRepo, employeeRepo); // Initialize the company repository
 
             _personController = new PersonController(); // Initialize the person controller
             _contactController = new ContactController(); // Initialize the contact controller

@@ -77,7 +77,7 @@ namespace backend.Controllers
             try
             {
                 // Call the repository method to get the list of contacts
-                var contacts = _contactHandler.GetContactsById(id);
+                var contacts = _contactRepository.GetContactsById(id);
 
                 // Check if any contacts were found
                 if (contacts == null || !contacts.Any())

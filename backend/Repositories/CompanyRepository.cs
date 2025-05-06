@@ -13,11 +13,12 @@ namespace backend.Repositories
         private string _connectionString; // Connection string for the database
         private readonly PersonRepository _personRepository; // Instance of PersonRepository for managing persons
         private readonly ContactRepository _contactRepository; // Instance of PersonRepository for managing persons
+        private readonly EmployeeRepository _employeeRepository; // Instance of EmployeeRepository for managing employees
 
         /// <summary>
         /// Constructor to initialize the connection string and SQL connection.
         /// </summary>
-        public CompanyRepository(PersonRepository personRepository, ContactRepository contactRepository)
+        public CompanyRepository(PersonRepository personRepository, ContactRepository contactRepository, EmployeeRepository employeeRepository)
         {
             // Create a configuration builder to retrieve the connection string
             var builder = WebApplication.CreateBuilder();
@@ -28,6 +29,7 @@ namespace backend.Repositories
 
             _personRepository = personRepository; // Initialize the PersonRepository instance
             _contactRepository = contactRepository; // Initialize the ContactRepository instance
+            _employeeRepository = employeeRepository; // Initialize the EmployeeRepository instance
         }
 
 
@@ -123,7 +125,7 @@ namespace backend.Repositories
                                     CreationAuthor = reader["CreationAuthor"] != DBNull.Value ? reader["CreationAuthor"].ToString() : null,
                                     LastModificationDate = reader["LastModificationDate"] != DBNull.Value ? (DateTime?)reader["LastModificationDate"] : null,
                                     LastModificationAuthor = reader["LastModificationAuthor"] != DBNull.Value ? reader["LastModificationAuthor"].ToString() : null,
-                                    Employees = new List<EmployeeModel>()
+                                    Employees = null
                                 };
 
                                 // Add the company to the list
@@ -195,7 +197,7 @@ namespace backend.Repositories
                                     LastModificationAuthor = reader["LastModificationAuthor"] != DBNull.Value ? reader["LastModificationAuthor"].ToString() : null,
                                     Person = _personRepository.GetPersonById(reader["Id"].ToString()),
                                     Contact = _contactRepository.GetContactsById(reader["Id"].ToString()),
-                                    Employees = new List<EmployeeModel>() // Initialize empty list
+                                    Employees = _employeeRepository.GetEmployeesByCompanyId(reader["Id"].ToString())
                                 };
                             }
                         }
