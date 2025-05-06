@@ -5,10 +5,18 @@ import BenefitList from '@/components/BenefitList.vue'
 import Benefit from '@/components/BenefitView.vue'
 import BenefitCreate from '@/components/BenefitCreate.vue'
 import SelectChangeBenefit from '@/components/SelectChangeBenefit.vue'
+import ViewEmployeeProfileEmployer from '../views/ViewEmployeeProfileEmployer.vue'
 
 const routes =
 [
     { path: '/login', name: 'LoginForm', component: Login },
+
+     {
+       path: '/view-employee-profile-employer/:id',
+       name: 'ViewEmployeeProfileEmployer',
+       component: ViewEmployeeProfileEmployer
+     },
+
     {
         path: '/employees-list',
         name: 'EmployeesList',
