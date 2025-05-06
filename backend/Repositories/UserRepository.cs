@@ -107,5 +107,83 @@ namespace backend.Repositories
             // Return null if no user was found
             return null;
         }
+
+        /// <summary>
+        /// Retrieves detailed user information by email, including roles and related data.
+        /// </summary>
+        /// <param name="email">The email address of the user to retrieve.</param>
+        /// <returns>An object containing detailed user information, or null if not found.</returns>
+        public object GetUserInformationByEmail(string email)
+        {
+            // SQL query to retrieve user information with multiple joins
+            var query = @"
+                SELECT 
+                    u.Id AS IdUsuario,
+                    u.Email,
+                    u.IsAdmin,
+                    p.Id AS IdPerson,
+                    np.Id AS IdNaturalPerson,
+                    np.FirstName,
+                    np.FirstSurname,
+                    np.SecondSurname,
+                    e.CompanyId,
+                    CASE 
+                        WHEN s.Id IS NOT NULL THEN 'Supervisor'
+                        WHEN pm.Id IS NOT NULL THEN 'Payroll Manager'
+                        WHEN em.Id IS NOT NULL THEN 'Employer'
+                        ELSE 'Collaborator'
+                    END AS Position
+                FROM Users u
+                LEFT JOIN NaturalPersons np ON u.Id = np.UserId
+                LEFT JOIN Persons p ON np.Id = p.Id
+                LEFT JOIN Employees e ON np.Id = e.Id
+                LEFT JOIN Supervisors s ON e.Id = s.Id
+                LEFT JOIN PayrollManagers pm ON e.Id = pm.Id
+                LEFT JOIN Employers em ON np.Id = em.Id
+                WHERE u.Email = @Email";
+
+            // Create a SQL command with the query and connection
+            using (var command = new SqlCommand(query, _connection))
+            {
+                // Add the email parameter to the query to prevent SQL injection
+                command.Parameters.AddWithValue("@Email", email);
+
+                // Open the database connection
+                _connection.Open();
+
+                // Execute the query and retrieve the results using a data reader
+                using (var reader = command.ExecuteReader())
+                {
+                    // Check if a record was found
+                    if (reader.Read())
+                    {
+                        // Map the data from the reader to an anonymous object
+                        var userInfo = new
+                        {
+                            IdUsuario = reader["IdUsuario"].ToString(),
+                            Email = reader["Email"].ToString(),
+                            IsAdmin = (bool)reader["IsAdmin"],
+                            IdPerson = reader["IdPerson"].ToString(),
+                            IdNaturalPerson = reader["IdNaturalPerson"].ToString(),
+                            FirstName = reader["FirstName"].ToString(),
+                            FirstSurname = reader["FirstSurname"].ToString(),
+                            SecondSurname = reader["SecondSurname"].ToString(),
+                            CompanyId = reader["CompanyId"] != DBNull.Value ? reader["CompanyId"].ToString() : null,
+                            Position = reader["Position"].ToString()
+                        };
+
+                        // Close the connection and return the user information
+                        _connection.Close();
+                        return userInfo;
+                    }
+                }
+
+                // Close the connection if no user was found
+                _connection.Close();
+            }
+
+            // Return null if no user was found
+            return null;
+        }
     }
 }

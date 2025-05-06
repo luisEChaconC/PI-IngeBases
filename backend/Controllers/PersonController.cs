@@ -9,12 +9,12 @@ namespace backend.Controllers
     [ApiController]
     public class PersonController : ControllerBase
     {
-        private readonly PersonRepository _personHandler; // Repository to handle database operations for persons
+        private readonly PersonRepository _personRepository; // Repository to handle database operations for persons
 
         // Constructor to initialize the person repository
         public PersonController()
         {
-            _personHandler = new PersonRepository(); // Initialize the person repository
+            _personRepository = new PersonRepository(); // Initialize the person repository
         }
 
         /// <summary>
@@ -35,7 +35,7 @@ namespace backend.Controllers
                 }
 
                 // Call the repository method to create the person
-                string personId = _personHandler.CreatePerson(person);
+                string personId = _personRepository.CreatePerson(person);
 
                 // Return 201 Created response with a success message
                 return Created("", new {id = personId, message = "Person created successfully" });

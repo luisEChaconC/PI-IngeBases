@@ -1,4 +1,5 @@
 import AddEmployee from '../views/AddEmployee.vue'
+import EmployeesList from '../views/EmployeesList.vue'
 import Login from '../views/LoginForm.vue'
 import { createRouter, createWebHistory } from 'vue-router'
 import BenefitList from '@/components/BenefitList.vue' 
@@ -13,6 +14,11 @@ const routes =
         path: '/add-employee',
         name: 'AddEmployee',
         component: AddEmployee
+    },
+    {
+        path: '/employees-list',
+        name: 'EmployeesList',
+        component: EmployeesList
     },
     {
         path: '/benefits',
