@@ -310,14 +310,20 @@ export default {
         }
     },
     methods: {
-        handleRegisterCompany() {
+        async handleRegisterCompany() {
             this.validateAllFields();
             
             if (this.hasErrors()) {
                 return;
             }
 
-            this.registerCompany();
+            const result = await this.registerCompany();
+            if (result) {
+                alert("Se registró la empresa exitosamente!");
+                this.$router.push('/main-menu');
+            } else {
+                alert("No se pudo registrar la empresa");
+            }
         },
         async registerCompany() {
             try {
@@ -367,12 +373,11 @@ export default {
                 const response = await axios.post('https://localhost:5000/api/Company/CreateCompanyWithDependencies', payload);
 
                 if (response.status == 201) {
-                    alert("Se registró la empresa exitosamente!");
-                    this.$router.push('/main-menu');
+                    return true;
+                } else {
+                    return false;
                 }
             } catch (error) {
-                alert("No se pudo registrar la empresa");
-
                 console.error("Error details:", error);
                 if (error.response) {
                     console.error("Response data:", error.response.data);
@@ -387,6 +392,8 @@ export default {
                     // Something happened in setting up the request that triggered an error
                     console.error("Error:", error.message);
                 }
+
+                return false;
             }
         },
         validateAllFields() {
