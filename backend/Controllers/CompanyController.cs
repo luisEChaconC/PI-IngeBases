@@ -55,9 +55,7 @@ namespace backend.Controllers
         /// <summary>
         /// HTTP POST endpoint to create a new company with all dependencies.
         /// </summary>
-        /// <param name="person">The person model containing the data to insert.</param>
-        /// <param name="contact">The contact model containing the data to insert.</param>
-        /// <param name="company">The company model containing the data to insert.</param>
+        /// <param name="request">The request model containing the person, contacts, and company data.</param>
         /// <returns>A response indicating the result of the operation.</returns>
         [HttpPost]
         [Route("CreateCompanyWithDependencies")]
@@ -72,15 +70,23 @@ namespace backend.Controllers
 
                 // Extract data from the request model
                 var person = request.Person;
-                var contact = request.Contact;
+                var contacts = request.Contacts;
                 var company = request.Company;
 
                 // Create dependencies
+                // Create person dependency and get the generated ID
                 var personId = _personController.CreatePersonDependency(person);
-                _contactController.CreateContactDependency(contact, personId);
+
+                // Create contact associated with the person
+                foreach (var contact in contacts)
+                {
+                    _contactController.CreateContactDependency(contact, personId);
+                }
+
+                // Create the company
                 CreateCompanyDependency(company, personId);
 
-                return Created("", new { message = "Company and all dependencies created successfully" });
+                return Created("", new { message = "Company and all dependencies created successfully", personId = personId });
             }
             catch (Exception ex)
             {
@@ -89,16 +95,16 @@ namespace backend.Controllers
         }
 
         /// <summary>
-        /// Creates an company dependency.
+        /// Creates a company dependency.
         /// </summary>
         /// <param name="company">The company model to create.</param>
-        /// <param name="naturalPersonId">The ID of the associated person.</param>
+        /// <param name="personId">The ID of the associated person.</param>
         private void CreateCompanyDependency(CompanyModel company, string personId)
         {
             company.Id = personId;
 
-            var employeeResult = CreateCompany(company) as ObjectResult;
-            if (employeeResult == null || employeeResult.StatusCode != StatusCodes.Status201Created)
+            var companyResult = CreateCompany(company) as ObjectResult;
+            if (companyResult == null || companyResult.StatusCode != StatusCodes.Status201Created)
             {
                 throw new Exception("Failed to create company.");
             }
