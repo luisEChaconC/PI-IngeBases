@@ -138,8 +138,15 @@
 </template>
 
 <script>
+    import axios from 'axios';
     export default {
         name: 'EmployerRegistration',
+        props: {
+            companyId: {
+                type: String,
+                required: true
+            }
+        },
         data() {
             return {
                 employer: {
@@ -165,6 +172,10 @@
                     password: '',
                 }
             }
+        },
+        
+        created() {
+            console.log('Employer registration with parameter:', this.param);
         },
 
         methods: {
