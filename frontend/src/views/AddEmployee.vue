@@ -75,6 +75,7 @@
 
 <script>
 import axios from "axios";
+import currentUserService from "@/services/currentUserService";
 
 export default {
     name: "AddEmployee",
@@ -105,7 +106,7 @@ export default {
                 },
                 employee: {
                     workerId: "",
-                    companyId: "D4F7DD81-2E6D-4264-8619-28BAC1EA0627", // Example company ID we should get this from the cookies of the employer signed
+                    companyId: "",
                     contractType: "",
                     grossSalary: 0,
                     hasToReportHours: false,
@@ -118,17 +119,18 @@ export default {
         async submitForm() {
             // Dynamically set the password before submitting
             // The user password is the first surname and the last 3 digits of the legal id
-            this.formData.user.password = `${this.formData.naturalPerson.firstSurname}${this.formData.person.legalId.slice(-3)}`;
-            console.log(this.formData)
+            this.formData.user.password = `${this.formData.naturalPerson.firstSurname}${this.formData.person.legalId.slice(-3)}`
+            const currentUserInformation = currentUserService.getCurrentUserInformationFromLocalStorage()
+            this.formData.employee.companyId = currentUserInformation.companyId
             try {
                 const response = await axios.post(
                     "https://localhost:5000/api/Employee/CreateEmployeeWithDependencies",
                     this.formData
                 );
-                alert("Empleado agregado exitosamente");
-                console.log(response.data);
+                alert("Empleado agregado exitosamente")
+                console.log(response.data)
             } catch (error) {
-                alert("Ocurrió un error al tratar de agregar el empleado.");
+                alert("Ocurrió un error al tratar de agregar el empleado.")
             }
         },
     },
