@@ -27,11 +27,26 @@
             <a class="nav-link" href="#">Empresa</a>
           </li>
           <li v-if="showOption('viewEmployees')" class="nav-item">
-            <a class="nav-link" href="#">Empleados</a>
+            <router-link to="/employees-list" class="nav-link">Empleados</router-link>
           </li>
+
           <li v-if="showOption('viewBenefits')" class="nav-item">
-            <router-link to="/benefits" class="nav-link">Beneficios</router-link>
+            <router-link
+              v-if="employeeType === 'Employer'"
+              to="/benefits"
+              class="nav-link"
+            >
+              Beneficios
+            </router-link>
+            <a
+              v-else
+              class="nav-link"
+              href="#"
+            >
+              Beneficios
+            </a>
           </li>
+
           <li v-if="showOption('viewRequestHourCorrection')" class="nav-item">
             <a class="nav-link" href="#">Corrección Horas</a>
           </li>
@@ -57,23 +72,25 @@
 </template>
 
 <script>
+import currentUserService from "@/services/currentUserService";
+
 export default {
   name: "MainMenu",
   data() {
     return {
-      employeeType: "supervisor", // change different roles
+      employeeType: "", // se obtiene dinámicamente
     };
   },
   methods: {
     showOption(option) {
       const permissions = {
-        employee: [
+        Employee: [
           "viewProfile", 
           "viewPayments", 
           "viewWorkedHours", 
           "viewBenefits"],
 
-        employer: [
+        Employer: [
           "viewProfile",
           "viewCompany",
           "viewEmployees",
@@ -82,7 +99,7 @@ export default {
           "viewRoleAssignment",
         ],
 
-        supervisor: [
+        Supervisor: [
           "viewProfile",
           "viewPayments",
           "viewWorkedHours",
@@ -91,13 +108,13 @@ export default {
           "viewRequestHourCorrection",
         ],
 
-        softwareManager: [
+        SoftwareManager: [
           "viewProfile",
           "viewCompanyManagement",
           "viewReports",
         ],
 
-        payrollManager: [
+        PayrollManager: [
           "viewProfile",
           "viewPayments",
           "viewWorkedHours",
@@ -105,12 +122,17 @@ export default {
           "viewGeneratePayroll",
           "viewPayrollHistory",
         ],
-
       };
 
-      return permissions[this.employeeType].includes(option);
+      return permissions[this.employeeType]?.includes(option);
     },
   },
+
+  created() {
+    const currentUserInformation = currentUserService.getCurrentUserInformationFromLocalStorage();
+    this.employeeType = currentUserInformation.position; // o currentUserInformation.role, dependiendo del nombre exacto
+    console.log("Rol del usuario:", this.employeeType);
+  }
 };
 </script>
 
