@@ -41,4 +41,5 @@ class CurrentUserService {
     }
 }
 
-export default CurrentUserService;
+// Export a pre-instantiated object of the service
+export default new CurrentUserService();
