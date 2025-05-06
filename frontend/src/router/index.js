@@ -1,11 +1,10 @@
 import ViewEmployeeProfile from '../views/ViewEmployeeProfile.vue'
 import { createRouter, createWebHistory } from 'vue-router'
-import BenefitList from '@/components/BenefitList.vue' 
-import Benefit from '@/components/BenefitView.vue'
+
 
 const routes = [
     {
-        path: '/view-employee-profile',
+        path: '/view-employee-profile/:id',
         name: 'ViewEmployeeProfile',
         component: ViewEmployeeProfile
       }
