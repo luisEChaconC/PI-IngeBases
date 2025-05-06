@@ -10,6 +10,7 @@ import SelectChangeBenefit from '@/components/SelectChangeBenefit.vue'
 const routes =
 [
     { path: '/login', name: 'LoginForm', component: Login },
+    { path: '/company-registration', name: 'CompanyRegistration', component: CompanyRegistration},
     { path: '/employees-list', name: 'EmployeesList', component: EmployeesList },
     { path: '/benefits', name: 'Benefits', component: BenefitList },
     { path: '/benefit/:id', name: 'Benefit', component: Benefit, props: true },
