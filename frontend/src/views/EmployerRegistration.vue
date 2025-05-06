@@ -175,19 +175,24 @@
         },
         
         created() {
-            console.log('Employer registration with parameter:', this.param);
+            console.log('Employer registration with parameter:', this.companyId);
         },
 
         methods: {
-            handleRegisterEmployer() {
+            async handleRegisterEmployer() {
                 this.validateAllFields();
                 
                 if (this.hasErrors()) {
                     return;
                 }
                 
-                console.log(this.employer);
-                // Here will be the code to register the employer
+                const result = await this.registerEmployer();
+                if (result) {
+                    alert("Se registró el empleado exitosamente!");
+                    this.$router.push('/company-registration');
+                } else {
+                    alert("Error al registrarse. Por favor intente de nuevo.");
+                }
             },
             
             validateAllFields() {
@@ -198,6 +203,72 @@
                 this.validatePhoneNumber();
                 this.validateEmail();
                 this.validatePassword();
+            },
+
+            async registerEmployer() {
+                try {
+                    const payload = {
+                        person: {
+                            id: "",
+                            legalId: this.removeHyphens(this.employer.legalId),
+                            type: "Natural Person",
+                            province: "",
+                            canton: "",
+                            district: "",
+                            neighborhood: "",
+                            additionalDirectionDetails: ""
+                        },
+                        user: {
+                            id: "",
+                            email: this.employer.email,
+                            password: this.employer.password,
+                            isAdmin: false
+                        },
+                        naturalPerson: {
+                            id: "",
+                            firstName: this.employer.name.firstName,
+                            firstSurname: this.employer.name.firstSurname,
+                            secondSurname: this.employer.name.secondSurname,
+                            userId: ""
+                        },
+                        contact: {
+                            id: "",
+                            type: "Phone Number",
+                            phoneNumber: this.removeHyphens(this.employer.phoneNumber),
+                            email: "",
+                            personId: ""
+                        },
+                        employer: {
+                            id: "",
+                            workerId: "asdf",
+                            companyId: this.companyId
+                        }
+                    };
+                    
+                    console.log("Sending data:", JSON.stringify(payload, null, 2));
+                    
+                    const response = await axios.post('https://localhost:5000/api/Employer/CreateEmployerWithDependencies', payload);
+                    
+                    if (response.status === 201) {
+                        return true;
+                    } else {
+                        return false;
+                    }
+                } catch (error) {
+                    console.error("Error details:", error);
+                    if (error.response) {
+                        console.error("Response data:", error.response.data);
+                        console.error("Status:", error.response.status);
+                        if (error.response.data && error.response.data.errors) {
+                            console.error("Validation errors:", error.response.data.errors);
+                        }
+                    } else if (error.request) {
+                        console.error("No response received:", error.request);
+                    } else {
+                        console.error("Error:", error.message);
+                    }
+                    return false;
+                }
             },
             
             hasErrors() {
@@ -293,10 +364,10 @@
                     return;
                 }
                 
-                if (!this.legalIdHasValidLength()) {
-                    this.errors.legalId = 'La cédula de identidad debe contener exactamente 10 caracteres numéricos';
-                    return;
-                }
+                // if (!this.legalIdHasValidLength()) {
+                //     this.errors.legalId = 'La cédula de identidad debe contener exactamente 10 caracteres numéricos';
+                //     return;
+                // }
                 
                 this.errors.legalId = '';
             },
@@ -411,6 +482,10 @@
                 const hasSpecialChar = /[#$!?%&/]/.test(this.employer.password);
                 
                 return hasUpperCase && hasLowerCase && hasNumber && hasSpecialChar;
+            },
+            
+            removeHyphens(string) {
+                return string.replace(/-/g, '');
             }
         }
     }
