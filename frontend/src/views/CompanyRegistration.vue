@@ -266,6 +266,7 @@
 </template>
 
 <script>
+import axios from 'axios';
 export default {
     name: 'CompanyRegistration',
     data() {
@@ -329,7 +330,78 @@ export default {
             this.removeHyphensFromLegalEntityId();
             this.removeHyphensFromPhoneNumber();
 
-            console.log(this.company)
+            this.registerCompany();
+        },
+        async registerCompany() {
+            try {
+                // Create request payload using form data
+                const payload = {
+                    person: {
+                        id: "",
+                        legalId: this.company.legalEntityId,
+                        type: "Legal Entity",
+                        province: this.company.direction.province,
+                        canton: this.company.direction.canton,
+                        district: this.company.direction.district,
+                        neighborhood: this.company.direction.neighborhood,
+                        additionalDirectionDetails: this.company.direction.additionalDetails
+                    },
+                    contacts: [
+                        {
+                            id: "",
+                            type: "Email",
+                            phoneNumber: "",
+                            email: this.company.contact.email,
+                            personId: ""
+                        },
+                        {
+                            id: "",
+                            type: "Phone Number",
+                            phoneNumber: this.company.contact.phoneNumber,
+                            personId: ""
+                        }
+                    ],
+                    company: {
+                        id: "",
+                        name: this.company.name,
+                        description: this.company.description,
+                        paymentType: this.company.paymentType === "monthly" ? "Monthly" : 
+                                   this.company.paymentType === "biweekly" ? "Biweekly" : "Weekly",
+                        employees: [],
+                        maxBenefitsPerEmployee: parseInt(this.company.maxBenefits),
+                        creationDate: new Date().toISOString(),
+                        creationAuthor: "system",
+                        lastModificationDate: new Date().toISOString(),
+                        lastModificationAuthor: "system"
+                    }
+                };
+                
+                console.log("Sending data:", JSON.stringify(payload, null, 2));
+                
+                const response = await axios.post('https://localhost:5000/api/Company/CreateCompanyWithDependencies', payload);
+
+                if (response.status == 201) {
+                    alert("Se registró la empresa exitosamente!");
+                    this.$router.push('/main-menu');
+                }
+            } catch (error) {
+                alert("No se pudo registrar la empresa");
+
+                console.error("Error details:", error);
+                if (error.response) {
+                    console.error("Response data:", error.response.data);
+                    console.error("Status:", error.response.status);
+                    if (error.response.data && error.response.data.errors) {
+                        console.error("Validation errors:", error.response.data.errors);
+                    }
+                } else if (error.request) {
+                    // The request was made but no response was received
+                    console.error("No response received:", error.request);
+                } else {
+                    // Something happened in setting up the request that triggered an error
+                    console.error("Error:", error.message);
+                }
+            }
         },
         hasErrors() {
             // Check basic information errors
