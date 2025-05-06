@@ -84,67 +84,60 @@ namespace backend.Repositories
         /// </summary>
         /// <returns>A list of company models.</returns>
         public List<CompanyModel> GetCompanies()
+{
+    List<CompanyModel> companies = new List<CompanyModel>();
+ var query = @"
+        SELECT c.Id, c.Name, c.Description, c.PaymentType, c.MaxBenefitsPerEmployee, 
+               c.CreationDate, c.CreationAuthor, c.LastModificationDate, c.LastModificationAuthor,
+               p.Province, p.Canton, p.Neighborhood, p.AdditionalDirectionDetails, p.LegalId,
+               (SELECT COUNT(*) FROM Employees e WHERE e.CompanyId = c.Id) AS EmployeeCount
+        FROM Companies c
+        INNER JOIN Persons p ON c.Id = p.Id
+        ORDER BY c.Name";
+
+    using (var connection = new SqlConnection(_connectionString))
+    {
+        try
         {
-            // Create a list to store the companies
-            List<CompanyModel> companies = new List<CompanyModel>();
+            connection.Open();
 
-            // SQL query to select all companies
-            var query = @"
-                SELECT c.Id, c.Name, c.Description, c.PaymentType, c.MaxBenefitsPerEmployee, 
-                       c.CreationDate, c.CreationAuthor, c.LastModificationDate, c.LastModificationAuthor,
-                       p.Province, p.Canton, p.Neighborhood, p.AdditionalDirectionDetails
-                FROM Companies c
-                INNER JOIN Persons p ON c.Id = p.Id
-                ORDER BY c.Name";
-
-            // Create a new connection for this operation
-            using (var connection = new SqlConnection(_connectionString))
+            using (var command = new SqlCommand(query, connection))
             {
-                try
+                using (var reader = command.ExecuteReader())
                 {
-                    connection.Open();
-                    
-                    // Create a SQL command with the query and connection
-                    using (var command = new SqlCommand(query, connection))
+                    while (reader.Read())
                     {
-                        // Execute the query and retrieve the results using a data reader
-                        using (var reader = command.ExecuteReader())
+                        var company = new CompanyModel
                         {
-                            // Iterate through the results
-                            while (reader.Read())
-                            {
-                                // Create a CompanyModel for each row
-                                var company = new CompanyModel
-                                {
-                                    Id = reader["Id"].ToString(),
-                                    Name = reader["Name"].ToString(),
-                                    Description = reader["Description"] != DBNull.Value ? reader["Description"].ToString() : null,
-                                    PaymentType = reader["PaymentType"].ToString(),
-                                    MaxBenefitsPerEmployee = reader["MaxBenefitsPerEmployee"] != DBNull.Value ? (int?)reader["MaxBenefitsPerEmployee"] : null,
-                                    CreationDate = (DateTime)reader["CreationDate"],
-                                    CreationAuthor = reader["CreationAuthor"] != DBNull.Value ? reader["CreationAuthor"].ToString() : null,
-                                    LastModificationDate = reader["LastModificationDate"] != DBNull.Value ? (DateTime?)reader["LastModificationDate"] : null,
-                                    LastModificationAuthor = reader["LastModificationAuthor"] != DBNull.Value ? reader["LastModificationAuthor"].ToString() : null,
-                                    Employees = null
-                                };
+                            Id = reader["Id"].ToString(),
+                            Name = reader["Name"].ToString(),
+                            Description = reader["Description"] != DBNull.Value ? reader["Description"].ToString() : null,
+                            PaymentType = reader["PaymentType"].ToString(),
+                            MaxBenefitsPerEmployee = reader["MaxBenefitsPerEmployee"] != DBNull.Value ? (int?)reader["MaxBenefitsPerEmployee"] : null,
+                            CreationDate = (DateTime)reader["CreationDate"],
+                            CreationAuthor = reader["CreationAuthor"] != DBNull.Value ? reader["CreationAuthor"].ToString() : null,
+                            LastModificationDate = reader["LastModificationDate"] != DBNull.Value ? (DateTime?)reader["LastModificationDate"] : null,
+                            LastModificationAuthor = reader["LastModificationAuthor"] != DBNull.Value ? reader["LastModificationAuthor"].ToString() : null,
+                            Employees = new List<EmployeeModel>(),
+                            EmployeeCount = Convert.ToInt32(reader["EmployeeCount"]),
+                            LegalId = reader["LegalId"].ToString()
+                        };
 
-                                // Add the company to the list
-                                companies.Add(company);
-                            }
-                        }
+                        companies.Add(company);
                     }
                 }
-                catch (Exception ex)
-                {
-                    // Log the exception or handle it as needed
-                    Console.WriteLine($"Error retrieving companies: {ex.Message}");
-                    throw; // Re-throw the exception to be handled by the controller
-                }
             }
-
-            // Return the list of companies
-            return companies;
         }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error retrieving companies: {ex.Message}");
+            throw;
+        }
+    }
+
+    return companies;
+}
+
 
         /// <summary>
         /// Retrieves a company by its ID.

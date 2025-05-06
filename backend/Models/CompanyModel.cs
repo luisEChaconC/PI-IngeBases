@@ -18,7 +18,11 @@ namespace backend.Models
         [RegularExpression("^(Monthly|Biweekly|Weekly)$", ErrorMessage = "PaymentType must be 'Monthly', 'Biweekly', or 'Weekly'.")]
         public string PaymentType { get; set; }
 
-        public List<dynamic> ?Employees { get; set; }
+        public List<EmployeeModel> ?Employees { get; set; }
+        
+        public int EmployeeCount { get; set; }
+        
+        public string? LegalId { get; set; }
 
         public int? MaxBenefitsPerEmployee { get; set; }
 
