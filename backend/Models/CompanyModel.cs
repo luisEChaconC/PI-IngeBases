@@ -41,6 +41,8 @@ namespace backend.Models
 
         public List<ContactModel> ?Contact { get; set; }
 
+        public List<dynamic> ?EmployeesDynamic { get; set; }
+
         public CompanyModel()
         {
             Id = string.Empty;
@@ -55,9 +57,10 @@ namespace backend.Models
             Person = null;
             Contact = null;
             Employees = null;
+            EmployeesDynamic = null;
         }
 
-        public CompanyModel(string id, string name, string? description, string paymentType, List<dynamic> employees, int? maxBenefitsPerEmployee, DateTime creationDate, string? creationAuthor, DateTime? lastModificationDate, string? lastModificationAuthor)
+        public CompanyModel(string id, string name, string? description, string paymentType, List<EmployeeModel> employees, int? maxBenefitsPerEmployee, DateTime creationDate, string? creationAuthor, DateTime? lastModificationDate, string? lastModificationAuthor)
         {
             Id = id;
             Name = name;

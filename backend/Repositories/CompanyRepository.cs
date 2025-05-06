@@ -190,7 +190,7 @@ namespace backend.Repositories
                                     LastModificationAuthor = reader["LastModificationAuthor"] != DBNull.Value ? reader["LastModificationAuthor"].ToString() : null,
                                     Person = _personRepository.GetPersonById(reader["Id"].ToString()),
                                     Contact = _contactRepository.GetContactsById(reader["Id"].ToString()),
-                                    Employees = _employeeRepository.GetEmployeesByCompanyId(reader["Id"].ToString())
+                                    EmployeesDynamic = _employeeRepository.GetEmployeesByCompanyId(reader["Id"].ToString())
                                 };
                             }
                         }

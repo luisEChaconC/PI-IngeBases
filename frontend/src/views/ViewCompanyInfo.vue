@@ -52,7 +52,7 @@
   
 <script>
 import axios from 'axios';
-import currentUserService from '../services/currentUserService.js';
+//import currentUserService from "@/services/currentUserService";
 export default {
   name: 'ViewCompanyInfo',
   data() {
@@ -87,7 +87,7 @@ export default {
       axios.get(`https://localhost:5000/api/Company/GetCompanyById/${companyId}`)
         .then((response) => {
           this.company = response.data;
-          this.company.employeesCount = response.data.employees.length;
+          this.company.employeesCount = response.data.employeesDynamic.length;
           
       
           const contactsList = response.data.contact; 
@@ -106,9 +106,10 @@ export default {
   },
 
   created() {
-    const currentUserInformation = currentUserService.getCurrentUserInformationFromLocalStorage();
-    console.log("Current user information:", currentUserInformation);
-    this.getCompanyById('62d57b2c-c081-4155-912d-abfc8d6cd6a0'); // Changed ID
+   // const currentUserInformation = currentUserService.getCurrentUserInformationFromLocalStorage();
+    this.getCompanyById('b4d86d82-d42c-4477-86b0-a9555fd01c38'); // Changed ID
+    
+    console.log('b4d86d82-d42c-4477-86b0-a9555fd01c38');
   },
 
   computed: {
