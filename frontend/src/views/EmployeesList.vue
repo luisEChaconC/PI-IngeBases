@@ -4,7 +4,7 @@
       <div class="card-body">
         <div class="d-flex justify-content-between mx-2 mb-4">
           <h2 class="card-title">Empleados</h2>
-          <a href="#" class="btn btn-dark">
+          <a href="/add-employee" class="btn btn-dark">
             <i class="fas fa-user-plus me-2"/>
             Nuevo Empleado
           </a>
