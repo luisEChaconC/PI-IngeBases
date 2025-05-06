@@ -11,13 +11,16 @@ namespace backend.Controllers
     public class CompanyController : ControllerBase
     {
         private readonly CompanyRepository _companyHandler; // Repository to handle database operations for companies
-        
+
         private readonly PersonController _personController; // Controller to handle person operations
         private readonly ContactController _contactController; // Controller to handle contact operations
         // Constructor to initialize the repositories
         public CompanyController()
         {
-            _companyHandler = new CompanyRepository(); // Initialize the company repository
+            var personRepo = new PersonRepository();
+            var contactRepo = new ContactRepository();
+            _companyHandler = new CompanyRepository(personRepo, contactRepo); // Initialize the company repository
+
             _personController = new PersonController(); // Initialize the person controller
             _contactController = new ContactController(); // Initialize the contact controller
         }

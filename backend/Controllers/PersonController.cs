@@ -69,5 +69,37 @@ namespace backend.Controllers
 
             return personId;
         }
+        
+        /// <summary>
+        /// HTTP GET endpoint to retrieve a person by its ID.
+        /// </summary>
+        /// <param name="id">The ID of the person to retrieve.</param>
+        /// <returns>The person if found; otherwise, a 404 Not Found response.</returns>
+        [HttpGet]
+        [Route("GetPersonById/{id}")]
+        public IActionResult GetPersonById(string id)
+        {
+            try
+            {
+                // Call the repository method to get the person by ID
+                var person = _personHandler.GetPersonById(id);
+
+                // Check if the person was found
+                if (person == null)
+                {
+                    // Return 404 Not Found if the person was not found
+                    return NotFound(new { message = "person not found." });
+                }
+
+                // Return 200 OK response with the person
+                return Ok(person);
+            }
+            catch (Exception ex)
+            {
+                // Return a 500 Internal Server Error response with the error message
+                return StatusCode(StatusCodes.Status500InternalServerError, 
+                    new { message = "An error occurred while retrieving the person.", error = ex.Message });
+            }
+        }
     }
 }

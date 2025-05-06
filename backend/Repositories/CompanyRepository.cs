@@ -11,11 +11,13 @@ namespace backend.Repositories
     {
         private SqlConnection _connection; // SQL connection object
         private string _connectionString; // Connection string for the database
+        private readonly PersonRepository _personRepository; // Instance of PersonRepository for managing persons
+        private readonly ContactRepository _contactRepository; // Instance of PersonRepository for managing persons
 
         /// <summary>
         /// Constructor to initialize the connection string and SQL connection.
         /// </summary>
-        public CompanyRepository()
+        public CompanyRepository(PersonRepository personRepository, ContactRepository contactRepository)
         {
             // Create a configuration builder to retrieve the connection string
             var builder = WebApplication.CreateBuilder();
@@ -23,6 +25,9 @@ namespace backend.Repositories
 
             // Initialize the SQL connection with the connection string
             _connection = new SqlConnection(_connectionString);
+
+            _personRepository = personRepository; // Initialize the PersonRepository instance
+            _contactRepository = contactRepository; // Initialize the ContactRepository instance
         }
 
 
@@ -188,6 +193,8 @@ namespace backend.Repositories
                                     CreationAuthor = reader["CreationAuthor"] != DBNull.Value ? reader["CreationAuthor"].ToString() : null,
                                     LastModificationDate = reader["LastModificationDate"] != DBNull.Value ? (DateTime?)reader["LastModificationDate"] : null,
                                     LastModificationAuthor = reader["LastModificationAuthor"] != DBNull.Value ? reader["LastModificationAuthor"].ToString() : null,
+                                    Person = _personRepository.GetPersonById(reader["Id"].ToString()),
+                                    Contact = _contactRepository.GetContactsById(reader["Id"].ToString()),
                                     Employees = new List<EmployeeModel>() // Initialize empty list
                                 };
                             }

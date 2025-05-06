@@ -20,7 +20,7 @@
               </div>
               <div class="mb-3">
                 <label for="phoneNumber" class="form-label">Teléfono</label>
-                <input type="tel" class="form-control" id="phoneNumber" v-model="company.phoneNumber" disabled />
+                <input type="tel" class="form-control" id="phoneNumber" v-model="company.contact.phoneNumber" disabled />
               </div>
     
             </div>
@@ -29,7 +29,7 @@
             <div class="col-md-5 ms-md-4">
               <div class="mb-3">
                 <label for="legalId" class="form-label">Cédula Jurídica</label>
-                <input type="text" class="form-control" id="legalId" v-model="company.legalId" disabled />
+                <input type="text" class="form-control" id="legalId" v-model="company.person.legalId" disabled />
               </div>
               <div class="mb-3">
                 <label for="employeesCount" class="form-label">Cantidad de empleados</label>
@@ -37,7 +37,7 @@
               </div>
               <div class="mb-3">
                 <label for="email" class="form-label">Correo</label>
-                <input type="text" class="form-control" id="email" v-model="company.email" disabled />
+                <input type="text" class="form-control" id="email" v-model="company.contact.email" disabled />
               </div>
             </div>
           </div>
@@ -50,64 +50,73 @@
     </div>
   </template>
   
-  <script>
-  import axios from 'axios';
-  export default {
-    name: 'ViewCompanyInfo', 
-    data() {
-      return {
-        company: {
-          name: "",
+<script>
+import axios from 'axios';
+
+export default {
+  name: 'ViewCompanyInfo',
+  data() {
+    return {
+      company: {
+        name: "",
+        province: "",
+        canton: "",
+        neighborhood: "",
+        additionalDirectionDetails: "",
+        legalId: "", 
+        employeesCount: 0,
+        paymentType: "",
+        person: {
           province: "",
           canton: "",
-          district: "",
           neighborhood: "",
           additionalDirectionDetails: "",
           legalId: "",
-          employeesCount: 0,
-          paymentType: "",
-          email:""
         },
-        companies: [] 
-      };
-    },
+        contact: {
+          phoneNumber: "",
+          email: ""
+        },
+        employees: []
+      }
+    };
+  },
 
-    methods: {
-      getCompanies() {
-      axios.get("http://localhost:5000/api/company")
+  methods: {
+    getCompanyById(companyId) {
+      axios.get(`https://localhost:5000/api/Company/GetCompanyById/${companyId}`)
         .then((response) => {
-          this.companies = response.data;
-          console.log("Received companies:", this.companies);
-          this.setCompanyById('dcf3a816-e997-46bc-87e9-19d8ffa92f60'); // temporary hardcoded ID
+          this.company = response.data;
+          this.company.employeesCount = response.data.employees.length;
+          
+      
+          const contactsList = response.data.contact; 
+
+          this.company.contact = {
+            phoneNumber: contactsList.find(c => c.phoneNumber)?.phoneNumber || "",
+            email: contactsList.find(c => c.email)?.email || ""
+          };
+
+          console.log("Company loaded:", this.company);
         })
         .catch((error) => {
-          console.error("Error: could not get companies ", error);
+          console.error("Error retrieving company:", error);
         });
-      },
-    
-   
-      setCompanyById(companyId) {
-        const foundCompany = this.companies.find(company => company.id === companyId);
-        console.log("Company found:", foundCompany); 
-        if (foundCompany) {
-          this.company = foundCompany;
-        } else {
-          console.warn("Could not find company with ID:", companyId);
-        }
-      }
-    },
-    created: function() {
-      this.getCompanies();
-    },
-
-    computed: {
-      fullAddress() {
-        const { province, canton, district, neighborhood, additionalDirectionDetails} = this.company;
-        return [province, canton, district, neighborhood, additionalDirectionDetails].filter(Boolean).join(', ');
-      }
     }
-  };
-  </script>
+  },
+
+  created() {
+    this.getCompanyById('62d57b2c-c081-4155-912d-abfc8d6cd6a0'); // Changed ID
+  },
+
+  computed: {
+    fullAddress() {
+      const { province, canton, neighborhood, additionalDirectionDetails } = this.company.person;
+      return [province, canton, neighborhood, additionalDirectionDetails].filter(Boolean).join(', ');
+    }
+  }
+};
+</script>
 
 <style scoped>
 
@@ -116,9 +125,9 @@
   max-width: 30%;
 }
 .card-title {
-  font-size: 30px;
+  font-size: 35px;
   font-weight: bold;
-  margin-bottom: 65px;
+  margin-bottom: 35px;
 }
 
 .btn-dark {
@@ -135,7 +144,7 @@
 
 input[disabled] {
   width: 100%;
-  background-color: #fff;
+  background-color: #f0efef;
   color: #000;           
   opacity: 1;          
 }

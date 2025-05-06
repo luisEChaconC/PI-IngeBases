@@ -33,6 +33,10 @@ namespace backend.Models
         [StringLength(80, ErrorMessage = "LastModificationAuthor cannot exceed 80 characters.")]
         public string? LastModificationAuthor { get; set; }
 
+        public PersonsModel? Person { get; set; }
+
+        public List<ContactModel> ?Contact { get; set; }
+
         public CompanyModel()
         {
             Id = string.Empty;
@@ -45,6 +49,8 @@ namespace backend.Models
             CreationAuthor = null;
             LastModificationDate = DateTime.Now;
             LastModificationAuthor = null;
+            Person = null;
+            Contact = null;
         }
 
         public CompanyModel(string id, string name, string? description, string paymentType, List<EmployeeModel> employees, int? maxBenefitsPerEmployee, DateTime creationDate, string? creationAuthor, DateTime? lastModificationDate, string? lastModificationAuthor)
