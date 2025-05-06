@@ -327,9 +327,6 @@ export default {
                 return;
             }
             
-            this.removeHyphensFromLegalEntityId();
-            this.removeHyphensFromPhoneNumber();
-
             this.registerCompany();
         },
         async registerCompany() {
@@ -338,7 +335,7 @@ export default {
                 const payload = {
                     person: {
                         id: "",
-                        legalId: this.company.legalEntityId,
+                        legalId: this.removeHyphens(this.company.legalEntityId),
                         type: "Legal Entity",
                         province: this.company.direction.province,
                         canton: this.company.direction.canton,
@@ -357,7 +354,7 @@ export default {
                         {
                             id: "",
                             type: "Phone Number",
-                            phoneNumber: this.company.contact.phoneNumber,
+                            phoneNumber: this.removeHyphens(this.company.contact.phoneNumber),
                             personId: ""
                         }
                     ],
@@ -441,9 +438,6 @@ export default {
         legalEntityIdHasAValidFormat() {
             const validFormat = /^\d-\d\d\d-\d\d\d\d\d\d$/;
             return validFormat.test(this.company.legalEntityId);
-        },
-        removeHyphensFromLegalEntityId() {
-            this.company.legalEntityId = this.removeHyphens(this.company.legalEntityId);
         },
         validateName() {
             if (!this.company.name) {
@@ -688,9 +682,6 @@ export default {
         phoneNumberHasValidFormat() {
             const validFormat = /^[0-9]{4}-[0-9]{4}$/;
             return validFormat.test(this.company.contact.phoneNumber);
-        },
-        removeHyphensFromPhoneNumber() {
-            this.company.contact.phoneNumber = this.removeHyphens(this.company.contact.phoneNumber);
         },
         removeHyphens(string) {
             return string.replace(/-/g, '');
