@@ -311,27 +311,16 @@ export default {
     },
     methods: {
         handleRegisterCompany() {
-            // Validate all fields before submitting
-            this.validateLegalEntityId();
-            this.validateName();
-            this.validateDescription();
-            this.validatePaymentType();
-            this.validateMaxBenefits();
-            this.validateAddressFields();
-            this.validateAdditionalDetails();
-            this.validateEmail();
-            this.validatePhoneNumber();
+            this.validateAllFields();
             
-            // Check if there are any errors
             if (this.hasErrors()) {
                 return;
             }
-            
+
             this.registerCompany();
         },
         async registerCompany() {
             try {
-                // Create request payload using form data
                 const payload = {
                     person: {
                         id: "",
@@ -399,6 +388,17 @@ export default {
                     console.error("Error:", error.message);
                 }
             }
+        },
+        validateAllFields() {
+            this.validateLegalEntityId();
+            this.validateName();
+            this.validateDescription();
+            this.validatePaymentType();
+            this.validateMaxBenefits();
+            this.validateAddressFields();
+            this.validateAdditionalDetails();
+            this.validateEmail();
+            this.validatePhoneNumber();
         },
         hasErrors() {
             // Check basic information errors
