@@ -9,12 +9,12 @@ namespace backend.Controllers
     [ApiController]
     public class PayrollManagerController : ControllerBase
     {
-        private readonly PayrollManagerRepository _payrollManagerHandler; // Repository to handle database operations for payroll managers
+        private readonly PayrollManagerRepository _payrollManagerRepository; // Repository to handle database operations for payroll managers
 
         // Constructor to initialize the payroll manager repository
         public PayrollManagerController()
         {
-            _payrollManagerHandler = new PayrollManagerRepository(); // Initialize the payroll manager repository
+            _payrollManagerRepository = new PayrollManagerRepository(); // Initialize the payroll manager repository
         }
 
         /// <summary>
@@ -35,7 +35,7 @@ namespace backend.Controllers
                 }
 
                 // Call the repository method to create the payroll manager
-                _payrollManagerHandler.CreatePayrollManager(payrollManager);
+                _payrollManagerRepository.CreatePayrollManager(payrollManager);
 
                 // Return 201 Created response with a success message
                 return Created("", new {id = payrollManager.Id, message = "Payroll Manager created successfully" });
