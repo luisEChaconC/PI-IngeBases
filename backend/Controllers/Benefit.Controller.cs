@@ -35,20 +35,20 @@ namespace backend.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<bool>> CreateBenefit(Benefit benefit)
+        public ActionResult<bool> CreateBenefit(Benefit benefit)
         {
             try
             {
                 if (benefit == null)
                     return BadRequest("Benefit is null");
 
-                var result = _benefitService.CreateBenefit(benefit);
-                return new JsonResult(result);
+                var result = _benefitService.CreateBenefit(benefit); 
+                return Ok(result);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError,
-                    "Error creating benefit");
+                    $"Error creating benefit: {ex.Message}");
             }
         }
     }
