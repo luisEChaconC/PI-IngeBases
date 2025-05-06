@@ -22,7 +22,7 @@ namespace backend.Models
         
         public int EmployeeCount { get; set; }
         
-        public string LegalId { get; set; }
+        public string? LegalId { get; set; }
 
         public int? MaxBenefitsPerEmployee { get; set; }
 
