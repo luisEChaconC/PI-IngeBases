@@ -1,49 +1,51 @@
 <template>
-    <div class="d-flex justify-content-center align-items-center min-vh-100 my-5">
-      <div class="card w-75">
-        <div class="card-body">
-          <h2 class="card-title">Información empresa</h2>
-          <div class="row gap-5">
-            <!-- Left column elements -->
-            <div class="col-md-5">
-              <div class="mb-3">
-                <label for="name" class="form-label">Nombre</label>
-                <input type="text" class="form-control" id="name" v-model="company.name" disabled />
-              </div>
-              <div class="mb-3">
+    <div class="d-flex justify-content-center align-items-center my-5">
+      <div class="card" style="max-width: 800px; width: 100%;">
+        <div class="card-body p-4">
+          <h4 class="card-title fw-bold mb-4">Información empresa</h4>
+          
+          <div class="row g-3">
+            <!-- Primera fila -->
+            <div class="col-md-6 mb-3">
+              <label for="name" class="form-label">Nombre</label>
+              <input type="text" class="form-control" id="name" v-model="company.name" disabled />
+            </div>
+            <div class="col-md-6 mb-3">
+              <label for="legalId" class="form-label">Cédula Jurídica</label>
+              <input type="text" class="form-control" id="legalId" v-model="company.person.legalId" disabled />
+            </div>
+            
+            <!-- Fila de dirección -->
+            <div class="col-12 mb-3">
               <label for="address" class="form-label">Dirección</label>
               <input type="text" class="form-control" id="address" :value="fullAddress" disabled/>
             </div>
-              <div class="mb-3">
-                <label for="paymentType" class="form-label">Tipo de pago</label>
-                <input type="email" class="form-control" id="paymentType" v-model="company.paymentType" disabled />
-              </div>
-              <div class="mb-3">
-                <label for="phoneNumber" class="form-label">Teléfono</label>
-                <input type="tel" class="form-control" id="phoneNumber" v-model="company.contact.phoneNumber" disabled />
-              </div>
-    
+            
+            <!-- Tercera fila -->
+            <div class="col-md-6 mb-3">
+              <label for="employeesCount" class="form-label">Cantidad empleados</label>
+              <input type="number" class="form-control" id="employeesCount" v-model="company.employeesCount" disabled />
             </div>
-  
-            <!-- Right column elements  -->
-            <div class="col-md-5 ms-md-4">
-              <div class="mb-3">
-                <label for="legalId" class="form-label">Cédula Jurídica</label>
-                <input type="text" class="form-control" id="legalId" v-model="company.person.legalId" disabled />
-              </div>
-              <div class="mb-3">
-                <label for="employeesCount" class="form-label">Cantidad de empleados</label>
-                <input type="int" class="form-control" id="employeesCount" v-model="company.employeesCount" disabled />
-              </div>
-              <div class="mb-3">
-                <label for="email" class="form-label">Correo</label>
-                <input type="text" class="form-control" id="email" v-model="company.contact.email" disabled />
-              </div>
+            <div class="col-md-6 mb-3">
+              <label for="paymentType" class="form-label">Tipo de Pago</label>
+              <select class="form-select" id="paymentType" v-model="company.paymentType" disabled>
+                <option value="" disabled>Seleccionar</option>
+              </select>
+            </div>
+            
+            <!-- Cuarta fila -->
+            <div class="col-md-6 mb-3">
+              <label for="email" class="form-label">Correo</label>
+              <input type="email" class="form-control" id="email" v-model="company.contact.email" disabled />
+            </div>
+            <div class="col-md-6 mb-3">
+              <label for="phoneNumber" class="form-label">Teléfono</label>
+              <input type="tel" class="form-control" id="phoneNumber" v-model="company.contact.phoneNumber" disabled />
             </div>
           </div>
   
-          <div class="d-flex justify-content-center mt-3">
-            <button type="button" class="btn btn-dark">Editar</button>
+          <div class="mt-4">
+            <button type="button" class="btn btn-dark px-4">Editar</button>
           </div>
         </div>
       </div>
@@ -120,34 +122,13 @@ export default {
 </script>
 
 <style scoped>
-
-.card {
-  border-radius: 10px;
-  max-width: 30%;
-}
-.card-title {
-  font-size: 35px;
-  font-weight: bold;
-  margin-bottom: 35px;
-}
-
 .btn-dark {
-  padding-left: 30px;
-  padding-right: 30px;
-  margin-top: 30px;
+  padding: 0.5rem 2rem;
 }
 
-.form-control {
-  font-size: 16px;
-  padding: 10px;
-  margin-bottom: 20px;
+.form-control:disabled, .form-select:disabled {
+  background-color: #f8f9fa;
+  color: #212529;
+  opacity: 1;
 }
-
-input[disabled] {
-  width: 100%;
-  background-color: #f0efef;
-  color: #000;           
-  opacity: 1;          
-}
-
 </style> 
