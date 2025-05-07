@@ -60,5 +60,49 @@ namespace backend.Repositories
 
             return contactId;
         }
+
+        /// <summary>
+        /// Retrieves a list of contacts by its ID.
+        /// </summary>
+        /// <param name="id">The ID of the contact to retrieve.</param>
+        /// <returns>The contact model if found; otherwise, null.</returns>
+        public List<ContactModel> GetContactsById(string companyId)
+        {
+            var contacts = new List<ContactModel>();
+
+            var query = @"
+                SELECT Id, Type, PhoneNumber, Email, PersonId
+                FROM Contacts
+                WHERE PersonId = @CompanyId";
+
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                connection.Open();
+
+                using (var command = new SqlCommand(query, connection))
+                {
+                    command.Parameters.AddWithValue("@CompanyId", companyId);
+
+                    using (var reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            var contact = new ContactModel
+                            {
+                                Id = reader["Id"].ToString(),
+                                Type = reader["Type"].ToString(),
+                                PhoneNumber = reader["PhoneNumber"] != DBNull.Value ? reader["PhoneNumber"].ToString() : null,
+                                Email = reader["Email"] != DBNull.Value ? reader["Email"].ToString() : null,
+                                PersonId = reader["PersonId"].ToString()
+                            };
+
+                            contacts.Add(contact);
+                        }
+                    }
+                }
+            }
+
+            return contacts;
+        }
     }
 }
