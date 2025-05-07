@@ -1,8 +1,8 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import CompanyRegistration from '@/views/CompanyRegistration.vue'
 import EmployerRegistration from '@/views/EmployerRegistration.vue'
-import EmployeesList from '../views/EmployeesList.vue'
-import Login from '../views/LoginForm.vue'
+import EmployeesList from '@/views/EmployeesList.vue'
+import Login from '@/views/LoginForm.vue'
 import BenefitList from '@/components/BenefitList.vue'
 import Benefit from '@/components/BenefitView.vue'
 import BenefitCreate from '@/components/BenefitCreate.vue'
@@ -12,7 +12,7 @@ const routes =
     [
         { path: '/login', name: 'LoginForm', component: Login },
         { path: '/company-registration', name: 'CompanyRegistration', component: CompanyRegistration },
-        { path: '/employer-registration/:param', name: 'EmployerRegistration', component: EmployerRegistration, props: true },
+        { path: '/employer-registration/:companyId', name: 'EmployerRegistration', component: EmployerRegistration, props: true },
         { path: '/employer-registration', redirect: '/login' },
         { path: '/employees-list', name: 'EmployeesList', component: EmployeesList },
         { path: '/benefits', name: 'Benefits', component: BenefitList },
