@@ -117,7 +117,7 @@ export default {
           alert("Se inició sesión con éxito! Redirigiendo al menú principal...");
           console.log("Login exitoso → redirigiendo al menú principal");
           // Uncomment the following line to enable navigation
-          // this.$router.push({ name: "MainMenu" });
+          this.$router.push({ name: "MainMenu" });
         }
       } catch (error) {
         // Handle errors that occur during the API call

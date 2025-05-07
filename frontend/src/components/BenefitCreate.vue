@@ -213,8 +213,9 @@ const saveBenefit = async () => {
   if (Object.keys(errors.value).length > 0) {
     return
   }
-
+  
   const userInfo = localStorage.getItem('currentUserInformation')
+  console.log(localStorage.getItem('currentUserInformation'))
   const companyId = userInfo ? JSON.parse(userInfo).companyId : null
 
   if (!companyId) {

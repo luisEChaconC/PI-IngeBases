@@ -126,6 +126,7 @@ export default {
   },
   created() {
     const currentUserInformation = currentUserService.getCurrentUserInformationFromLocalStorage();
+    console.log(currentUserService.getCurrentUserInformationFromLocalStorage())
     if (currentUserInformation?.position) {
       this.employeeType = currentUserInformation.position.replace(/\s/g, '');
     }

@@ -69,6 +69,7 @@ const getCurrentUserInformationFromLocalStorage = () => {
 
 const getBenefits = async () => {
     try {
+        console.log(getCurrentUserInformationFromLocalStorage())
         const companyId = getCurrentUserInformationFromLocalStorage()?.companyId;
 
         if (!companyId) {
