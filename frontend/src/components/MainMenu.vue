@@ -25,7 +25,6 @@
               <a class="nav-link" href="#">Pagos</a>
             </li>
             <li v-if="showOption('viewCompany')" class="nav-item">
-              <a class="nav-link" href="#">Empresa</a>
               <router-link to="/view-company-info" class="nav-link">Empresa</router-link>
 
             </li>
@@ -33,9 +32,22 @@
               <router-link to="/employees-list" class="nav-link">Empleados</router-link>
             </li>
             <li v-if="showOption('viewBenefits')" class="nav-item">
-              <router-link v-if="employeeType === 'Employer'" to="/benefits" class="nav-link">Beneficios</router-link>
-              <a v-else href="#" class="nav-link">Beneficios</a>
-            </li>
+            <router-link
+              v-if="employeeType === 'Employer'"
+              to="/benefits"
+              class="nav-link"
+            >
+              Beneficios
+            </router-link>
+            <router-link
+              v-else-if="employeeType === 'Collaborator'"
+              to="/select-change-benefit"
+              class="nav-link"
+            >
+              Beneficios
+            </router-link>
+            <a v-else href="#" class="nav-link">Beneficios</a>
+          </li>
             <li v-if="showOption('viewRequestHourCorrection')" class="nav-item">
               <a class="nav-link" href="#">Corrección Horas</a>
             </li>

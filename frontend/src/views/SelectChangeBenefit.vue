@@ -17,6 +17,11 @@
         <span>{{ benefit.name }}</span>
         <button class="btn btn-dark btn-sm" @click="removeBenefit(index)">Eliminar</button>
       </div>
+      <div class="d-flex justify-content-end mt-3">
+        <button class="btn btn-success" @click="assignBenefits" :disabled="selectedBenefits.length === 0">
+          Guardar
+        </button>
+      </div>
     </div>
 
     <!-- Modal -->
@@ -74,21 +79,35 @@ export default {
     const maxBenefits = ref(3);
     const modalInstance = ref(null);
     const benefitsModal = ref(null);
-
-    const getBenefits = async () => {
-      try {
-        const response = await axios.get("https://localhost:5000/api/benefit")
-        allBenefits.value = response.data;
-      } catch (error) {
-        console.error('Error getting benefits:', error);
-      }
-    };
-
     const availableBenefits = computed(() =>
       allBenefits.value.filter(
         (b) => !selectedBenefits.value.some((sb) => sb.id === b.id)
       )
     );
+
+    const getCurrentUserInformationFromLocalStorage = () => {
+      const userInformation = localStorage.getItem('currentUserInformation');
+      return userInformation ? JSON.parse(userInformation) : null;
+    };
+
+    const getBenefits = async () => {
+      try {
+        const companyId = getCurrentUserInformationFromLocalStorage()?.companyId;
+        if (!companyId) {
+          console.error('No se encontró companyId en localStorage.');
+          return;
+        }
+
+        const response = await axios.get("https://localhost:5000/api/benefit", {
+          params: { companyId }
+        });
+        allBenefits.value = response.data;
+        console.log(allBenefits);
+      } catch (error) {
+        console.error('Error getting benefits:', error);
+      }
+    };
+
 
     const exceedsLimit = computed(() =>
       selectedBenefits.value.length + tempSelection.value.length > maxBenefits.value
@@ -109,12 +128,60 @@ export default {
       }
     };
 
+    const assignBenefits = async () => {
+      try {
+        const employeeId = getCurrentUserInformationFromLocalStorage()?.idNaturalPerson;
+        const benefitIds = selectedBenefits.value.map(b => b.id);
+
+        if (!employeeId || benefitIds.length === 0) {
+          console.warn('Faltan datos para asignar beneficios.');
+          return;
+        }
+
+        const payload = {
+          employeeId,
+          benefitIds
+        };
+
+        console.log("Asignando con:", payload);
+
+        const response = await axios.post('https://localhost:5000/api/benefit/assign', payload);
+
+        if (response.status === 200) {
+          alert('Beneficios asignados exitosamente.');
+        }
+      } catch (error) {
+        console.error('Error asignando beneficios:', error);
+      }
+    };
+
+    const getAssignedBenefits = async () => {
+      try {
+        const employeeId = getCurrentUserInformationFromLocalStorage()?.idNaturalPerson;
+        if (!employeeId) {
+          console.error('No se encontró el ID del empleado en localStorage.');
+          return;
+        }
+
+        const response = await axios.get(`https://localhost:5000/api/benefit/assigned`, {
+          params: { employeeId }
+        });
+
+        // Cargar los beneficios asignados al estado
+        selectedBenefits.value = response.data;
+      } catch (error) {
+        console.error('Error recuperando los beneficios asignados:', error);
+      }
+    };
+
+
     const removeBenefit = (index) => {
       selectedBenefits.value.splice(index, 1);
     };
 
     onMounted(() => {
       getBenefits();
+      getAssignedBenefits();
     });
 
     return {
@@ -130,6 +197,7 @@ export default {
       openModal,
       addSelectedBenefits,
       removeBenefit,
+      assignBenefits,
     };
   },
 };

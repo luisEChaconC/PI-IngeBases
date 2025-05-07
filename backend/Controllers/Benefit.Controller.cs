@@ -56,5 +56,38 @@ namespace backend.Controllers
             return Ok(benefits);
         }
 
+        [HttpPost("assign")]
+        public ActionResult<bool> AssignBenefitsToEmployee([FromBody] EmployeeBenefitSelection selection)
+        {
+            try
+            {
+                if (selection == null || selection.BenefitIds == null || !selection.BenefitIds.Any())
+                    return BadRequest("Datos inválidos.");
+
+                var result = _benefitService.AssignBenefitsToEmployee(selection.EmployeeId, selection.BenefitIds);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    $"Error assigning benefits: {ex.Message}");
+            }
+        }
+
+        [HttpGet("assigned")]
+        public ActionResult<List<Benefit>> GetAssignedBenefits([FromQuery] Guid employeeId)
+        {
+            try
+            {
+                var benefits = _benefitService.GetAssignedBenefitsForEmployee(employeeId);
+                return Ok(benefits);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    $"Error fetching assigned benefits: {ex.Message}");
+            }
+        }
+
     }
 }
