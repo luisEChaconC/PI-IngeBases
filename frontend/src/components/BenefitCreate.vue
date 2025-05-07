@@ -214,6 +214,16 @@ const saveBenefit = async () => {
     return
   }
 
+  const userInfo = localStorage.getItem('currentUserInformation')
+  const companyId = userInfo ? JSON.parse(userInfo).companyId : null
+
+  if (!companyId) {
+    alert('No se encontró la empresa del usuario actual.')
+    return
+  }
+
+  benefit.value.companyId = companyId
+
   try {
     await axios.post('https://localhost:5000/api/benefit', benefit.value)
     alert('Beneficio guardado exitosamente')
@@ -223,4 +233,5 @@ const saveBenefit = async () => {
     alert('Error al guardar el beneficio')
   }
 }
+
 </script>
