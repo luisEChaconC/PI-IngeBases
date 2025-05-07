@@ -84,7 +84,7 @@ export default {
   methods: {
     showOption(option) {
       const permissions = {
-        Employee: [
+        Collaborator: [
           "viewProfile", 
           "viewPayments", 
           "viewWorkedHours", 
@@ -130,7 +130,9 @@ export default {
 
   created() {
     const currentUserInformation = currentUserService.getCurrentUserInformationFromLocalStorage();
-    this.employeeType = currentUserInformation.position; // o currentUserInformation.role, dependiendo del nombre exacto
+    if (currentUserInformation.position) {
+      this.employeeType = currentUserInformation.position.replace(/\s/g, ''); 
+    }
     console.log("Rol del usuario:", this.employeeType);
   }
 };
