@@ -141,10 +141,7 @@ export default {
      * Simulates navigation to the registration page.
      */
     handleRegister() {
-      alert("Se debería reenviar a otra vista!"); // Simulate navigation
-      console.log("Navegar a Registro de Usuario → luego Registro de Empresa");
-      // Uncomment the following line to enable navigation
-      // this.$router.push({ name: "UserRegister" });
+      this.$router.push('/company-registration');
     }
   }
 };
