@@ -5,6 +5,8 @@ CREATE TABLE Benefits (
        NOT NULL 
        PRIMARY KEY 
        DEFAULT NEWID(),
+	CompanyId UNIQUEIDENTIFIER NOT NULL,
+    FOREIGN KEY (CompanyId) REFERENCES Companies(Id) ON DELETE NO ACTION,
     Name VARCHAR(35) NOT NULL,
     Description VARCHAR(100),
     IsActive BIT NOT NULL,
@@ -18,4 +20,5 @@ CREATE TABLE Benefits (
        CHECK (FixedAmount BETWEEN 1 AND 10000000),
     RequiredMonthsWorked INT 
        CHECK (RequiredMonthsWorked BETWEEN 0 AND 480)
+   
 );

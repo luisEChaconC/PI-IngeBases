@@ -126,7 +126,7 @@ namespace backend.Repositories
                     np.FirstName,
                     np.FirstSurname,
                     np.SecondSurname,
-                    e.CompanyId,
+                    COALESCE(e.CompanyId, em.CompanyId) AS CompanyId, -- Get CompanyId from Employees or Employers
                     CASE 
                         WHEN s.Id IS NOT NULL THEN 'Supervisor'
                         WHEN pm.Id IS NOT NULL THEN 'Payroll Manager'
