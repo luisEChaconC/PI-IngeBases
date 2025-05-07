@@ -1,5 +1,4 @@
 import SelectChangeBenefit from '../views/SelectChangeBenefit.vue'
-import ViewCompanyInfo from '@/views/ViewCompanyInfo.vue'
 import AddEmployee from '@/views/AddEmployee.vue'
 import MainMenu from '@/components/MainMenu.vue'
 import ViewEmployeeProfile from '../views/ViewEmployeeProfile.vue'
