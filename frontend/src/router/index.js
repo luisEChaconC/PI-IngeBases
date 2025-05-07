@@ -14,6 +14,7 @@ const routes =
         { path: '/login', name: 'LoginForm', component: Login },
         { path: '/add-employee', name: 'AddEmployee', component: AddEmployee},
         { path: '/company-registration', name: 'CompanyRegistration', component: CompanyRegistration },
+        { path: '/employer-registration', redirect: '/login' },
         { path: '/view-companies-list',name: 'ViewCompaniesList',component: ViewEmployeeProfileEmployer},
         { path: '/employees-list', name: 'EmployeesList', component: EmployeesList },
         { path: '/benefits', name: 'Benefits', component: BenefitList },
