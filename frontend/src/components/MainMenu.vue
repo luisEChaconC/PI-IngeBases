@@ -25,7 +25,11 @@
               <a class="nav-link" href="#">Pagos</a>
             </li>
             <li v-if="showOption('viewCompany')" class="nav-item">
+<<<<<<< HEAD
+              <a class="nav-link" href="#">Empresa</a>
+=======
               <router-link to="/view-company-info" class="nav-link">Empresa</router-link>
+>>>>>>> develop
             </li>
             <li v-if="showOption('viewEmployees')" class="nav-item">
               <router-link to="/employees-list" class="nav-link">Empleados</router-link>
@@ -126,6 +130,7 @@ export default {
   },
   created() {
     const currentUserInformation = currentUserService.getCurrentUserInformationFromLocalStorage();
+    console.log(currentUserService.getCurrentUserInformationFromLocalStorage())
     if (currentUserInformation?.position) {
       this.employeeType = currentUserInformation.position.replace(/\s/g, '');
     }

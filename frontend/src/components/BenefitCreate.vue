@@ -213,6 +213,17 @@ const saveBenefit = async () => {
   if (Object.keys(errors.value).length > 0) {
     return
   }
+  
+  const userInfo = localStorage.getItem('currentUserInformation')
+  console.log(localStorage.getItem('currentUserInformation'))
+  const companyId = userInfo ? JSON.parse(userInfo).companyId : null
+
+  if (!companyId) {
+    alert('No se encontró la empresa del usuario actual.')
+    return
+  }
+
+  benefit.value.companyId = companyId
 
   try {
     await axios.post('https://localhost:5000/api/benefit', benefit.value)

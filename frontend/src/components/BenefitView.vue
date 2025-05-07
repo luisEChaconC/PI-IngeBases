@@ -71,6 +71,7 @@
   </template>
   
   <script setup>
+  
   import { computed, onMounted, ref } from 'vue'
   import { useRoute } from 'vue-router'
   import axios from 'axios'
@@ -78,15 +79,34 @@
   const route = useRoute()
   const benefitId = route.params.id
   const benefit = ref({})
+
+  const getCurrentUserInformationFromLocalStorage = () => {
+      const userInformation = localStorage.getItem('currentUserInformation');
+      return userInformation ? JSON.parse(userInformation) : null;
+  };
   
   onMounted(async () => {
-    try {
-      const response = await axios.get(`https://localhost:5000/api/benefit/${benefitId}`)
-      benefit.value = response.data
-    } catch (error) {
-      console.error('Error loading benefit:', error)
-    }
-  })
+  try {
+    const companyId = getCurrentUserInformationFromLocalStorage()?.companyId
+    const response = await axios.get(`https://localhost:5000/api/benefit/${benefitId}`, {
+      params: { companyId }
+    })
+    benefit.value = response.data
+  } catch (error) {
+    console.error('Error loading benefit:', error)
+  }
+})
+
+    const translatedEmployeeTypes = computed(() => {
+        const employeeTypeMap = {
+            'Full-Time': 'Tiempo completo',
+            'Part-Time': 'Medio tiempo',
+            'Professional Services': 'Por contrato',
+            'Hourly': 'Por Horas'
+        }
+
+        return benefit.value.eligibleEmployeeTypes?.map(type => employeeTypeMap[type] || type) || []
+    })
 
     const translatedEmployeeTypes = computed(() => {
         const employeeTypeMap = {
