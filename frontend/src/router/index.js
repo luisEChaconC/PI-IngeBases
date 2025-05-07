@@ -11,8 +11,8 @@ import BenefitCreate from '@/components/BenefitCreate.vue'
 import SelectChangeBenefit from '@/components/SelectChangeBenefit.vue'
 import ViewEmployeeProfileEmployer from '../views/ViewEmployeeProfileEmployer.vue'
 import ViewCompanyInfo from '../views/ViewCompanyInfo.vue'
-
 import ViewCompaniesList from '../views/ViewCompaniesList.vue'
+
 const routes =
     [
         { path: '/', redirect: '/login' },
