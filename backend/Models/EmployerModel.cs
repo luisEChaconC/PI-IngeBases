@@ -6,6 +6,7 @@ namespace backend.Models
     {
         public string Id { get; set; }
 
+        [Required(ErrorMessage = "WorkerId is required.")]
         [StringLength(80, ErrorMessage = "WorkerId cannot exceed 80 characters.")]
         public string WorkerId { get; set; }
 
