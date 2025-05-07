@@ -42,7 +42,7 @@ namespace backend.Models
 
     public class EligibleEmployeeTypesValidationAttribute : ValidationAttribute
     {
-        private readonly string[] allowed = new[] { "PartTime", "FullTime", "ByContract" };
+        private readonly string[] allowed = new[] { "Full-Time", "Part-Time", "Professional Services", "Hourly" };
 
         protected override ValidationResult IsValid(object value, ValidationContext validationContext)
         {
