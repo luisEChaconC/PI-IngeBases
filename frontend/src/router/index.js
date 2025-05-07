@@ -9,9 +9,9 @@ import BenefitList from '@/components/BenefitList.vue'
 import Benefit from '@/components/BenefitView.vue'
 import BenefitCreate from '@/components/BenefitCreate.vue'
 import SelectChangeBenefit from '@/components/SelectChangeBenefit.vue'
-import ViewCompanyInfo from '@/views/ViewCompanyInfo.vue'
+import ViewEmployeeProfileEmployer from '../views/ViewEmployeeProfileEmployer.vue'
 
-import ViewEmployeeProfileEmployer from '../views/ViewCompaniesList.vue'
+import ViewCompaniesList from '../views/ViewCompaniesList.vue'
 const routes =
     [
         { path: '/', redirect: '/login' },
@@ -20,8 +20,9 @@ const routes =
         { path: '/company-registration', name: 'CompanyRegistration', component: CompanyRegistration },
         { path: '/employer-registration/:companyId', name: 'EmployerRegistration', component: EmployerRegistration, props: true },
         { path: '/employer-registration', redirect: '/login' },
-        { path: '/view-companies-list',name: 'ViewCompaniesList',component: ViewEmployeeProfileEmployer},
+        { path: '/view-companies-list',name: 'ViewCompaniesList',component: ViewCompaniesList},
         { path: '/employees-list', name: 'EmployeesList', component: EmployeesList },
+        { path: '/view-employee-profile-employer/:id', name: 'ViewEmployeeProfileEmployer', component: ViewEmployeeProfileEmployer},
         { path: '/benefits', name: 'Benefits', component: BenefitList },
         { path: '/benefit/:id', name: 'Benefit', component: Benefit, props: true },
         { path: '/benefit/create', name: 'CreateBenefit', component: BenefitCreate },

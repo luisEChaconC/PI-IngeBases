@@ -113,10 +113,8 @@ export default {
           // Use the global service instance to fetch and save user information
           await currentUserService.fetchAndSaveCurrentUserInformationToLocalStorage(this.email);
 
-          // Simulate a successful login and redirect to the main menu
-          alert("Se inició sesión con éxito!");
-          console.log("Login exitoso → redirigiendo al menú principal");
-          this.$router.push('/main-menu');
+          // Uncomment the following line to enable navigation
+          this.$router.push({ name: "MainMenu" });
         }
       } catch (error) {
         // Handle errors that occur during the API call
