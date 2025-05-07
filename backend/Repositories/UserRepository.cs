@@ -131,6 +131,7 @@ namespace backend.Repositories
                         ELSE e.CompanyId
                     END AS CompanyId,
                     CASE 
+                        WHEN u.IsAdmin = 1 THEN 'SoftwareManager'
                         WHEN s.Id IS NOT NULL THEN 'Supervisor'
                         WHEN pm.Id IS NOT NULL THEN 'Payroll Manager'
                         WHEN em.Id IS NOT NULL THEN 'Employer'

@@ -1,6 +1,14 @@
 <template>
   <div class="container my-5">
-    <div class="card shadow">
+    <router-link
+      to="/main-menu"
+      class="btn btn-outline-secondary position-absolute top-0 start-0 m-3"
+      title="Volver al menú principal"
+    >
+      ← Volver
+    </router-link>
+
+    <div class="card shadow mt-5 pt-3">
       <div class="card-body">
         <h2 class="card-title mb-4">Empresas</h2>
         <div class="table-responsive" style="max-height: 600px; overflow-y: auto;">
@@ -18,9 +26,7 @@
                 <td>{{ company.name }}</td>
                 <td>{{ company.creationAuthor }}</td> 
                 <td>{{ company.legalId }}</td>
-
                 <td>{{ company.employeeCount }}</td>
-
               </tr>
             </tbody>
           </table>
@@ -29,6 +35,7 @@
     </div>
   </div>
 </template>
+
 <script>
 import axios from 'axios';
 import { ref, onMounted } from 'vue';
