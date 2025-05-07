@@ -64,5 +64,37 @@ namespace backend.Controllers
                 throw new Exception("Failed to create contact.");
             }
         }
+
+        /// <summary>
+        /// HTTP GET endpoint to retrieve all contacts by the associated person/company ID.
+        /// </summary>
+        /// <param name="id">The ID of the person or company whose contacts to retrieve.</param>
+        /// <returns>The list of contacts if found; otherwise, a 404 Not Found response.</returns>
+        [HttpGet]
+        [Route("GetContactsById/{id}")]
+        public IActionResult GetContactsById(string id)
+        {
+            try
+            {
+                // Call the repository method to get the list of contacts
+                var contacts = _contactRepository.GetContactsById(id);
+
+                // Check if any contacts were found
+                if (contacts == null || !contacts.Any())
+                {
+                    // Return 404 Not Found if no contacts were found
+                    return NotFound(new { message = "No contacts found for the specified ID." });
+                }
+
+                // Return 200 OK response with the list of contacts
+                return Ok(contacts);
+            }
+            catch (Exception ex)
+            {
+                // Return a 500 Internal Server Error response with the error message
+                return StatusCode(StatusCodes.Status500InternalServerError, 
+                    new { message = "An error occurred while retrieving contacts.", error = ex.Message });
+            }
+        }
     }
 }
