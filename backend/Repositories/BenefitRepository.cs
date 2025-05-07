@@ -99,6 +99,86 @@ namespace backend.Services
             return benefits;
         }
 
+        public bool AssignBenefitsToEmployee(Guid employeeId, List<Guid> benefitIds)
+        {
+            const string insertQuery = @"
+                INSERT INTO EmployeeXBenefit (Id, BenefitId, EmployeeId)
+                VALUES (@Id, @BenefitId, @EmployeeId)";
+
+            const string checkExistenceQuery = @"
+                SELECT COUNT(1) 
+                FROM EmployeeXBenefit 
+                WHERE BenefitId = @BenefitId AND EmployeeId = @EmployeeId";
+
+            using var connection = new SqlConnection(_connectionString);
+            connection.Open();
+
+            foreach (var benefitId in benefitIds)
+            {
+                // Verify if it has already been added
+                using var checkCmd = new SqlCommand(checkExistenceQuery, connection);
+                checkCmd.Parameters.AddWithValue("@BenefitId", benefitId);
+                checkCmd.Parameters.AddWithValue("@EmployeeId", employeeId);
+
+                var existingCount = (int)checkCmd.ExecuteScalar();
+
+                if (existingCount > 0)
+                {
+                    continue;
+                }
+
+                using var insertCmd = new SqlCommand(insertQuery, connection);
+                insertCmd.Parameters.AddWithValue("@Id", Guid.NewGuid());
+                insertCmd.Parameters.AddWithValue("@BenefitId", benefitId);
+                insertCmd.Parameters.AddWithValue("@EmployeeId", employeeId);
+
+                insertCmd.ExecuteNonQuery();
+            }
+
+            return true;
+        }
+
+
+        public List<Benefit> GetAssignedBenefitsForEmployee(Guid employeeId)
+        {
+            var benefits = new List<Benefit>();
+            var query = @"
+        SELECT B.* 
+        FROM Benefits B
+        INNER JOIN EmployeeXBenefit EB ON B.Id = EB.BenefitId
+        WHERE EB.EmployeeId = @EmployeeId";
+
+            using var command = new SqlCommand(query, _connection);
+            command.Parameters.AddWithValue("@EmployeeId", employeeId);
+
+            using var adapter = new SqlDataAdapter(command);
+            var table = new DataTable();
+
+            _connection.Open();
+            adapter.Fill(table);
+            _connection.Close();
+
+            foreach (DataRow row in table.Rows)
+            {
+                var id = Guid.Parse(row["Id"].ToString());
+                benefits.Add(new Benefit
+                {
+                    Id = id.ToString(),
+                    CompanyId = row["CompanyId"].ToString(),
+                    Name = row["Name"].ToString(),
+                    Description = row["Description"].ToString(),
+                    IsActive = Convert.ToBoolean(row["IsActive"]),
+                    Type = row["Type"].ToString(),
+                    LinkAPI = row["LinkAPI"].ToString(),
+                    FixedPercentage = row["FixedPercentage"] != DBNull.Value ? Convert.ToInt32(row["FixedPercentage"]) : null,
+                    FixedAmount = row["FixedAmount"] != DBNull.Value ? Convert.ToInt32(row["FixedAmount"]) : null,
+                    RequiredMonthsWorked = Convert.ToInt32(row["RequiredMonthsWorked"])
+                });
+            }
+
+            return benefits;
+        }
+
         public bool CreateBenefit(Benefit benefit)
         {
             var benefitId = Guid.NewGuid();
