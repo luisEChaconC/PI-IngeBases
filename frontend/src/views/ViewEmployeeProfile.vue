@@ -1,5 +1,12 @@
 <template>
-  <div class="d-flex justify-content-center align-items-center min-vh-100 my-5">
+  <div class="d-flex justify-content-center align-items-center min-vh-100 my-5 position-relative">
+    <router-link
+      to="/main-menu"
+      class="btn btn-outline-secondary position-absolute top-0 start-0 m-3"
+      title="Volver"
+    >
+      ← Volver
+    </router-link>
     <div v-if="loading" class="text-center">
       <div class="spinner-border" role="status">
         <span class="visually-hidden">Cargando...</span>
