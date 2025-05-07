@@ -25,9 +25,9 @@
                 <td>{{ employee.legalId }}</td>
                 <td>{{ employee.position }}</td>
                 <td class="d-flex justify-content-center">
-                  <button class="btn btn-outline-dark btn-sm">
+                  <a :href="'/view-employee-profile-employer/' + employee.idEmployee" class="btn btn-outline-dark btn-sm">
                     <i class="fas fa-eye"></i>
-                  </button>
+                  </a>
                 </td>
               </tr>
               <tr v-if="employees.length === 0">

@@ -62,5 +62,64 @@ namespace backend.Repositories
 
             return personId;
         }
+        
+        /// <summary>
+        /// Retrieves a person by its ID.
+        /// </summary>
+        /// <param name="id">The ID of the person to retrieve.</param>
+        /// <returns>The person model if found; otherwise, null.</returns>
+        public PersonsModel GetPersonById(string id)
+        {
+            PersonsModel person = null;
+
+            // SQL query to select a person by ID
+            var query = @"
+                SELECT Id, LegalId, Type, Province, Canton, Neighborhood, AdditionalDirectionDetails
+                FROM Persons
+                WHERE Id = @Id";
+
+            // Create a new connection for this operation
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                try
+                {
+                    connection.Open();
+
+                    // Create a SQL command with the query and connection
+                    using (var command = new SqlCommand(query, connection))
+                    {
+                        // Add the ID parameter to the query to prevent SQL injection
+                        command.Parameters.AddWithValue("@Id", id);
+
+                        // Execute the query and retrieve the results using a data reader
+                        using (var reader = command.ExecuteReader())
+                        {
+                            // Check if a record was found
+                            if (reader.Read())
+                            {
+                                // Map the data from the reader to a PersonsModel object
+                                person = new PersonsModel
+                                {
+                                    Id = reader["Id"].ToString(),
+                                    LegalId = reader["LegalId"].ToString(),
+                                    Type = reader["Type"].ToString(),
+                                    Province = reader["Province"] != DBNull.Value ? reader["Province"].ToString() : null,
+                                    Canton = reader["Canton"] != DBNull.Value ? reader["Canton"].ToString() : null,
+                                    Neighborhood = reader["Neighborhood"] != DBNull.Value ? reader["Neighborhood"].ToString() : null,
+                                    AdditionalDirectionDetails = reader["AdditionalDirectionDetails"] != DBNull.Value ? reader["AdditionalDirectionDetails"].ToString() : null
+                                };
+                            }
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error retrieving person: {ex.Message}");
+                    throw;
+                }
+            }
+
+            return person;
+        }
     }
 }
