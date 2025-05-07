@@ -73,6 +73,7 @@
 
 <script>
 import axios from "axios"; // Importing Axios for making HTTP requests
+import currentUserService from "@/services/currentUserService";
 
 export default {
   name: "LoginForm", // Component name
@@ -109,6 +110,9 @@ export default {
             return; // Exit the function
           }
 
+          // Use the global service instance to fetch and save user information
+          await currentUserService.fetchAndSaveCurrentUserInformationToLocalStorage(this.email);
+
           // Simulate a successful login and redirect to the main menu
           alert("Se inició sesión con éxito! Redirigiendo al menú principal...");
           console.log("Login exitoso → redirigiendo al menú principal");
@@ -137,10 +141,7 @@ export default {
      * Simulates navigation to the registration page.
      */
     handleRegister() {
-      alert("Se debería reenviar a otra vista!"); // Simulate navigation
-      console.log("Navegar a Registro de Usuario → luego Registro de Empresa");
-      // Uncomment the following line to enable navigation
-      // this.$router.push({ name: "UserRegister" });
+      this.$router.push('/company-registration');
     }
   }
 };

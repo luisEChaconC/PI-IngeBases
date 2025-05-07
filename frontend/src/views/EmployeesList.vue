@@ -4,7 +4,7 @@
       <div class="card-body">
         <div class="d-flex justify-content-between mx-2 mb-4">
           <h2 class="card-title">Empleados</h2>
-          <a href="#" class="btn btn-dark">
+          <a href="/add-employee" class="btn btn-dark">
             <i class="fas fa-user-plus me-2"/>
             Nuevo Empleado
           </a>
@@ -43,6 +43,7 @@
 
 <script>
 import axios from 'axios'
+import currentUserService from "@/services/currentUserService";
 
 export default {
   name: 'EmployeesList',
@@ -54,7 +55,8 @@ export default {
   methods: {
     async fetchEmployees() {
       try {
-        const companyId = 'E0731D81-5309-40C6-8927-B5929DCDEB55' // Replace with the actual company ID
+        const currentUserInformation = currentUserService.getCurrentUserInformationFromLocalStorage()
+        const companyId = currentUserInformation.companyId
         const response = await axios.get('https://localhost:5000/api/Employee/GetEmployeesByCompanyId', {
           params: { companyId: companyId }
         })
