@@ -188,8 +188,8 @@
                 
                 const result = await this.registerEmployer();
                 if (result) {
-                    alert("Se registró el empleado exitosamente!");
-                    this.$router.push('/company-registration');
+                    alert("Se registró el empleador exitosamente!");
+                    this.$router.push('/main-menu');
                 } else {
                     alert("Error al registrarse. Por favor intente de nuevo.");
                 }
