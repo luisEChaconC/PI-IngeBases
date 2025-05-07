@@ -58,8 +58,26 @@
 <script setup>
 import axios from "axios";
 import { ref, onMounted } from 'vue';
+import currentUserService from "@/services/currentUserService";
 
-const maxBenefits = ref(3);
+
+const maxBenefits = ref(3); 
+
+const getCompanyMaxBenefits = async () => {
+  try {
+    const companyId = currentUserService.getCurrentUserInformationFromLocalStorage()?.companyId;
+    console.log("Company ID obtenido:", companyId);
+
+    const response = await axios.get(`https://localhost:5000/api/company/GetCompanyById/${companyId}`);
+
+    if (response.data?.maxBenefitsPerEmployee !== undefined) {
+      maxBenefits.value = response.data.maxBenefitsPerEmployee;
+    }
+  } catch (error) {
+    console.error("Error obteniendo maxBenefitsPerEmployee:", error);
+  }
+};
+
 const benefits = ref([]);
 
 const translateType = (type) => {
@@ -80,6 +98,7 @@ const getBenefits = async () => {
     try {
         console.log(getCurrentUserInformationFromLocalStorage())
         const companyId = getCurrentUserInformationFromLocalStorage()?.companyId;
+        
 
         if (!companyId) {
             console.error("No se encontró el ID de la empresa en el localStorage.");
@@ -95,6 +114,7 @@ const getBenefits = async () => {
 
 onMounted(() => {
     getBenefits();
+    getCompanyMaxBenefits();
 });
 </script>
 

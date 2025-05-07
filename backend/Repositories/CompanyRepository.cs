@@ -155,7 +155,7 @@ namespace backend.Repositories
                        p.Province, p.Canton, p.Neighborhood, p.AdditionalDirectionDetails
                 FROM Companies c
                 INNER JOIN Persons p ON c.Id = p.Id
-                WHERE c.Id = @Id";
+                WHERE UPPER(c.Id) = UPPER(@Id)";
 
             // Create a new connection for this operation
             using (var connection = new SqlConnection(_connectionString))
