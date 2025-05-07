@@ -1,3 +1,4 @@
+import AddEmployee from '@/views/AddEmployee.vue'
 import MainMenu from '@/components/MainMenu.vue'
 import { createRouter, createWebHistory } from 'vue-router'
 import CompanyRegistration from '@/views/CompanyRegistration.vue'
@@ -9,10 +10,13 @@ import BenefitCreate from '@/components/BenefitCreate.vue'
 import SelectChangeBenefit from '@/components/SelectChangeBenefit.vue'
 import ViewCompanyInfo from '@/views/ViewCompanyInfo.vue'
 
+import ViewEmployeeProfileEmployer from '../views/ViewCompaniesList.vue'
 const routes =
     [
         { path: '/login', name: 'LoginForm', component: Login },
+        { path: '/add-employee', name: 'AddEmployee', component: AddEmployee},
         { path: '/company-registration', name: 'CompanyRegistration', component: CompanyRegistration },
+        { path: '/view-companies-list',name: 'ViewCompaniesList',component: ViewEmployeeProfileEmployer},
         { path: '/employees-list', name: 'EmployeesList', component: EmployeesList },
         { path: '/benefits', name: 'Benefits', component: BenefitList },
         { path: '/benefit/:id', name: 'Benefit', component: Benefit, props: true },
