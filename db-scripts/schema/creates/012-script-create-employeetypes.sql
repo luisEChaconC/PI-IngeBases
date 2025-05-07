@@ -5,5 +5,5 @@ CREATE TABLE EmployeeTypes (
        NOT NULL 
        PRIMARY KEY 
        DEFAULT NEWID(),
-    Name VARCHAR(30) NOT NULL UNIQUE  -- TO DO check types
+    Name VARCHAR(30) CHECK (Name IN ('Full-Time', 'Part-Time', 'Professional Services', 'Hourly')) NOT NULL, 
 );
