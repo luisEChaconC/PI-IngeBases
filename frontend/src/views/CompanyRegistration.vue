@@ -257,7 +257,6 @@
             <!-- Second row -->
             <div class="row mt-4">
                 <div class="col-12 d-flex justify-content-between align-items-center">
-                    <p class="mb-0">¿Ya tiene una empresa? <router-link to="/login">Ingrese</router-link></p>
                     <button type="submit" class="btn btn-dark btn-lg">Registrar Empresa</button>
                 </div>
             </div>

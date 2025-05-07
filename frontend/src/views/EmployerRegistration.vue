@@ -122,13 +122,8 @@
                                 </div>
                             </div>
                             
-                            <!-- This div groups the "Registrarse" button and the "Inicie sesión" link -->
-                            <div>
-                                <!-- "Registrarse" button -->
-                                <button type="submit" class="btn btn-dark">Registrarse</button>
-                                <!-- "Inicie sesión" link -->
-                                <p class="mt-3 mb-0">¿Ya está registrado? <a href="/login" class="text-decoration-none">Inicie sesión</a></p>
-                            </div>
+                            <!-- "Registrarse" button -->
+                            <button type="submit" class="btn btn-dark">Registrarse</button>
                         </div>
                     </div>
                 </fieldset>
