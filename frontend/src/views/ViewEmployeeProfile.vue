@@ -18,7 +18,9 @@
     </div>
     <div v-else class="card w-50">
       <div class="card-body">
-        <h2 class="card-title">Perfil de Empleado</h2>
+        <h2 class="card-title">
+          Perfil de {{ userPosition === 'Employer' ? 'Empleador' : 'Empleado' }}
+        </h2>
         <div class="row">
           <div class="col-md-6">
             <div class="mb-3">
@@ -29,11 +31,12 @@
               <label for="secondLastName" class="form-label">Segundo apellido</label>
               <input type="text" class="form-control" id="secondLastName" v-model="employee.secondLastName" disabled />
             </div>
-            <div class="mb-3">
+            <div v-if="userPosition !== 'Employer'" class="mb-3">
               <label for="workerId" class="form-label">ID Trabajador</label>
               <input type="text" class="form-control" id="workerId" v-model="employee.workerId" disabled />
             </div>
-            <div class="mb-3">
+
+            <div v-if="userPosition !== 'Employer'" class="mb-3">
               <label for="contractType" class="form-label">Tipo de Contrato</label>
               <input type="text" class="form-control" id="contractType" v-model="employee.contractType" disabled />
             </div>
@@ -55,7 +58,7 @@
               <label for="role" class="form-label">Rol</label>
               <input type="text" class="form-control" id="role" v-model="employee.role" disabled />
             </div>
-            <div class="mb-3">
+            <div v-if="userPosition !== 'Employer'" class="mb-3">
               <label for="grossSalary" class="form-label">Salario Bruto</label>
               <div class="input-group">
                 <span class="input-group-text">₡</span>
@@ -88,17 +91,22 @@ export default {
     const employee = ref({});
     const loading = ref(true);
     const error = ref(null);
-    //const route = useRoute();
+    const userPosition = ref('');
 
     const getEmployee = async () => {
       try {
         loading.value = true;
         error.value = null;
-        
+
         const currentUserInformation = currentUserService.getCurrentUserInformationFromLocalStorage();
-        const id = currentUserInformation.idNaturalPerson;
-    
-        const response = await axios.get(`https://localhost:5000/api/EmployeeGetID/GetEmployeeById/${id}`);
+        userPosition.value = currentUserInformation.position;
+        let response;
+
+        if (currentUserInformation.isAdmin) {
+          response = await axios.get(`https://localhost:5000/api/EmployerGetID/GetEmployerById/${currentUserInformation.idNaturalPerson}`);
+        } else {
+          response = await axios.get(`https://localhost:5000/api/EmployeeGetID/GetEmployeeById/${currentUserInformation.idNaturalPerson}`);
+        }
 
         employee.value = {
           id: response.data.id || '',
@@ -107,7 +115,7 @@ export default {
           secondLastName: response.data.secondSurname || '',
           identityCard: response.data.cedula || '',
           workerId: response.data.workerId || '',
-          role: response.data.isAdmin ? 'Administrador' : 'Empleado',
+          role: currentUserInformation.isAdmin ? 'Empleador' : 'Empleado',
           contractType: response.data.contractType || '',
           grossSalary: response.data.grossSalary || 0,
           email: response.data.email || '',
@@ -115,8 +123,8 @@ export default {
         };
 
       } catch (err) {
-        console.error("Error al obtener datos del empleado:", err);
-        error.value = "Error al cargar la información del empleado. Por favor, intente de nuevo más tarde.";
+        console.error("Error al obtener datos del perfil:", err);
+        error.value = "Error al cargar la información del perfil. Por favor, intente de nuevo más tarde.";
       } finally {
         loading.value = false;
       }
@@ -129,10 +137,12 @@ export default {
     return {
       employee,
       loading,
-      error
+      error,
+      userPosition
     };
   }
 };
+
 </script>
 
 <style scoped>
