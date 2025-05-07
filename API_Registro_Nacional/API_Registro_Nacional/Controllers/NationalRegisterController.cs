@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using API_Registro_Nacional.Helpers;
+using API_Registro_Nacional.Models;
 
 namespace API_Registro_Nacional.Controllers
 {
@@ -8,11 +9,14 @@ namespace API_Registro_Nacional.Controllers
     [Route("api/[controller]")]
     public class NationalRegisterController : ControllerBase
     {
-        [HttpGet("validate/{legalID}")]
-        public IActionResult ValidateLegalID(string legalID)
+        [HttpPost("validate")]
+        public IActionResult ValidateLegalID([FromBody] LegalIDRequest request)
         {
-            bool isValid = LegalIDValidator.IsLegalIDValid(legalID);
-            return Ok(isValid);
+            if (ModelState.IsValid) {
+                bool isValid = LegalIDValidator.IsLegalIDValid(request.LegalID);
+                return Ok(isValid);
+            }
+            return BadRequest(ModelState);
         }
     }
 }
