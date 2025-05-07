@@ -1,4 +1,4 @@
-﻿using backend.Models;
+using backend.Models;
 using backend.Models.Requests;
 using backend.Repositories;
 using Microsoft.AspNetCore.Http;
@@ -17,7 +17,11 @@ namespace backend.Controllers
         // Constructor to initialize the repositories
         public CompanyController()
         {
-            _companyRepository = new CompanyRepository(); // Initialize the company repository
+            var personRepo = new PersonRepository();
+            var contactRepo = new ContactRepository();
+            var employeeRepo = new EmployeeRepository(); // Initialize the employee repository
+           _companyRepository = new CompanyRepository(personRepo, contactRepo, employeeRepo); // Initialize the company repository
+
             _personController = new PersonController(); // Initialize the person controller
             _contactController = new ContactController(); // Initialize the contact controller
         }

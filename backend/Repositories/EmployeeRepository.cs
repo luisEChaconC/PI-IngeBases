@@ -63,7 +63,8 @@ namespace backend.Repositories
             var employees = new List<dynamic>();
 
             var query = @"
-                SELECT 
+                SELECT
+                    e.Id as IdEmployee,
                     np.FirstName + ' ' + np.FirstSurname + ' ' + np.SecondSurname AS FullName,
                     p.LegalId,
                     CASE 
@@ -90,6 +91,7 @@ namespace backend.Repositories
                     {
                         employees.Add(new
                         {
+                            IdEmployee = reader["IdEmployee"].ToString(),
                             FullName = reader["FullName"].ToString(),
                             LegalId = reader["LegalId"].ToString(),
                             Position = reader["Position"].ToString()

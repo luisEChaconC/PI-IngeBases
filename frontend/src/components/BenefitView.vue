@@ -108,6 +108,17 @@
         return benefit.value.eligibleEmployeeTypes?.map(type => employeeTypeMap[type] || type) || []
     })
 
+    const translatedEmployeeTypes = computed(() => {
+        const employeeTypeMap = {
+            'Full-Time': 'Tiempo completo',
+            'Part-Time': 'Medio tiempo',
+            'Professional Services': 'Por contrato',
+            'Hourly': 'Por Horas'
+        }
+
+        return benefit.value.eligibleEmployeeTypes?.map(type => employeeTypeMap[type] || type) || []
+    })
+
   const translatedType = computed(() => {
     switch (benefit.value.type) {
       case 'API': return 'API'

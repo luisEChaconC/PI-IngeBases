@@ -1,5 +1,14 @@
 <template>
   <div class="container mt-5">
+      <div class="position-relative mb-4">
+        <router-link
+          to="/main-menu"
+          class="btn btn-outline-secondary"
+          title="Volver al menú principal"
+        >
+          ← Volver
+        </router-link>
+      </div>
       <h1 class="mb-4">Beneficios</h1>
 
       <div class="row align-items-center mb-4">

@@ -1,5 +1,12 @@
 <template>
-    <div class="d-flex justify-content-center align-items-center min-vh-100 my-5 my-md-0">        
+    <div class="d-flex justify-content-center align-items-center min-vh-100 my-5 my-md-0 position-relative">
+        <router-link
+          to="/employees-list"
+          class="btn btn-outline-secondary position-absolute top-0 start-0 m-3"
+          title="Volver a la lista de empleados"
+        >
+          ← Volver
+        </router-link>        
         <div class="card w-50">
             <div class="card-body">
                 <h2 class="card-title">Nuevo empleado</h2>

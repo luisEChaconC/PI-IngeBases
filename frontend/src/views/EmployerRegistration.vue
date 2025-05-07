@@ -122,13 +122,8 @@
                                 </div>
                             </div>
                             
-                            <!-- This div groups the "Registrarse" button and the "Inicie sesión" link -->
-                            <div>
-                                <!-- "Registrarse" button -->
-                                <button type="submit" class="btn btn-dark">Registrarse</button>
-                                <!-- "Inicie sesión" link -->
-                                <p class="mt-3 mb-0">¿Ya está registrado? <a href="/login" class="text-decoration-none">Inicie sesión</a></p>
-                            </div>
+                            <!-- "Registrarse" button -->
+                            <button type="submit" class="btn btn-dark">Registrarse</button>
                         </div>
                     </div>
                 </fieldset>
@@ -189,7 +184,7 @@
                 const result = await this.registerEmployer();
                 if (result) {
                     alert("Se registró el empleador exitosamente!");
-                    this.$router.push('/main-menu');
+                    this.$router.push('/login');
                 } else {
                     alert("Error al registrarse. Por favor intente de nuevo.");
                 }

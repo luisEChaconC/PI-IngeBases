@@ -234,5 +234,4 @@ const saveBenefit = async () => {
     alert('Error al guardar el beneficio')
   }
 }
-
 </script>
