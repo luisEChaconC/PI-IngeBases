@@ -1,5 +1,14 @@
 <template>
     <div class="container mt-4 mb-4">
+        <div class="position-relative mb-4">
+            <router-link
+              to="/login"
+              class="btn btn-outline-secondary"
+              title="Volver al inicio de sesión"
+            >
+              ← Volver
+            </router-link>
+        </div>
         <form @submit.prevent="handleRegisterCompany" novalidate>
             <!-- First row -->
             <div class="row">
@@ -257,7 +266,6 @@
             <!-- Second row -->
             <div class="row mt-4">
                 <div class="col-12 d-flex justify-content-between align-items-center">
-                    <p class="mb-0">¿Ya tiene una empresa? <router-link to="/login">Ingrese</router-link></p>
                     <button type="submit" class="btn btn-dark btn-lg">Registrar Empresa</button>
                 </div>
             </div>

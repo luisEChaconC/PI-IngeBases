@@ -1,5 +1,14 @@
 <template>
   <div class="container mt-5">
+      <div class="position-relative mb-4">
+        <router-link
+          to="/main-menu"
+          class="btn btn-outline-secondary"
+          title="Volver al menú principal"
+        >
+          ← Volver
+        </router-link>
+      </div>
       <h1 class="mb-4">Beneficios</h1>
 
       <div class="row align-items-center mb-4">
@@ -47,36 +56,46 @@
 </template>
 
 <script setup>
-  import axios from "axios";
-  import { ref, onMounted } from 'vue'
+import axios from "axios";
+import { ref, onMounted } from 'vue';
 
-  const maxBenefits = ref(3)
+const maxBenefits = ref(3);
+const benefits = ref([]);
 
-  const translateType = (type) => {
-      switch (type) {
-          case 'API': return 'API';
-          case 'FixedAmount': return 'Monto fijo';
-          case 'FixedPercentage': return 'Porcentaje fijo';
-          default: return 'Desconocido';
-      }
-  }
+const translateType = (type) => {
+    switch (type) {
+        case 'API': return 'API';
+        case 'FixedAmount': return 'Monto fijo';
+        case 'FixedPercentage': return 'Porcentaje fijo';
+        default: return 'Desconocido';
+    }
+};
 
-  const benefits = ref([])
+const getCurrentUserInformationFromLocalStorage = () => {
+    const userInformation = localStorage.getItem('currentUserInformation');
+    return userInformation ? JSON.parse(userInformation) : null;
+};
 
-  // Backend connection
-  const getBenefits = async () => {
-      try {
-          const response = await axios.get("https://localhost:5000/api/benefit")
-          benefits.value = response.data
-      } catch (error) {
-          console.error("Not able to obtain the benefits:", error)
-      }
-  }
-  // When it the component starts
-  onMounted(() => {
-      getBenefits()
-  })
+const getBenefits = async () => {
+    try {
+        console.log(getCurrentUserInformationFromLocalStorage())
+        const companyId = getCurrentUserInformationFromLocalStorage()?.companyId;
 
+        if (!companyId) {
+            console.error("No se encontró el ID de la empresa en el localStorage.");
+            return;
+        }
+
+        const response = await axios.get(`https://localhost:5000/api/benefit?companyId=${companyId}`);
+        benefits.value = response.data;
+    } catch (error) {
+        console.error("No se pudieron obtener los beneficios:", error);
+    }
+};
+
+onMounted(() => {
+    getBenefits();
+});
 </script>
 
 <style scoped>

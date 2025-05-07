@@ -16,16 +16,10 @@ namespace backend.Controllers
             _benefitService = new BenefitService();
         }
 
-        [HttpGet]
-        public List<Benefit> Get()
-        {
-            return _benefitService.GetBenefits();
-        }
-
         [HttpGet("{id}")]
-        public ActionResult<Benefit> GetById(Guid id)
+        public ActionResult<Benefit> GetById(Guid id, [FromQuery] string companyId)
         {
-            var benefits = _benefitService.GetBenefits();
+            var benefits = _benefitService.GetBenefits(companyId);
             var benefit = benefits.FirstOrDefault(b => b.Id == id.ToString());
 
             if (benefit == null)
@@ -51,5 +45,16 @@ namespace backend.Controllers
                     $"Error creating benefit: {ex.Message}");
             }
         }
+
+        [HttpGet]
+        public ActionResult<List<Benefit>> Get([FromQuery] string companyId)
+        {
+            if (string.IsNullOrEmpty(companyId))
+                return BadRequest("Se requiere el ID de la empresa.");
+
+            var benefits = _benefitService.GetBenefits(companyId);
+            return Ok(benefits);
+        }
+
     }
 }

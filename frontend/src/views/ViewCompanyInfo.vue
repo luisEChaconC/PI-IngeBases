@@ -1,5 +1,12 @@
 <template>
     <div class="d-flex justify-content-center align-items-center my-5">
+      <router-link
+        to="/main-menu"
+        class="btn btn-outline-secondary position-absolute top-0 start-0 m-3"
+        title="Volver al menú principal"
+      >
+        ← Volver
+      </router-link>
       <div class="card" style="max-width: 800px; width: 100%;">
         <div class="card-body p-4">
           <h4 class="card-title fw-bold mb-4">Información empresa</h4>

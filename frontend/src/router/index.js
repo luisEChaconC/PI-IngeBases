@@ -1,3 +1,4 @@
+import SelectChangeBenefit from '../views/SelectChangeBenefit.vue'
 import AddEmployee from '@/views/AddEmployee.vue'
 import MainMenu from '@/components/MainMenu.vue'
 import { createRouter, createWebHistory } from 'vue-router'
@@ -8,11 +9,9 @@ import Login from '@/views/LoginForm.vue'
 import BenefitList from '@/components/BenefitList.vue'
 import Benefit from '@/components/BenefitView.vue'
 import BenefitCreate from '@/components/BenefitCreate.vue'
-import SelectChangeBenefit from '@/components/SelectChangeBenefit.vue'
 import ViewEmployeeProfileEmployer from '../views/ViewEmployeeProfileEmployer.vue'
-import ViewCompanyInfo from '../views/ViewCompanyInfo.vue'
+import ViewCompanyInfo from '@/views/ViewCompanyInfo.vue'
 import ViewCompaniesList from '../views/ViewCompaniesList.vue'
-
 const routes =
     [
         { path: '/', redirect: '/login' },
