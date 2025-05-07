@@ -22,18 +22,18 @@ DECLARE @CompanyPersonId UNIQUEIDENTIFIER;
 
 INSERT INTO Persons (LegalId, Type, Province, Canton, Neighborhood, AdditionalDirectionDetails)
 OUTPUT INSERTED.Id INTO @CompanyPersonIdTable(Id)
-VALUES ('9433569757', 'Legal Entity', 'ProvinceX', 'CantonY', 'NeighborhoodZ', 'Some direction info');
+VALUES ('9433569757', 'Legal Entity', 'San José', 'Escazú', 'San Rafael', '200m oeste del Centro Comercial Multiplaza');
 
 SELECT TOP 1 @CompanyPersonId = Id FROM @CompanyPersonIdTable;
 
 INSERT INTO Companies (Id, Name, Description, PaymentType, MaxBenefitsPerEmployee, CreationAuthor, LastModificationAuthor)
-VALUES (@CompanyPersonId, 'Company 1', 'Company description here.', 'Monthly', 3, 'System', 'System');
+VALUES (@CompanyPersonId, 'TecnoSoluciones CR', 'Empresa líder en servicios tecnológicos y desarrollo de software.', 'Monthly', 3, 'System', 'System');
 
 -- Company Contacts
 INSERT INTO Contacts (Type, Email, PersonId)
-VALUES ('Email', 'nvincent@owens-williamson.biz', @CompanyPersonId);
+VALUES ('Email', 'contacto@empresa1.co.cr', @CompanyPersonId);
 INSERT INTO Contacts (Type, PhoneNumber, PersonId)
-VALUES ('Phone Number', '49356016', @CompanyPersonId);
+VALUES ('Phone Number', '22893016', @CompanyPersonId);
 
 
 -- Employer for Company 1
@@ -42,22 +42,22 @@ DECLARE @EmployerUserId UNIQUEIDENTIFIER = NEWID();
 
 INSERT INTO Persons (LegalId, Type, Province, Canton, Neighborhood, AdditionalDirectionDetails)
 OUTPUT INSERTED.Id INTO @EmployerPersonIdTable(Id)
-VALUES ('0633382597', 'Natural Person', 'ProvinceX', 'CantonY', 'NeighborhoodZ', 'Employer address');
+VALUES ('0633382597', 'Natural Person', 'San José', 'Santa Ana', 'Pozos', 'Condominio Valle del Sol, casa #45');
 
 SELECT TOP 1 @EmployerPersonId = Id FROM @EmployerPersonIdTable;
 
 INSERT INTO Users (Id, Email, Password, IsAdmin)
-VALUES (@EmployerUserId, 'donnavincent@clark-powers.net', '^%461VsBCy', 1);
+VALUES (@EmployerUserId, 'carlos.mendoza@empresa1.co.cr', '^%461VsBCy', 1);
 
 INSERT INTO NaturalPersons (Id, FirstName, FirstSurname, SecondSurname, UserId)
-VALUES (@EmployerPersonId, 'Brian', 'Mcdaniel', 'Johnson', @EmployerUserId);
+VALUES (@EmployerPersonId, 'Carlos', 'Mendoza', 'Jiménez', @EmployerUserId);
 
 INSERT INTO Employers (Id, CompanyId)
 VALUES (@EmployerPersonId, @CompanyPersonId);
 
 -- Employer Contact (Phone)
 INSERT INTO Contacts (Type, PhoneNumber, PersonId)
-VALUES ('Phone Number', '04255911', @EmployerPersonId);
+VALUES ('Phone Number', '88255911', @EmployerPersonId);
 
 
 -- Employee 1 for Company 1
@@ -66,22 +66,22 @@ DECLARE @Emp1UserId UNIQUEIDENTIFIER = NEWID();
 
 INSERT INTO Persons (LegalId, Type, Province, Canton, Neighborhood, AdditionalDirectionDetails)
 OUTPUT INSERTED.Id INTO @EmpPersonIdTable(Id)
-VALUES ('0764688260', 'Natural Person', 'ProvinceX', 'CantonY', 'NeighborhoodZ', 'Employee address');
+VALUES ('0764688260', 'Natural Person', 'Heredia', 'Belén', 'La Asunción', 'Residencial Los Arcos, casa #23');
 
 SELECT TOP 1 @Emp1PersonId = Id FROM @EmpPersonIdTable;
 
 INSERT INTO Users (Id, Email, Password, IsAdmin)
-VALUES (@Emp1UserId, 'morrismatthew@hebert.com', '4NO121TyR&', 0);
+VALUES (@Emp1UserId, 'miguel.soto@empresa1.co.cr', '4NO121TyR&', 0);
 
 INSERT INTO NaturalPersons (Id, FirstName, FirstSurname, SecondSurname, UserId)
-VALUES (@Emp1PersonId, 'Mitchell', 'Preston', 'Gonzales', @Emp1UserId);
+VALUES (@Emp1PersonId, 'Miguel', 'Soto', 'Vargas', @Emp1UserId);
 
 INSERT INTO Employees (Id, WorkerId, CompanyId, ContractType, GrossSalary, HasToReportHours)
 VALUES (@Emp1PersonId, 'WID-1-1', @CompanyPersonId, 'Part-Time', 34212.71, 1);
 
 -- Employee Contact (Phone)
 INSERT INTO Contacts (Type, PhoneNumber, PersonId)
-VALUES ('Phone Number', '98639740', @Emp1PersonId);
+VALUES ('Phone Number', '70639740', @Emp1PersonId);
 
 
 DELETE FROM @CompanyPersonIdTable
@@ -94,22 +94,22 @@ DECLARE @Emp2UserId UNIQUEIDENTIFIER = NEWID();
 
 INSERT INTO Persons (LegalId, Type, Province, Canton, Neighborhood, AdditionalDirectionDetails)
 OUTPUT INSERTED.Id INTO @EmpPersonIdTable(Id)
-VALUES ('6648702932', 'Natural Person', 'ProvinceX', 'CantonY', 'NeighborhoodZ', 'Employee address');
+VALUES ('6648702932', 'Natural Person', 'San José', 'Montes de Oca', 'San Pedro', 'Condominio Lomas del Este, apartamento #12B');
 
 SELECT TOP 1 @Emp2PersonId = Id FROM @EmpPersonIdTable;
 
 INSERT INTO Users (Id, Email, Password, IsAdmin)
-VALUES (@Emp2UserId, 'moorejason@yahoo.com', 'nL&2URZp&K', 0);
+VALUES (@Emp2UserId, 'gabriela.rodriguez@empresa1.co.cr', 'nL&2URZp&K', 0);
 
 INSERT INTO NaturalPersons (Id, FirstName, FirstSurname, SecondSurname, UserId)
-VALUES (@Emp2PersonId, 'Gina', 'Anderson', 'Carter', @Emp2UserId);
+VALUES (@Emp2PersonId, 'Gabriela', 'Rodríguez', 'Castro', @Emp2UserId);
 
 INSERT INTO Employees (Id, WorkerId, CompanyId, ContractType, GrossSalary, HasToReportHours)
 VALUES (@Emp2PersonId, 'WID-1-2', @CompanyPersonId, 'Part-Time', 57006.88, 0);
 
 -- Employee Contact (Phone)
 INSERT INTO Contacts (Type, PhoneNumber, PersonId)
-VALUES ('Phone Number', '82459713', @Emp2PersonId);
+VALUES ('Phone Number', '62459713', @Emp2PersonId);
 
 
 -- ============End of First Execution==============
@@ -131,18 +131,18 @@ DECLARE @CompanyPersonId UNIQUEIDENTIFIER;
 
 INSERT INTO Persons (LegalId, Type, Province, Canton, Neighborhood, AdditionalDirectionDetails)
 OUTPUT INSERTED.Id INTO @CompanyPersonIdTable(Id)
-VALUES ('5389265343', 'Legal Entity', 'ProvinceX', 'CantonY', 'NeighborhoodZ', 'Some direction info');
+VALUES ('5389265343', 'Legal Entity', 'Alajuela', 'Alajuela', 'El Coyol', 'Zona Industrial, 300m norte de AutoMercado');
 
 SELECT TOP 1 @CompanyPersonId = Id FROM @CompanyPersonIdTable;
 
 INSERT INTO Companies (Id, Name, Description, PaymentType, MaxBenefitsPerEmployee, CreationAuthor, LastModificationAuthor)
-VALUES (@CompanyPersonId, 'Company 2', 'Company description here.', 'Monthly', 3, 'System', 'System');
+VALUES (@CompanyPersonId, 'Café Dorado S.A.', 'Productora y exportadora de café de alta calidad desde Costa Rica.', 'Monthly', 3, 'System', 'System');
 
 -- Company Contacts
 INSERT INTO Contacts (Type, Email, PersonId)
-VALUES ('Email', 'ashleewilliams@lewis-doyle.com', @CompanyPersonId);
+VALUES ('Email', 'info@empresa2.co.cr', @CompanyPersonId);
 INSERT INTO Contacts (Type, PhoneNumber, PersonId)
-VALUES ('Phone Number', '67004728', @CompanyPersonId);
+VALUES ('Phone Number', '24304728', @CompanyPersonId);
 
 
 -- Employer for Company 2
@@ -151,22 +151,22 @@ DECLARE @EmployerUserId UNIQUEIDENTIFIER = NEWID();
 
 INSERT INTO Persons (LegalId, Type, Province, Canton, Neighborhood, AdditionalDirectionDetails)
 OUTPUT INSERTED.Id INTO @EmployerPersonIdTable(Id)
-VALUES ('4942908531', 'Natural Person', 'ProvinceX', 'CantonY', 'NeighborhoodZ', 'Employer address');
+VALUES ('4942908531', 'Natural Person', 'Alajuela', 'Atenas', 'Centro', 'Barrio Los Jardines, 200m sur de la Iglesia');
 
 SELECT TOP 1 @EmployerPersonId = Id FROM @EmployerPersonIdTable;
 
 INSERT INTO Users (Id, Email, Password, IsAdmin)
-VALUES (@EmployerUserId, 'perezelizabeth@gmail.com', '$1zPJusvwK', 1);
+VALUES (@EmployerUserId, 'valeria.morales@empresa2.co.cr', '$1zPJusvwK', 1);
 
 INSERT INTO NaturalPersons (Id, FirstName, FirstSurname, SecondSurname, UserId)
-VALUES (@EmployerPersonId, 'Sherry', 'Michael', 'Strickland', @EmployerUserId);
+VALUES (@EmployerPersonId, 'Valeria', 'Morales', 'Quesada', @EmployerUserId);
 
 INSERT INTO Employers (Id, CompanyId)
 VALUES (@EmployerPersonId, @CompanyPersonId);
 
 -- Employer Contact (Phone)
 INSERT INTO Contacts (Type, PhoneNumber, PersonId)
-VALUES ('Phone Number', '36585571', @EmployerPersonId);
+VALUES ('Phone Number', '86585571', @EmployerPersonId);
 
 
 -- Employee 1 for Company 2
@@ -175,22 +175,22 @@ DECLARE @Emp1UserId UNIQUEIDENTIFIER = NEWID();
 
 INSERT INTO Persons (LegalId, Type, Province, Canton, Neighborhood, AdditionalDirectionDetails)
 OUTPUT INSERTED.Id INTO @EmpPersonIdTable(Id)
-VALUES ('4521330394', 'Natural Person', 'ProvinceX', 'CantonY', 'NeighborhoodZ', 'Employee address');
+VALUES ('4521330394', 'Natural Person', 'Heredia', 'San Pablo', 'Rincón de Ricardo', '100m este del parque municipal');
 
 SELECT TOP 1 @Emp1PersonId = Id FROM @EmpPersonIdTable;
 
 INSERT INTO Users (Id, Email, Password, IsAdmin)
-VALUES (@Emp1UserId, 'kevin10@hotmail.com', '!^2$PLf1f^', 0);
+VALUES (@Emp1UserId, 'ricardo.blanco@empresa2.co.cr', '!^2$PLf1f^', 0);
 
 INSERT INTO NaturalPersons (Id, FirstName, FirstSurname, SecondSurname, UserId)
-VALUES (@Emp1PersonId, 'Rebecca', 'Willis', 'Nelson', @Emp1UserId);
+VALUES (@Emp1PersonId, 'Ricardo', 'Blanco', 'Navarro', @Emp1UserId);
 
 INSERT INTO Employees (Id, WorkerId, CompanyId, ContractType, GrossSalary, HasToReportHours)
 VALUES (@Emp1PersonId, 'WID-2-1', @CompanyPersonId, 'Part-Time', 32226.77, 1);
 
 -- Employee Contact (Phone)
 INSERT INTO Contacts (Type, PhoneNumber, PersonId)
-VALUES ('Phone Number', '52585942', @Emp1PersonId);
+VALUES ('Phone Number', '72585942', @Emp1PersonId);
 
 DELETE FROM @CompanyPersonIdTable
 DELETE FROM @EmployerPersonIdTable
@@ -202,22 +202,22 @@ DECLARE @Emp2UserId UNIQUEIDENTIFIER = NEWID();
 
 INSERT INTO Persons (LegalId, Type, Province, Canton, Neighborhood, AdditionalDirectionDetails)
 OUTPUT INSERTED.Id INTO @EmpPersonIdTable(Id)
-VALUES ('7886489878', 'Natural Person', 'ProvinceX', 'CantonY', 'NeighborhoodZ', 'Employee address');
+VALUES ('7886489878', 'Natural Person', 'Cartago', 'La Unión', 'Tres Ríos', 'Condominio Monte Verde, casa #78');
 
 SELECT TOP 1 @Emp2PersonId = Id FROM @EmpPersonIdTable;
 
 INSERT INTO Users (Id, Email, Password, IsAdmin)
-VALUES (@Emp2UserId, 'davidflores@hotmail.com', '4^PQ3nk$)1', 0);
+VALUES (@Emp2UserId, 'laura.fallas@empresa2.co.cr', '4^PQ3nk$)1', 0);
 
 INSERT INTO NaturalPersons (Id, FirstName, FirstSurname, SecondSurname, UserId)
-VALUES (@Emp2PersonId, 'Kevin', 'Boyd', 'Wilson', @Emp2UserId);
+VALUES (@Emp2PersonId, 'Laura', 'Fallas', 'Méndez', @Emp2UserId);
 
 INSERT INTO Employees (Id, WorkerId, CompanyId, ContractType, GrossSalary, HasToReportHours)
 VALUES (@Emp2PersonId, 'WID-2-2', @CompanyPersonId, 'Hourly', 34571.93, 1);
 
 -- Employee Contact (Phone)
 INSERT INTO Contacts (Type, PhoneNumber, PersonId)
-VALUES ('Phone Number', '93731394', @Emp2PersonId);
+VALUES ('Phone Number', '83731394', @Emp2PersonId);
 
 
 -- ============End of Second Execution============
@@ -237,18 +237,18 @@ DECLARE @CompanyPersonId UNIQUEIDENTIFIER;
 
 INSERT INTO Persons (LegalId, Type, Province, Canton, Neighborhood, AdditionalDirectionDetails)
 OUTPUT INSERTED.Id INTO @CompanyPersonIdTable(Id)
-VALUES ('7472437759', 'Legal Entity', 'ProvinceX', 'CantonY', 'NeighborhoodZ', 'Some direction info');
+VALUES ('7472437759', 'Legal Entity', 'Guanacaste', 'Liberia', 'Centro', 'Diagonal al Banco Nacional');
 
 SELECT TOP 1 @CompanyPersonId = Id FROM @CompanyPersonIdTable;
 
 INSERT INTO Companies (Id, Name, Description, PaymentType, MaxBenefitsPerEmployee, CreationAuthor, LastModificationAuthor)
-VALUES (@CompanyPersonId, 'Company 3', 'Company description here.', 'Monthly', 3, 'System', 'System');
+VALUES (@CompanyPersonId, 'EcoTurismo Guanacaste', 'Servicios de turismo ecológico y sostenible en la región de Guanacaste.', 'Monthly', 3, 'System', 'System');
 
 -- Company Contacts
 INSERT INTO Contacts (Type, Email, PersonId)
-VALUES ('Email', 'raymondjohnson@murphy.info', @CompanyPersonId);
+VALUES ('Email', 'contacto@empresa3.co.cr', @CompanyPersonId);
 INSERT INTO Contacts (Type, PhoneNumber, PersonId)
-VALUES ('Phone Number', '87021193', @CompanyPersonId);
+VALUES ('Phone Number', '26271193', @CompanyPersonId);
 
 
 -- Employer for Company 3
@@ -257,22 +257,22 @@ DECLARE @EmployerUserId UNIQUEIDENTIFIER = NEWID();
 
 INSERT INTO Persons (LegalId, Type, Province, Canton, Neighborhood, AdditionalDirectionDetails)
 OUTPUT INSERTED.Id INTO @EmployerPersonIdTable(Id)
-VALUES ('3137483987', 'Natural Person', 'ProvinceX', 'CantonY', 'NeighborhoodZ', 'Employer address');
+VALUES ('3137483987', 'Natural Person', 'Guanacaste', 'Nicoya', 'Santa Ana', 'Residencial Las Palmeras, casa #15');
 
 SELECT TOP 1 @EmployerPersonId = Id FROM @EmployerPersonIdTable;
 
 INSERT INTO Users (Id, Email, Password, IsAdmin)
-VALUES (@EmployerUserId, 'fcollins@cook.com', 'B#!8C2rQUn', 1);
+VALUES (@EmployerUserId, 'mariana.villalobos@empresa3.co.cr', 'B#!8C2rQUn', 1);
 
 INSERT INTO NaturalPersons (Id, FirstName, FirstSurname, SecondSurname, UserId)
-VALUES (@EmployerPersonId, 'Jennifer', 'Mccoy', 'Nelson', @EmployerUserId);
+VALUES (@EmployerPersonId, 'Mariana', 'Villalobos', 'Solano', @EmployerUserId);
 
 INSERT INTO Employers (Id, CompanyId)
 VALUES (@EmployerPersonId, @CompanyPersonId);
 
 -- Employer Contact (Phone)
 INSERT INTO Contacts (Type, PhoneNumber, PersonId)
-VALUES ('Phone Number', '65150913', @EmployerPersonId);
+VALUES ('Phone Number', '85150913', @EmployerPersonId);
 
 
 -- Employee 1 for Company 3
@@ -281,22 +281,22 @@ DECLARE @Emp1UserId UNIQUEIDENTIFIER = NEWID();
 
 INSERT INTO Persons (LegalId, Type, Province, Canton, Neighborhood, AdditionalDirectionDetails)
 OUTPUT INSERTED.Id INTO @EmpPersonIdTable(Id)
-VALUES ('5769876198', 'Natural Person', 'ProvinceX', 'CantonY', 'NeighborhoodZ', 'Employee address');
+VALUES ('5769876198', 'Natural Person', 'Puntarenas', 'Esparza', 'Espíritu Santo', '150m oeste del Centro Educativo');
 
 SELECT TOP 1 @Emp1PersonId = Id FROM @EmpPersonIdTable;
 
 INSERT INTO Users (Id, Email, Password, IsAdmin)
-VALUES (@Emp1UserId, 'lisadoyle@sweeney-todd.info', 'TB2gEUhr&M', 0);
+VALUES (@Emp1UserId, 'alejandro.rojas@empresa3.co.cr', 'TB2gEUhr&M', 0);
 
 INSERT INTO NaturalPersons (Id, FirstName, FirstSurname, SecondSurname, UserId)
-VALUES (@Emp1PersonId, 'Daniel', 'Jacobs', 'Allen', @Emp1UserId);
+VALUES (@Emp1PersonId, 'Alejandro', 'Rojas', 'Varela', @Emp1UserId);
 
 INSERT INTO Employees (Id, WorkerId, CompanyId, ContractType, GrossSalary, HasToReportHours)
 VALUES (@Emp1PersonId, 'WID-3-1', @CompanyPersonId, 'Part-Time', 39713.54, 0);
 
 -- Employee Contact (Phone)
 INSERT INTO Contacts (Type, PhoneNumber, PersonId)
-VALUES ('Phone Number', '80840936', @Emp1PersonId);
+VALUES ('Phone Number', '60840936', @Emp1PersonId);
 
 DELETE FROM @CompanyPersonIdTable
 DELETE FROM @EmployerPersonIdTable
@@ -308,22 +308,22 @@ DECLARE @Emp2UserId UNIQUEIDENTIFIER = NEWID();
 
 INSERT INTO Persons (LegalId, Type, Province, Canton, Neighborhood, AdditionalDirectionDetails)
 OUTPUT INSERTED.Id INTO @EmpPersonIdTable(Id)
-VALUES ('6393668242', 'Natural Person', 'ProvinceX', 'CantonY', 'NeighborhoodZ', 'Employee address');
+VALUES ('6393668242', 'Natural Person', 'Limón', 'Pococí', 'Guápiles', 'Barrio Los Colegios, 200m sur del Más x Menos');
 
 SELECT TOP 1 @Emp2PersonId = Id FROM @EmpPersonIdTable;
 
 INSERT INTO Users (Id, Email, Password, IsAdmin)
-VALUES (@Emp2UserId, 'dbonilla@mcdonald-kline.biz', '9*#0A2cgyt', 0);
+VALUES (@Emp2UserId, 'sofia.araya@empresa3.co.cr', '9*#0A2cgyt', 0);
 
 INSERT INTO NaturalPersons (Id, FirstName, FirstSurname, SecondSurname, UserId)
-VALUES (@Emp2PersonId, 'Melissa', 'Webb', 'Jackson', @Emp2UserId);
+VALUES (@Emp2PersonId, 'Sofía', 'Araya', 'Barrantes', @Emp2UserId);
 
 INSERT INTO Employees (Id, WorkerId, CompanyId, ContractType, GrossSalary, HasToReportHours)
 VALUES (@Emp2PersonId, 'WID-3-2', @CompanyPersonId, 'Full-Time', 58975.01, 1);
 
 -- Employee Contact (Phone)
 INSERT INTO Contacts (Type, PhoneNumber, PersonId)
-VALUES ('Phone Number', '37711478', @Emp2PersonId);
+VALUES ('Phone Number', '77711478', @Emp2PersonId);
 
 -- ============End of Third Execution============
 
@@ -335,9 +335,9 @@ DECLARE @CompanyId2 UNIQUEIDENTIFIER
 DECLARE @CompanyId3 UNIQUEIDENTIFIER
 
 -- Retrieve company IDs based on their names
-SELECT @CompanyId1 = Id FROM Companies WHERE Name = 'Company 1'
-SELECT @CompanyId2 = Id FROM Companies WHERE Name = 'Company 2'
-SELECT @CompanyId3 = Id FROM Companies WHERE Name = 'Company 3'
+SELECT @CompanyId1 = Id FROM Companies WHERE Name = 'TecnoSoluciones CR'
+SELECT @CompanyId2 = Id FROM Companies WHERE Name = 'Café Dorado S.A.'
+SELECT @CompanyId3 = Id FROM Companies WHERE Name = 'EcoTurismo Guanacaste'
 
 INSERT INTO Benefits (CompanyId, Name, Description, IsActive, Type, LinkAPI, FixedPercentage, FixedAmount, RequiredMonthsWorked)
 VALUES 
