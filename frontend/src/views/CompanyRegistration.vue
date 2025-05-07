@@ -1,5 +1,14 @@
 <template>
     <div class="container mt-4 mb-4">
+        <div class="position-relative mb-4">
+            <router-link
+              to="/login"
+              class="btn btn-outline-secondary"
+              title="Volver al inicio de sesión"
+            >
+              ← Volver
+            </router-link>
+        </div>
         <form @submit.prevent="handleRegisterCompany" novalidate>
             <!-- First row -->
             <div class="row">

@@ -1,5 +1,14 @@
 <template>
   <div class="container my-5">
+    <div class="position-relative mb-4">
+      <router-link
+        to="/main-menu"
+        class="btn btn-outline-secondary"
+        title="Volver al menú principal"
+      >
+        ← Volver
+      </router-link>
+    </div>
     <div class="card shadow">
       <div class="card-body">
         <div class="d-flex justify-content-between mx-2 mb-4">
