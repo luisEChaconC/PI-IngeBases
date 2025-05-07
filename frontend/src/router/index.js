@@ -9,6 +9,8 @@ import BenefitList from '@/components/BenefitList.vue'
 import Benefit from '@/components/BenefitView.vue'
 import BenefitCreate from '@/components/BenefitCreate.vue'
 import SelectChangeBenefit from '@/components/SelectChangeBenefit.vue'
+import ViewCompanyInfo from '@/views/ViewCompanyInfo.vue'
+
 import ViewEmployeeProfileEmployer from '../views/ViewCompaniesList.vue'
 const routes =
     [
@@ -24,7 +26,9 @@ const routes =
         { path: '/benefit/create', name: 'CreateBenefit', component: BenefitCreate },
         { path: '/select-change-benefit', name: 'SelectChangeBenefit', component: SelectChangeBenefit },
         { path: '/main-menu', name: 'MainMenu', component: MainMenu }
+        { path: '/view-company-info', name: 'ViewCompanyInfo', component: ViewCompanyInfo },
     ]
+
 
 const router = createRouter({
     history: createWebHistory(),

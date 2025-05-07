@@ -17,7 +17,10 @@ class CurrentUserService {
                 params: { email }
             });
 
+
             const userInformation = response.data;
+            console.log("User info recibido:", userInformation);
+
             localStorage.setItem('currentUserInformation', JSON.stringify(userInformation));
         } catch (error) {
             console.error('Error fetching and saving current user information to localStorage:', error);
