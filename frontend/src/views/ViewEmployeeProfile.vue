@@ -72,7 +72,8 @@
 <script>
 import axios from 'axios';
 import { ref, onMounted } from 'vue';
-import { useRoute } from 'vue-router';
+//import { useRoute } from 'vue-router';
+import currentUserService from "@/services/currentUserService";
 
 export default {
   name: 'ViewEmployeeProfile',
@@ -80,14 +81,16 @@ export default {
     const employee = ref({});
     const loading = ref(true);
     const error = ref(null);
-    const route = useRoute();
+    //const route = useRoute();
 
     const getEmployee = async () => {
       try {
         loading.value = true;
         error.value = null;
-
-        const id = route.params.id;
+        
+        const currentUserInformation = currentUserService.getCurrentUserInformationFromLocalStorage();
+        const id = currentUserInformation.idNaturalPerson;
+    
         const response = await axios.get(`https://localhost:5000/api/EmployeeGetID/GetEmployeeById/${id}`);
 
         employee.value = {

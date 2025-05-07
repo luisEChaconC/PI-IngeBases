@@ -24,7 +24,8 @@ const routes =
         { path: '/benefit/:id', name: 'Benefit', component: Benefit, props: true },
         { path: '/benefit/create', name: 'CreateBenefit', component: BenefitCreate },
         { path: '/select-change-benefit', name: 'SelectChangeBenefit', component: SelectChangeBenefit },
-        { path: '/main-menu', name: 'MainMenu', component: MainMenu }
+        { path: '/main-menu', name: 'MainMenu', component: MainMenu },
+        { path: '/view-employee-profile', name: 'ViewEmployeeProfile', component: ViewEmployeeProfile }
     ]
 
 const router = createRouter({
