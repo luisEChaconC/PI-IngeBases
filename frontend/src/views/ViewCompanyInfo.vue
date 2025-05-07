@@ -1,5 +1,12 @@
 <template>
-    <div class="d-flex justify-content-center align-items-center min-vh-100 my-5">
+    <div class="d-flex justify-content-center align-items-center min-vh-100 my-5 position-relative">
+      <router-link
+        to="/main-menu"
+        class="btn btn-outline-secondary position-absolute top-0 start-0 m-3"
+        title="Volver al menú principal"
+      >
+        ← Volver
+      </router-link>
       <div class="card w-75">
         <div class="card-body">
           <h2 class="card-title">Información empresa</h2>
