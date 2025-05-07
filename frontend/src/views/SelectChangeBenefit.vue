@@ -128,6 +128,24 @@ export default {
       }
     };
 
+    const getCompanyMaxBenefits = async () => {
+      try {
+        const companyId = getCurrentUserInformationFromLocalStorage()?.companyId;
+        if (!companyId) {
+          console.error("No se encontró companyId en localStorage.");
+          return;
+        }
+
+        const response = await axios.get(`https://localhost:5000/api/company/GetCompanyById/${companyId}`);
+
+        if (response.data?.maxBenefitsPerEmployee !== undefined) {
+          maxBenefits.value = response.data.maxBenefitsPerEmployee;
+        }
+      } catch (error) {
+        console.error("Error obteniendo maxBenefitsPerEmployee:", error);
+      }
+    };
+
     const assignBenefits = async () => {
       try {
         const employeeId = getCurrentUserInformationFromLocalStorage()?.idNaturalPerson;
@@ -182,6 +200,7 @@ export default {
     onMounted(() => {
       getBenefits();
       getAssignedBenefits();
+      getCompanyMaxBenefits();
     });
 
     return {
