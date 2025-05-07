@@ -14,6 +14,7 @@ import ViewCompanyInfo from '@/views/ViewCompanyInfo.vue'
 import ViewEmployeeProfileEmployer from '../views/ViewCompaniesList.vue'
 const routes =
     [
+        { path: '/', redirect: '/login' },
         { path: '/login', name: 'LoginForm', component: Login },
         { path: '/add-employee', name: 'AddEmployee', component: AddEmployee},
         { path: '/company-registration', name: 'CompanyRegistration', component: CompanyRegistration },
