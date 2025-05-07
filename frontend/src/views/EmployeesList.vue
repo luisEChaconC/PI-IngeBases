@@ -43,6 +43,7 @@
 
 <script>
 import axios from 'axios'
+import currentUserService from "@/services/currentUserService";
 
 export default {
   name: 'EmployeesList',
@@ -54,7 +55,8 @@ export default {
   methods: {
     async fetchEmployees() {
       try {
-        const companyId = 'E0731D81-5309-40C6-8927-B5929DCDEB55' // Replace with the actual company ID
+        const currentUserInformation = currentUserService.getCurrentUserInformationFromLocalStorage()
+        const companyId = currentUserInformation.companyId
         const response = await axios.get('https://localhost:5000/api/Employee/GetEmployeesByCompanyId', {
           params: { companyId: companyId }
         })
