@@ -1,6 +1,4 @@
 <template>
-    
-
   <h3 class="fw-bold mb-4 text-center">Beneficio</h3>
     <div class="container d-flex justify-content-center align-items-center mt-5">
         <router-link
@@ -55,12 +53,14 @@
         </div>
   
         <div class="mb-3">
-          <label class="form-label">Tipos de empleados elegibles</label>
-          <ul class="list-group">
-            <li class="list-group-item" v-for="(type, index) in benefit.eligibleEmployeeTypes" :key="index">
-              {{ type }}
-            </li>
-          </ul>
+            <label class="form-label">Tipos de empleados elegibles</label>
+            <ul class="list-group">
+                <li class="list-group-item"
+                    v-for="(type, index) in translatedEmployeeTypes"
+                    :key="index">
+                    {{ type }}
+                </li>
+            </ul>
         </div>
   
         <div class="text-center mt-4">
@@ -71,6 +71,7 @@
   </template>
   
   <script setup>
+  
   import { computed, onMounted, ref } from 'vue'
   import { useRoute } from 'vue-router'
   import axios from 'axios'
@@ -78,15 +79,33 @@
   const route = useRoute()
   const benefitId = route.params.id
   const benefit = ref({})
+
+  const getCurrentUserInformationFromLocalStorage = () => {
+      const userInformation = localStorage.getItem('currentUserInformation');
+      return userInformation ? JSON.parse(userInformation) : null;
+  };
   
   onMounted(async () => {
-    try {
-      const response = await axios.get(`https://localhost:5000/api/benefit/${benefitId}`)
-      benefit.value = response.data
-    } catch (error) {
-      console.error('Error loading benefit:', error)
-    }
-  })
+  try {
+    const companyId = getCurrentUserInformationFromLocalStorage()?.companyId
+    const response = await axios.get(`https://localhost:5000/api/benefit/${benefitId}`, {
+      params: { companyId }
+    })
+    benefit.value = response.data
+  } catch (error) {
+    console.error('Error loading benefit:', error)
+  }
+})
+    const translatedEmployeeTypes = computed(() => {
+        const employeeTypeMap = {
+            'Full-Time': 'Tiempo completo',
+            'Part-Time': 'Medio tiempo',
+            'Professional Services': 'Por contrato',
+            'Hourly': 'Por Horas'
+        }
+
+        return benefit.value.eligibleEmployeeTypes?.map(type => employeeTypeMap[type] || type) || []
+    })
 
   const translatedType = computed(() => {
     switch (benefit.value.type) {

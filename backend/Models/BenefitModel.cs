@@ -9,6 +9,8 @@ namespace backend.Models
     {
         public string? Id { get; set; }
 
+        public string CompanyId { get; set; }
+
         [Required(ErrorMessage = "El nombre es obligatorio.")]
         [StringLength(35, MinimumLength = 3, ErrorMessage = "El nombre debe tener entre 3 y 35 caracteres.")]
         [RegularExpression(@"^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$", ErrorMessage = "Solo letras, tildes y ñ son permitidas.")]
@@ -42,7 +44,7 @@ namespace backend.Models
 
     public class EligibleEmployeeTypesValidationAttribute : ValidationAttribute
     {
-        private readonly string[] allowed = new[] { "PartTime", "FullTime", "ByContract" };
+        private readonly string[] allowed = new[] { "Full-Time", "Part-Time", "Professional Services", "Hourly" };
 
         protected override ValidationResult IsValid(object value, ValidationContext validationContext)
         {

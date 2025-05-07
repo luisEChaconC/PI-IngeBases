@@ -63,12 +63,19 @@ namespace backend.Services
             return result != null ? (Guid?)result : null;
         }
 
-
-        public List<Benefit> GetBenefits()
+        public List<Benefit> GetBenefits(string companyId)
         {
             var benefits = new List<Benefit>();
-            var query = "SELECT * FROM Benefits";
-            var table = CreateQueryTable(query);
+            var query = "SELECT * FROM Benefits WHERE CompanyId = @CompanyId";
+
+            using var command = new SqlCommand(query, _connection);
+            command.Parameters.AddWithValue("@CompanyId", Guid.Parse(companyId));
+            using var adapter = new SqlDataAdapter(command);
+            var table = new DataTable();
+
+            _connection.Open();
+            adapter.Fill(table);
+            _connection.Close();
 
             foreach (DataRow row in table.Rows)
             {
@@ -76,13 +83,14 @@ namespace backend.Services
                 benefits.Add(new Benefit
                 {
                     Id = id.ToString(),
+                    CompanyId = row["CompanyId"].ToString(),
                     Name = row["Name"].ToString(),
                     Description = row["Description"].ToString(),
                     IsActive = Convert.ToBoolean(row["IsActive"]),
                     Type = row["Type"].ToString(),
                     LinkAPI = row["LinkAPI"].ToString(),
-                    FixedPercentage = row["FixedPercentage"] != DBNull.Value ? Convert.ToInt32(row["FixedPercentage"]) : 0,
-                    FixedAmount = row["FixedAmount"] != DBNull.Value ? Convert.ToInt32(row["FixedAmount"]) : 0,
+                    FixedPercentage = row["FixedPercentage"] != DBNull.Value ? Convert.ToInt32(row["FixedPercentage"]) : null,
+                    FixedAmount = row["FixedAmount"] != DBNull.Value ? Convert.ToInt32(row["FixedAmount"]) : null,
                     RequiredMonthsWorked = Convert.ToInt32(row["RequiredMonthsWorked"]),
                     EligibleEmployeeTypes = GetEmployeeTypesForBenefit(id)
                 });
@@ -96,10 +104,10 @@ namespace backend.Services
             var benefitId = Guid.NewGuid();
 
             const string insertBenefitQuery = @"
-        INSERT INTO Benefits
-        (Id, Name, Description, IsActive, Type, LinkAPI, FixedPercentage, FixedAmount, RequiredMonthsWorked)
-        VALUES
-        (@Id, @Name, @Description, @IsActive, @Type, @LinkAPI, @FixedPercentage, @FixedAmount, @RequiredMonthsWorked)";
+                INSERT INTO Benefits
+                (Id, CompanyId, Name, Description, IsActive, Type, LinkAPI, FixedPercentage, FixedAmount, RequiredMonthsWorked)
+                VALUES
+                (@Id, @CompanyId, @Name, @Description, @IsActive, @Type, @LinkAPI, @FixedPercentage, @FixedAmount, @RequiredMonthsWorked)";
 
             using (var connection = new SqlConnection(_connection.ConnectionString))
             {
@@ -108,6 +116,7 @@ namespace backend.Services
                 using (var command = new SqlCommand(insertBenefitQuery, connection))
                 {
                     command.Parameters.AddWithValue("@Id", benefitId);
+                    command.Parameters.AddWithValue("@CompanyId", Guid.Parse(benefit.CompanyId));
                     command.Parameters.AddWithValue("@Name", benefit.Name);
                     command.Parameters.AddWithValue("@Description", benefit.Description ?? "");
                     command.Parameters.AddWithValue("@IsActive", benefit.IsActive);
@@ -119,15 +128,14 @@ namespace backend.Services
 
                     var success = command.ExecuteNonQuery() > 0;
 
-                    // Insertar relaciones con tipos de empleado
                     foreach (var empType in benefit.EligibleEmployeeTypes)
                     {
-                        var empTypeId = GetEmployeeTypeIdByName(empType, connection); // <-- pasa la conexión
+                        var empTypeId = GetEmployeeTypeIdByName(empType, connection);
                         if (empTypeId != null)
                         {
                             const string relQuery = @"
-                        INSERT INTO EmployeeTypesXBenefits (EmployeeTypeId, BenefitId)
-                        VALUES (@EmpTypeId, @BenefitId)";
+                                INSERT INTO EmployeeTypesXBenefits (EmployeeTypeId, BenefitId)
+                                VALUES (@EmpTypeId, @BenefitId)";
 
                             using var relCmd = new SqlCommand(relQuery, connection);
                             relCmd.Parameters.AddWithValue("@EmpTypeId", empTypeId);
@@ -140,7 +148,5 @@ namespace backend.Services
                 }
             }
         }
-
-
     }
 }
