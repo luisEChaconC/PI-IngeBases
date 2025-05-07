@@ -272,6 +272,7 @@ export default {
     data() {
         return {
             company: {
+                id: '',
                 legalEntityId: '',
                 name: '',
                 description: '',
@@ -320,7 +321,7 @@ export default {
             const result = await this.registerCompany();
             if (result) {
                 alert("Se registró la empresa exitosamente!");
-                this.$router.push('/main-menu');
+                this.$router.push('/employer-registration/' + this.company.id);
             } else {
                 alert("No se pudo registrar la empresa");
             }
@@ -373,6 +374,7 @@ export default {
                 const response = await axios.post('https://localhost:5000/api/Company/CreateCompanyWithDependencies', payload);
 
                 if (response.status == 201) {
+                    this.company.id = response.data.personId;
                     return true;
                 } else {
                     return false;

@@ -1,3 +1,4 @@
+import MainMenu from '@/components/MainMenu.vue'
 import { createRouter, createWebHistory } from 'vue-router'
 import CompanyRegistration from '@/views/CompanyRegistration.vue'
 import EmployerRegistration from '@/views/EmployerRegistration.vue'
@@ -19,6 +20,7 @@ const routes =
         { path: '/benefit/:id', name: 'Benefit', component: Benefit, props: true },
         { path: '/benefit/create', name: 'CreateBenefit', component: BenefitCreate },
         { path: '/select-change-benefit', name: 'SelectChangeBenefit', component: SelectChangeBenefit },
+        { path: '/main-menu', name: 'MainMenu', component: MainMenu }
     ]
 
 const router = createRouter({
