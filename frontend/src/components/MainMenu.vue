@@ -10,7 +10,7 @@
         <div class="collapse navbar-collapse" id="mainNavbar">
           <ul class="navbar-nav me-auto mb-2 mb-lg-0">
             <li v-if="showOption('viewProfile')" class="nav-item">
-              <a class="nav-link" href="#">Perfil</a>
+              <router-link to="/view-employee-profile" class="nav-link">Perfil</router-link>
             </li>
             <li v-if="showOption('viewWorkedHours')" class="nav-item">
               <a class="nav-link" href="#">Horas Laboradas</a>

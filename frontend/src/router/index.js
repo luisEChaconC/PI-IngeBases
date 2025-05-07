@@ -1,6 +1,7 @@
 import SelectChangeBenefit from '../views/SelectChangeBenefit.vue'
 import AddEmployee from '@/views/AddEmployee.vue'
 import MainMenu from '@/components/MainMenu.vue'
+import ViewEmployeeProfile from '../views/ViewEmployeeProfile.vue'
 import { createRouter, createWebHistory } from 'vue-router'
 import CompanyRegistration from '@/views/CompanyRegistration.vue'
 import EmployerRegistration from '@/views/EmployerRegistration.vue'
@@ -19,6 +20,7 @@ const routes =
         { path: '/add-employee', name: 'AddEmployee', component: AddEmployee},
         { path: '/company-registration', name: 'CompanyRegistration', component: CompanyRegistration },
         { path: '/employer-registration/:companyId', name: 'EmployerRegistration', component: EmployerRegistration, props: true },
+        { path: '/view-employee-profile/:id',name: 'ViewEmployeeProfile',component: ViewEmployeeProfile },
         { path: '/employer-registration', redirect: '/login' },
         { path: '/view-companies-list',name: 'ViewCompaniesList',component: ViewCompaniesList},
         { path: '/employees-list', name: 'EmployeesList', component: EmployeesList },
@@ -27,6 +29,7 @@ const routes =
         { path: '/benefit/:id', name: 'Benefit', component: Benefit, props: true },
         { path: '/benefit/create', name: 'CreateBenefit', component: BenefitCreate },
         { path: '/select-change-benefit', name: 'SelectChangeBenefit', component: SelectChangeBenefit },
+        { path: '/view-employee-profile', name: 'ViewEmployeeProfile', component: ViewEmployeeProfile },
         { path: '/main-menu', name: 'MainMenu', component: MainMenu },
         { path: '/view-company-info', name: 'ViewCompanyInfo', component: ViewCompanyInfo },
     ]
