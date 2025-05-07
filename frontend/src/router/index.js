@@ -2,6 +2,7 @@ import AddEmployee from '@/views/AddEmployee.vue'
 import MainMenu from '@/components/MainMenu.vue'
 import { createRouter, createWebHistory } from 'vue-router'
 import CompanyRegistration from '@/views/CompanyRegistration.vue'
+import EmployerRegistration from '@/views/EmployerRegistration.vue'
 import EmployeesList from '@/views/EmployeesList.vue'
 import Login from '@/views/LoginForm.vue'
 import BenefitList from '@/components/BenefitList.vue'
@@ -16,6 +17,8 @@ const routes =
         { path: '/login', name: 'LoginForm', component: Login },
         { path: '/add-employee', name: 'AddEmployee', component: AddEmployee},
         { path: '/company-registration', name: 'CompanyRegistration', component: CompanyRegistration },
+        { path: '/employer-registration/:companyId', name: 'EmployerRegistration', component: EmployerRegistration, props: true },
+        { path: '/employer-registration', redirect: '/login' },
         { path: '/view-companies-list',name: 'ViewCompaniesList',component: ViewEmployeeProfileEmployer},
         { path: '/employees-list', name: 'EmployeesList', component: EmployeesList },
         { path: '/benefits', name: 'Benefits', component: BenefitList },
