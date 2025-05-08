@@ -47,7 +47,7 @@ VALUES ('0633382597', 'Natural Person', 'San José', 'Santa Ana', 'Pozos', 'Cond
 SELECT TOP 1 @EmployerPersonId = Id FROM @EmployerPersonIdTable;
 
 INSERT INTO Users (Id, Email, Password, IsAdmin)
-VALUES (@EmployerUserId, 'carlos.mendoza@empresa1.co.cr', '^%461VsBCy', 1);
+VALUES (@EmployerUserId, 'carlos.mendoza@empresa1.co.cr', '^%461VsBCy', 0);
 
 INSERT INTO NaturalPersons (Id, FirstName, FirstSurname, SecondSurname, UserId)
 VALUES (@EmployerPersonId, 'Carlos', 'Mendoza', 'Jiménez', @EmployerUserId);
@@ -156,7 +156,7 @@ VALUES ('4942908531', 'Natural Person', 'Alajuela', 'Atenas', 'Centro', 'Barrio 
 SELECT TOP 1 @EmployerPersonId = Id FROM @EmployerPersonIdTable;
 
 INSERT INTO Users (Id, Email, Password, IsAdmin)
-VALUES (@EmployerUserId, 'valeria.morales@empresa2.co.cr', '$1zPJusvwK', 1);
+VALUES (@EmployerUserId, 'valeria.morales@empresa2.co.cr', '$1zPJusvwK', 0);
 
 INSERT INTO NaturalPersons (Id, FirstName, FirstSurname, SecondSurname, UserId)
 VALUES (@EmployerPersonId, 'Valeria', 'Morales', 'Quesada', @EmployerUserId);
@@ -262,7 +262,7 @@ VALUES ('3137483987', 'Natural Person', 'Guanacaste', 'Nicoya', 'Santa Ana', 'Re
 SELECT TOP 1 @EmployerPersonId = Id FROM @EmployerPersonIdTable;
 
 INSERT INTO Users (Id, Email, Password, IsAdmin)
-VALUES (@EmployerUserId, 'mariana.villalobos@empresa3.co.cr', 'B#!8C2rQUn', 1);
+VALUES (@EmployerUserId, 'mariana.villalobos@empresa3.co.cr', 'B#!8C2rQUn', 0);
 
 INSERT INTO NaturalPersons (Id, FirstName, FirstSurname, SecondSurname, UserId)
 VALUES (@EmployerPersonId, 'Mariana', 'Villalobos', 'Solano', @EmployerUserId);

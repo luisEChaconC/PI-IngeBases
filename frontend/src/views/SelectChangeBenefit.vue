@@ -1,5 +1,14 @@
 <template>
   <div class="container my-5">
+    <div class="position-relative mb-4">
+      <router-link
+          to="/main-menu"
+          class="btn btn-outline-secondary"
+          title="Volver al menú principal"
+        >
+          ← Volver
+        </router-link>
+    </div>
     <div class="card p-4 shadow">
       <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="card-title mb-0">Beneficios</h2>

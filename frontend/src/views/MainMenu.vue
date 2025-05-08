@@ -58,7 +58,7 @@
               <a class="nav-link" href="#">Asignación de Roles</a>
             </li>
             <li v-if="showOption('viewCompanyManagement')" class="nav-item">
-              <a class="nav-link" href="#">Gestión de Empresas</a>
+              <router-link class="nav-link" to="/view-companies-list">Gestión de Empresas</router-link>
             </li>
             <li v-if="showOption('viewReports')" class="nav-item">
               <a class="nav-link" href="#">Reportes</a>
