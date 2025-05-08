@@ -1,64 +1,77 @@
 <template>
-    <div class="d-flex justify-content-center align-items-center my-5">
+  <div>
+    <!-- Barra superior fija con botón de regreso -->
+    <div class="top-bar">
       <router-link
         to="/main-menu"
-        class="btn btn-outline-secondary position-absolute top-0 start-0 m-3"
+        class="btn btn-outline-secondary"
         title="Volver al menú principal"
       >
         ← Volver
       </router-link>
-      <div class="card" style="max-width: 800px; width: 100%;">
-        <div class="card-body p-4">
-          <h4 class="card-title fw-bold mb-4">Información empresa</h4>
-          
-          <div class="row g-3">
-            <!-- Primera fila -->
-            <div class="col-md-6 mb-3">
-              <label for="name" class="form-label">Nombre</label>
-              <input type="text" class="form-control" id="name" v-model="company.name" disabled />
+    </div>
+
+    <!-- Contenido principal con espaciado para evitar la barra superior -->
+    <div class="main-content">
+      <div class="container">
+        <div class="row justify-content-center">
+          <div class="col-lg-10">
+            <div class="card shadow">
+              <div class="card-body p-4">
+                <h4 class="card-title fw-bold mb-4">Información empresa</h4>
+                
+                <div class="row g-3">
+                  <!-- Primera fila -->
+                  <div class="col-md-6 mb-3">
+                    <label for="name" class="form-label">Nombre</label>
+                    <input type="text" class="form-control" id="name" v-model="company.name" disabled />
+                  </div>
+                  <div class="col-md-6 mb-3">
+                    <label for="legalId" class="form-label">Cédula Jurídica</label>
+                    <input type="text" class="form-control" id="legalId" v-model="company.person.legalId" disabled />
+                  </div>
+                  
+                  <!-- Fila de dirección -->
+                  <div class="col-12 mb-3">
+                    <label for="address" class="form-label">Dirección</label>
+                    <input type="text" class="form-control" id="address" :value="fullAddress" disabled/>
+                  </div>
+                  
+                  <!-- Tercera fila -->
+                  <div class="col-md-6 mb-3">
+                    <label for="employeesCount" class="form-label">Cantidad empleados</label>
+                    <input type="number" class="form-control" id="employeesCount" v-model="company.employeesCount" disabled />
+                  </div>
+                  <div class="col-md-6 mb-3">
+                    <label for="paymentType" class="form-label">Tipo de Pago</label>
+                    <select class="form-select" id="paymentType" disabled>
+                      <option>{{ translatedPaymentType }}</option>
+                    </select>
+                  </div>
+                  
+                  <!-- Cuarta fila -->
+                  <div class="col-md-6 mb-3">
+                    <label for="email" class="form-label">Correo</label>
+                    <input type="email" class="form-control" id="email" v-model="company.contact.email" disabled />
+                  </div>
+                  <div class="col-md-6 mb-3">
+                    <label for="phoneNumber" class="form-label">Teléfono</label>
+                    <input type="tel" class="form-control" id="phoneNumber" v-model="company.contact.phoneNumber" disabled />
+                  </div>
+                </div>
+        
+                <div class="mt-4">
+                  <button type="button" class="btn btn-dark px-4">Editar</button>
+                </div>
+              </div>
             </div>
-            <div class="col-md-6 mb-3">
-              <label for="legalId" class="form-label">Cédula Jurídica</label>
-              <input type="text" class="form-control" id="legalId" v-model="company.person.legalId" disabled />
-            </div>
-            
-            <!-- Fila de dirección -->
-            <div class="col-12 mb-3">
-              <label for="address" class="form-label">Dirección</label>
-              <input type="text" class="form-control" id="address" :value="fullAddress" disabled/>
-            </div>
-            
-            <!-- Tercera fila -->
-            <div class="col-md-6 mb-3">
-              <label for="employeesCount" class="form-label">Cantidad empleados</label>
-              <input type="number" class="form-control" id="employeesCount" v-model="company.employeesCount" disabled />
-            </div>
-            <div class="col-md-6 mb-3">
-              <label for="paymentType" class="form-label">Tipo de Pago</label>
-              <select class="form-select" id="paymentType" v-model="company.paymentType" disabled>
-                <option value="" disabled>Seleccionar</option>
-              </select>
-            </div>
-            
-            <!-- Cuarta fila -->
-            <div class="col-md-6 mb-3">
-              <label for="email" class="form-label">Correo</label>
-              <input type="email" class="form-control" id="email" v-model="company.contact.email" disabled />
-            </div>
-            <div class="col-md-6 mb-3">
-              <label for="phoneNumber" class="form-label">Teléfono</label>
-              <input type="tel" class="form-control" id="phoneNumber" v-model="company.contact.phoneNumber" disabled />
-            </div>
-          </div>
-  
-          <div class="mt-4">
-            <button type="button" class="btn btn-dark px-4">Editar</button>
           </div>
         </div>
       </div>
     </div>
-  </template>
-  
+  </div>
+</template>
+
 <script>
 import axios from 'axios';
 import currentUserService from "@/services/currentUserService";
@@ -123,12 +136,38 @@ export default {
     fullAddress() {
       const { province, canton, neighborhood, additionalDirectionDetails } = this.company.person;
       return [province, canton, neighborhood, additionalDirectionDetails].filter(Boolean).join(', ');
+    },
+    
+    translatedPaymentType() {
+      const translations = {
+        'Monthly': 'Mensual',
+        'Biweekly': 'Quincenal', 
+        'Weekly': 'Semanal'
+      };
+      
+      return translations[this.company.paymentType] || this.company.paymentType;
     }
   }
 };
 </script>
 
 <style scoped>
+.top-bar {
+  background-color: white;
+  padding: 15px 20px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1000;
+}
+
+.main-content {
+  padding-top: 80px;
+  padding-bottom: 40px;
+}
+
 .btn-dark {
   padding: 0.5rem 2rem;
 }
@@ -137,5 +176,14 @@ export default {
   background-color: #f8f9fa;
   color: #212529;
   opacity: 1;
+}
+
+.card.shadow {
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+}
+
+.card-title {
+  font-size: 1.5rem;
+  font-weight: bold;
 }
 </style> 
