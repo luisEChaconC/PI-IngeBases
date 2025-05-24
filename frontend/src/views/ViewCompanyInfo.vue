@@ -22,19 +22,24 @@
                 
                 <div class="row g-3">
                   <!-- Primera fila -->
-                  <div class="col-md-6 mb-3">
+                  <div class="col-md-6 mb-3 position-relative">
                     <label for="name" class="form-label">Nombre</label>
-                    <input type="text" class="form-control" id="name" v-model="company.name" disabled />
+                    <input type="text" class="form-control pe-5" id="name" v-model="company.name" :disabled="!isEditing" />
+                    <i v-if="isEditing" class="bi bi-pencil-fill text-dark position-absolute" style="top: 40px; right: 17px;"></i>
                   </div>
-                  <div class="col-md-6 mb-3">
+
+                  <!-- Cédula Jurídica -->
+                  <div class="col-md-6 mb-3 position-relative">
                     <label for="legalId" class="form-label">Cédula Jurídica</label>
-                    <input type="text" class="form-control" id="legalId" v-model="company.person.legalId" disabled />
+                    <input type="text" class="form-control pe-5" id="legalId" v-model="company.person.legalId" :disabled="!isEditing" />
+                    <i v-if="isEditing" class="bi bi-pencil-fill text-dark position-absolute" style="top: 40px; right: 17px;"></i>
                   </div>
-                  
-                  <!-- Fila de dirección -->
-                  <div class="col-12 mb-3">
+
+                  <!-- Dirección -->
+                  <div class="col-12 mb-3 position-relative">
                     <label for="address" class="form-label">Dirección</label>
-                    <input type="text" class="form-control" id="address" :value="fullAddress" disabled/>
+                    <input type="text" class="form-control pe-5" id="address" :value="fullAddress" :disabled="!isEditing" />
+                    <i v-if="isEditing" class="bi bi-pencil-fill text-dark position-absolute" style="top: 40px; right: 17px;"></i>
                   </div>
                   
                   <!-- Tercera fila -->
@@ -42,26 +47,54 @@
                     <label for="employeesCount" class="form-label">Cantidad empleados</label>
                     <input type="number" class="form-control" id="employeesCount" v-model="company.employeesCount" disabled />
                   </div>
-                  <div class="col-md-6 mb-3">
+
+                  <!-- Tipo de Pago -->
+                  <div class="col-md-6 mb-3 position-relative">
                     <label for="paymentType" class="form-label">Tipo de Pago</label>
-                    <select class="form-select" id="paymentType" disabled>
+                 
+                    <!-- Modo edición -->
+                    <select v-if="isEditing" class="form-select pe-5 no-arrow" id="paymentType" v-model="company.paymentType">
+                      <option disabled value="">Seleccione...</option>
+                      <option v-if="company.paymentType && !['Monthly', 'Biweekly', 'Weekly'].includes(company.paymentType)"  :value="company.paymentType">
+                        {{ translatedPaymentType }}
+                      </option>
+                      <option value="Monthly">Mensual</option>
+                      <option value="Weekly">Semanal</option>
+                      <option value="Biweekly">Quincenal</option>
+                    </select>
+
+                    <!-- Modo lectura -->
+                    <select v-else class="form-select pe-5" id="paymentType" disabled>
                       <option>{{ translatedPaymentType }}</option>
                     </select>
+
+                    <i v-if="isEditing" class="bi bi-pencil-fill text-dark position-absolute" style="top: 40px; right: 17px;"></i>
+                  </div>
+
+                  <!-- Correo -->
+                  <div class="col-md-6 mb-3 position-relative">
+                    <label for="email" class="form-label">Correo</label>
+                    <input type="email" class="form-control pe-5" id="email" v-model="company.contact.email" :disabled="!isEditing" />
+                    <i v-if="isEditing" class="bi bi-pencil-fill text-dark position-absolute" style="top: 40px; right: 17px;"></i>
+                  </div>
+
+                  <!-- Teléfono -->
+                  <div class="col-md-6 mb-3 position-relative">
+                    <label for="phoneNumber" class="form-label">Teléfono</label>
+                    <input type="tel" class="form-control pe-5" id="phoneNumber" v-model="company.contact.phoneNumber" :disabled="!isEditing" />
+                    <i v-if="isEditing" class="bi bi-pencil-fill text-dark position-absolute" style="top: 40px; right: 17px;"></i>
                   </div>
                   
-                  <!-- Cuarta fila -->
-                  <div class="col-md-6 mb-3">
-                    <label for="email" class="form-label">Correo</label>
-                    <input type="email" class="form-control" id="email" v-model="company.contact.email" disabled />
+                  <!-- Editar -->
+                  <div class="mt-4 d-flex gap-3">
+                    <button type="button" class="btn btn-dark px-4" @click="toggleEdit">
+                      {{ isEditing ? 'Guardar cambios' : 'Editar' }}
+                    </button>
+
+                    <button v-if="isEditing" type="button" class="btn btn-outline-secondary px-4" @click="cancelEdit">
+                      Cancelar
+                    </button>
                   </div>
-                  <div class="col-md-6 mb-3">
-                    <label for="phoneNumber" class="form-label">Teléfono</label>
-                    <input type="tel" class="form-control" id="phoneNumber" v-model="company.contact.phoneNumber" disabled />
-                  </div>
-                </div>
-        
-                <div class="mt-4">
-                  <button type="button" class="btn btn-dark px-4">Editar</button>
                 </div>
               </div>
             </div>
@@ -79,6 +112,7 @@ export default {
   name: 'ViewCompanyInfo',
   data() {
     return {
+      isEditing: false,
       company: {
         name: "",
         province: "",
@@ -124,7 +158,14 @@ export default {
         .catch((error) => {
           console.error("Error retrieving company:", error);
         });
-    }
+    },
+
+    toggleEdit() {
+      if (this.isEditing) {
+        //this.updateCompany(); 
+      }
+      this.isEditing = !this.isEditing;
+    },
   },
 
   created() {
@@ -186,4 +227,12 @@ export default {
   font-size: 1.5rem;
   font-weight: bold;
 }
+
+.no-arrow {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: none !important;
+}
+
 </style> 
