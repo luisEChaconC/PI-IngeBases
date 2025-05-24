@@ -2,7 +2,7 @@
   <div class="container mt-5">
       <div class="position-relative mb-4">
         <router-link
-          to="/main-menu"
+          to="/home-view"
           class="btn btn-outline-secondary"
           title="Volver al menú principal"
         >

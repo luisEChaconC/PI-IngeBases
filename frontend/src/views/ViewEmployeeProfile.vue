@@ -1,7 +1,7 @@
 <template>
-  <div class="d-flex justify-content-center align-items-center min-vh-100 my-5 position-relative">
+  <div class="d-flex justify-content-center align-items-center position-relative" style="min-height: calc(100vh - 200px);">
     <router-link
-      to="/main-menu"
+      to="/home-view"
       class="btn btn-outline-secondary position-absolute top-0 start-0 m-3"
       title="Volver"
     >

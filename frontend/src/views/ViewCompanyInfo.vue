@@ -1,15 +1,12 @@
 <template>
-  <div>
-    <!-- Barra superior fija con botón de regreso -->
-    <div class="top-bar">
-      <router-link
-        to="/main-menu"
-        class="btn btn-outline-secondary"
-        title="Volver al menú principal"
-      >
-        ← Volver
-      </router-link>
-    </div>
+  <div class="position-relative">
+    <router-link
+      to="/home-view"
+      class="btn btn-outline-secondary position-absolute top-0 start-0 mt-2 ms-3"
+      title="Volver"
+    >
+      ← Volver
+    </router-link>
 
     <!-- Contenido principal con espaciado para evitar la barra superior -->
     <div class="main-content">
@@ -157,14 +154,14 @@ export default {
   padding: 15px 20px;
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
   position: fixed;
-  top: 0;
+  top: 56px;
   left: 0;
   width: 100%;
   z-index: 1000;
 }
 
 .main-content {
-  padding-top: 80px;
+  padding-top: 150px;
   padding-bottom: 40px;
 }
 
@@ -186,4 +183,5 @@ export default {
   font-size: 1.5rem;
   font-weight: bold;
 }
+
 </style> 
