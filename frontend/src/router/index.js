@@ -13,6 +13,8 @@ import BenefitCreate from '@/views/BenefitCreate.vue'
 import ViewEmployeeProfileEmployer from '../views/ViewEmployeeProfileEmployer.vue'
 import ViewCompanyInfo from '@/views/ViewCompanyInfo.vue'
 import ViewCompaniesList from '../views/ViewCompaniesList.vue'
+import PayrollsList from '../views/PayrollsList.vue'
+
 const routes =
     [
         { path: '/', redirect: '/login' },
@@ -32,6 +34,7 @@ const routes =
         { path: '/view-employee-profile', name: 'ViewEmployeeProfile', component: ViewEmployeeProfile },
         { path: '/main-menu', name: 'MainMenu', component: MainMenu },
         { path: '/view-company-info', name: 'ViewCompanyInfo', component: ViewCompanyInfo },
+        { path: '/payrolls-list', name: 'PayrollsList', component: PayrollsList },
     ]
 
 
