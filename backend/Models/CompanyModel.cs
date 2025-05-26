@@ -59,7 +59,6 @@ namespace backend.Models
             Employees = null;
             EmployeesDynamic = null;
         }
-
         public CompanyModel(string id, string name, string? description, string paymentType, List<EmployeeModel> employees, int? maxBenefitsPerEmployee, DateTime creationDate, string? creationAuthor, DateTime? lastModificationDate, string? lastModificationAuthor)
         {
             Id = id;

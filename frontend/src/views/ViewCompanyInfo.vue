@@ -134,6 +134,13 @@ export default {
           email: ""
         },
         employees: []
+      },
+
+      companyUpdate: {
+        Id: "",
+        Name: "",
+        LegalId: "",
+        PaymentType: "",
       }
     };
   },
@@ -162,10 +169,31 @@ export default {
 
     toggleEdit() {
       if (this.isEditing) {
-        //this.updateCompany(); 
+        this.updateCompany(); 
       }
       this.isEditing = !this.isEditing;
+    }, 
+
+    updateCompany() {
+      const currentUserInformation = currentUserService.getCurrentUserInformationFromLocalStorage();
+
+      // Separar en una función
+      this.companyUpdate.Id = currentUserInformation.companyId; 
+      this.companyUpdate.Name = this.company.name;
+      this.companyUpdate.LegalId = this.company.person.legalId;
+      this.companyUpdate.PaymentType = this.company.paymentType;
+
+      axios.put(`https://localhost:5000/api/Company/${this.companyUpdate.Id}`, this.companyUpdate)
+        .then(() => {
+          alert("Company updated successfully");
+        })
+        .catch((error) => {
+          console.error("Error while updating company", error);
+          console.error("Data sent:", this.company);
+          console.error("Error while updating company", error.response?.data);
+        });
     },
+
   },
 
   created() {

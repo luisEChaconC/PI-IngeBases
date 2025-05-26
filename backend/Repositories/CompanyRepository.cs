@@ -209,5 +209,41 @@ namespace backend.Repositories
             // Return the company (or null if not found)
             return company;
         }
+
+    	public void UpdateCompany(UpdateCompanyModel company)
+        {
+            // TODO PONER LO DE LAST MODIFICATION DATE CON GETDATE Y EL AUTHOR ME LO TRAIGO DEL VIEW
+            var query = @"
+                UPDATE Companies
+                SET Name = @Name,
+                    PaymentType = @PaymentType
+                WHERE Id = @Id
+                
+                UPDATE Persons
+                SET LegalId = @LegalId
+                WHERE Id = @Id;";
+
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                try
+                {
+                    connection.Open();
+                    using (var command = new SqlCommand(query, connection))
+                    {
+                        command.Parameters.AddWithValue("@Id", company.Id);
+                        command.Parameters.AddWithValue("@Name", company.Name);
+                        command.Parameters.AddWithValue("@LegalId", company.LegalId);
+                        command.Parameters.AddWithValue("@PaymentType", company.PaymentType);
+
+                        command.ExecuteNonQuery();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error updating company: {ex.Message}");
+                    throw;
+                }
+            }
+        }
     }
 }

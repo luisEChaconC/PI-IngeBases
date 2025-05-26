@@ -169,5 +169,23 @@ namespace backend.Controllers
                     new { message = "An error occurred while retrieving the company.", error = ex.Message });
             }
         }
+
+        [HttpPut("{id}")]
+        public IActionResult UpdateCompany(string id, [FromBody] UpdateCompanyModel company)
+        {
+            try
+            {
+                if (id != company.Id)
+                    return BadRequest("URL ID does not match the company ID");
+
+                _companyRepository.UpdateCompany(company);
+                return Ok("Company updated successfully");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"An update error ocurred: {ex.Message}");
+            }
+        }
+
     }
 }
