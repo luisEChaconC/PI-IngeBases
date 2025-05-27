@@ -7,3 +7,4 @@ CREATE TABLE EmployeeTypesXBenefits (
     FOREIGN KEY (EmployeeTypeId) REFERENCES EmployeeTypes(Id),
     FOREIGN KEY (BenefitId) REFERENCES Benefits(Id)
 );
+
