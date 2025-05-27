@@ -1,0 +1,11 @@
+USE PayrollSystem
+
+CREATE TABLE Payrolls (
+	Id UNIQUEIDENTIFIER NOT NULL PRIMARY KEY DEFAULT NEWID(),
+	StartDate Date UNIQUE,
+	EndDate Date UNIQUE,
+	CompanyId UNIQUEIDENTIFIER,
+	PayrollManagerId UNIQUEIDENTIFIER NOT NULL,
+	FOREIGN KEY (CompanyId) REFERENCES Companies(Id),
+	FOREIGN KEY (PayrollManagerId) REFERENCES PayrollManagers(Id),
+);
