@@ -12,10 +12,10 @@ namespace backend.Infraestructure
         {
         }
 
-        public List<PayrollModel> GetPayrollsByCompanyId(string companyId)
+        public List<PayrollModel> GetPayrollsByCompanyId(string companyId) 
         {
             var payrolls = new List<PayrollModel>();
-            var query = @"SELECT Id, StartDate, EndDate, CompanyId, PayrollManagerId FROM Payrolls WHERE CompanyId = @CompanyId";
+            var query = @"SELECT Id, StartDate, EndDate, CompanyId, PayrollManagerId FROM Payrolls WHERE CompanyId = @CompanyId ORDER BY EndDate DESC";
             try
             {
                 _connection.Open();

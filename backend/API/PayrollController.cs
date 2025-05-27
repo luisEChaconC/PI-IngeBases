@@ -19,8 +19,24 @@ namespace backend.API
         [HttpGet]
         public IActionResult GetPayrollsByCompanyId([FromQuery] string companyId)
         {
-            var payrolls = _payrollService.GetPayrollsByCompanyId(companyId);
-            return Ok(payrolls);
+            try
+            {
+                if (string.IsNullOrEmpty(companyId))
+                {
+                    return BadRequest("CompanyId is required.");
+                }
+
+                var payrolls = _payrollService.GetPayrollsByCompanyId(companyId);
+                return Ok(payrolls);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new
+                {
+                    message = "An error occurred while retrieving the payrolls.",
+                    error = ex.Message
+                });
+            }
         }
     }
 }
