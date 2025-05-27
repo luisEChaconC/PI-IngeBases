@@ -1,4 +1,6 @@
 using backend.Services;
+using backend.Application;
+using backend.Infraestructure;
 
 var builder = WebApplication.CreateBuilder(args);
  
@@ -19,6 +21,9 @@ var builder = WebApplication.CreateBuilder(args);
  builder.Services.AddEndpointsApiExplorer();
  builder.Services.AddSwaggerGen();
  
+ builder.Services.AddScoped<IPayrollRepository, PayrollRepository>();
+ builder.Services.AddScoped<IPayrollService, PayrollService>();
+
  var app = builder.Build();
  
  // Configure the HTTP request pipeline.
