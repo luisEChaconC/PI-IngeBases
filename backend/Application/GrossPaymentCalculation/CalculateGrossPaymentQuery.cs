@@ -2,18 +2,18 @@
 using backend.Application.DTOs;
 using backend.Application.GrossPaymentCalculation;
 
-namespace backend.Application.Commands.SalaryCalculation
+namespace backend.Application.GrossPaymentCalculation
 {
-    public interface ICalculateSalaryCommand
+    public interface ICalculateGrossPaymentQuery
     {
         decimal Execute(CalculateSalaryDto dto);
     }
 
-    public class CalculateSalaryCommand : ICalculateSalaryCommand
+    public class CalculateGrossPaymentQuery : ICalculateGrossPaymentQuery
     {
         private readonly GrossPaymentCalculationOrchestrator _orchestrator;
 
-        public CalculateSalaryCommand(GrossPaymentCalculationOrchestrator orchestrator)
+        public CalculateGrossPaymentQuery(GrossPaymentCalculationOrchestrator orchestrator)
         {
             _orchestrator = orchestrator;
         }
