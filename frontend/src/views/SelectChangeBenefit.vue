@@ -2,7 +2,7 @@
   <div class="container my-5">
     <div class="position-relative mb-4">
       <router-link
-          to="/main-menu"
+          to="/home-view"
           class="btn btn-outline-secondary"
           title="Volver al menú principal"
         >
@@ -95,23 +95,43 @@ export default {
     );
 
     const getCurrentUserInformationFromLocalStorage = () => {
-      const userInformation = localStorage.getItem('currentUserInformation');
+      const userInformation = localStorage.getItem('currentUserInformation'); 
       return userInformation ? JSON.parse(userInformation) : null;
     };
 
     const getBenefits = async () => {
       try {
-        const companyId = getCurrentUserInformationFromLocalStorage()?.companyId;
+        const userInfo = getCurrentUserInformationFromLocalStorage();
+
+        const companyId = userInfo?.companyId;
+        const employeeId = userInfo?.idNaturalPerson;
+        const employee = await axios.get(`https://localhost:5000/api/EmployeeGetID/GetEmployeeById/${employeeId}`);
+        const contractType = employee?.data?.contractType;
+        console.log(contractType);
+        console.log(companyId);
         if (!companyId) {
           console.error('No se encontró companyId en localStorage.');
+          return;
+        }
+
+        if (!contractType) {
+          console.error('No se encontró contractType en localStorage.');
           return;
         }
 
         const response = await axios.get("https://localhost:5000/api/benefit", {
           params: { companyId }
         });
-        allBenefits.value = response.data;
-        console.log(allBenefits);
+        console.log('Beneficios sin filtro:', response.data);
+        // Filter benefits where EligibleEmployeeTypes includes the user's contractType
+        allBenefits.value = response.data.filter(benefit =>
+          benefit.eligibleEmployeeTypes &&
+          benefit.eligibleEmployeeTypes.some(type =>
+            type.trim().toLowerCase() === contractType.trim().toLowerCase()
+          )
+        );
+
+        console.log('Beneficios filtrados:', allBenefits.value);
       } catch (error) {
         console.error('Error getting benefits:', error);
       }
