@@ -1,4 +1,6 @@
-using backend.Services;
+using backend.Application.Commands.PaymentDetails;
+using backend.Application.Queries.PaymentDetails;
+using backend.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
  
@@ -17,9 +19,17 @@ var builder = WebApplication.CreateBuilder(args);
  builder.Services.AddControllers();
  // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
  builder.Services.AddEndpointsApiExplorer();
- builder.Services.AddSwaggerGen();
- 
- var app = builder.Build();
+builder.Services.AddSwaggerGen();
+
+
+// Register Clean Architecture Services
+builder.Services.AddScoped<IPaymentDetailRepository, PaymentDetailRepository>();
+builder.Services.AddScoped<ICreatePaymentDetailCommand, CreatePaymentDetailCommand>();
+builder.Services.AddScoped<IGetPaymentDetailByIdQuery, GetPaymentDetailByIdQuery>();
+builder.Services.AddScoped<IGetPaymentDetailsByEmployeeIdQuery, GetPaymentDetailsByEmployeeIdQuery>();
+builder.Services.AddScoped<IGetPaymentDetailsByCompanyIdQuery, GetPaymentDetailsByCompanyIdQuery>();
+
+var app = builder.Build();
  
  // Configure the HTTP request pipeline.
  if (app.Environment.IsDevelopment())
