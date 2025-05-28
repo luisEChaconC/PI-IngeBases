@@ -2,7 +2,7 @@
   <div class="container my-5">
     <div class="position-relative mb-4">
       <router-link
-        to="/main-menu"
+        to="/home-view"
         class="btn btn-outline-secondary"
         title="Volver al menú principal"
       >
@@ -28,7 +28,6 @@
                 <th>Monto deducido</th>
                 <th>Salario bruto</th>
                 <th>Salario neto</th>
-                <th>Estado</th>
               </tr>
             </thead>
             <tbody>
@@ -39,10 +38,9 @@
                 <td>{{ formatCurrency(payroll.deductedAmount) }}</td>
                 <td>{{ formatCurrency(payroll.grossSalary) }}</td>
                 <td>{{ formatCurrency(payroll.netSalary) }}</td>
-                <td>{{ translateState(payroll.state) }}</td>
               </tr>
               <tr v-if="payrolls.length === 0">
-                <td colspan="7" class="text-center">No se encontraron planillas.</td>
+                <td colspan="6" class="text-center">No se encontraron planillas.</td>
               </tr>
             </tbody>
           </table>
@@ -64,8 +62,7 @@ export default {
           endDate: '2025-05-15',
           deductedAmount: 120000,
           grossSalary: 1500000,
-          netSalary: 1380000,
-          state: 'Open'
+          netSalary: 1380000
         },
         {
           managerFullName: 'María Fernández',
@@ -73,8 +70,7 @@ export default {
           endDate: '2025-04-30',
           deductedAmount: 95000,
           grossSalary: 1400000,
-          netSalary: 1305000,
-          state: 'Closed'
+          netSalary: 1305000
         },
         {
           managerFullName: 'Luis Gómez',
@@ -82,8 +78,7 @@ export default {
           endDate: '2025-05-15',
           deductedAmount: 110000,
           grossSalary: 1350000,
-          netSalary: 1240000,
-          state: 'Processing'
+          netSalary: 1240000
         },
         {
           managerFullName: 'Ana Solís',
@@ -91,8 +86,7 @@ export default {
           endDate: '2025-03-15',
           deductedAmount: 105000,
           grossSalary: 1250000,
-          netSalary: 1145000,
-          state: 'Closed'
+          netSalary: 1145000
         },
         {
           managerFullName: 'Pedro Vargas',
@@ -100,8 +94,7 @@ export default {
           endDate: '2025-02-28',
           deductedAmount: 98000,
           grossSalary: 1320000,
-          netSalary: 1222000,
-          state: 'Open'
+          netSalary: 1222000
         },
         {
           managerFullName: 'Laura Jiménez',
@@ -109,8 +102,7 @@ export default {
           endDate: '2025-01-15',
           deductedAmount: 112000,
           grossSalary: 1450000,
-          netSalary: 1338000,
-          state: 'Closed'
+          netSalary: 1338000
         },
         {
           managerFullName: 'Jorge Castro',
@@ -118,8 +110,7 @@ export default {
           endDate: '2024-12-31',
           deductedAmount: 101000,
           grossSalary: 1200000,
-          netSalary: 1099000,
-          state: 'Processing'
+          netSalary: 1099000
         },
         {
           managerFullName: 'Gabriela Mora',
@@ -127,8 +118,7 @@ export default {
           endDate: '2024-11-15',
           deductedAmount: 99000,
           grossSalary: 1280000,
-          netSalary: 1181000,
-          state: 'Closed'
+          netSalary: 1181000
         },
         {
           managerFullName: 'Ricardo Soto',
@@ -136,8 +126,7 @@ export default {
           endDate: '2024-10-31',
           deductedAmount: 87000,
           grossSalary: 1190000,
-          netSalary: 1103000,
-          state: 'Open'
+          netSalary: 1103000
         },
         {
           managerFullName: 'Patricia Méndez',
@@ -145,8 +134,7 @@ export default {
           endDate: '2024-09-15',
           deductedAmount: 93000,
           grossSalary: 1230000,
-          netSalary: 1137000,
-          state: 'Closed'
+          netSalary: 1137000
         },
         {
           managerFullName: 'Esteban Rojas',
@@ -154,8 +142,7 @@ export default {
           endDate: '2024-08-31',
           deductedAmount: 102000,
           grossSalary: 1370000,
-          netSalary: 1268000,
-          state: 'Processing'
+          netSalary: 1268000
         },
         {
           managerFullName: 'Daniela Porras',
@@ -163,8 +150,7 @@ export default {
           endDate: '2024-07-15',
           deductedAmount: 95000,
           grossSalary: 1300000,
-          netSalary: 1205000,
-          state: 'Closed'
+          netSalary: 1205000
         },
         {
           managerFullName: 'Andrés Chaves',
@@ -172,8 +158,7 @@ export default {
           endDate: '2024-06-30',
           deductedAmount: 99000,
           grossSalary: 1270000,
-          netSalary: 1171000,
-          state: 'Open'
+          netSalary: 1171000
         },
         {
           managerFullName: 'Sofía Navarro',
@@ -181,8 +166,7 @@ export default {
           endDate: '2024-05-15',
           deductedAmount: 108000,
           grossSalary: 1420000,
-          netSalary: 1312000,
-          state: 'Closed'
+          netSalary: 1312000
         },
         {
           managerFullName: 'Mauricio Quesada',
@@ -190,8 +174,7 @@ export default {
           endDate: '2024-04-30',
           deductedAmount: 97000,
           grossSalary: 1210000,
-          netSalary: 1113000,
-          state: 'Processing'
+          netSalary: 1113000
         },
         {
           managerFullName: 'Valeria Ureña',
@@ -199,8 +182,7 @@ export default {
           endDate: '2024-03-15',
           deductedAmount: 94000,
           grossSalary: 1240000,
-          netSalary: 1146000,
-          state: 'Closed'
+          netSalary: 1146000
         },
         {
           managerFullName: 'Oscar Salazar',
@@ -208,8 +190,7 @@ export default {
           endDate: '2024-02-28',
           deductedAmount: 99000,
           grossSalary: 1290000,
-          netSalary: 1191000,
-          state: 'Open'
+          netSalary: 1191000
         },
         {
           managerFullName: 'Marina Acuña',
@@ -217,8 +198,7 @@ export default {
           endDate: '2024-01-15',
           deductedAmount: 100000,
           grossSalary: 1350000,
-          netSalary: 1250000,
-          state: 'Closed'
+          netSalary: 1250000
         },
         {
           managerFullName: 'Felipe Araya',
@@ -226,8 +206,7 @@ export default {
           endDate: '2023-12-31',
           deductedAmount: 95000,
           grossSalary: 1320000,
-          netSalary: 1225000,
-          state: 'Processing'
+          netSalary: 1225000
         },
         {
           managerFullName: 'Natalia Céspedes',
@@ -235,8 +214,7 @@ export default {
           endDate: '2023-11-15',
           deductedAmount: 92000,
           grossSalary: 1200000,
-          netSalary: 1108000,
-          state: 'Closed'
+          netSalary: 1108000
         }
       ]
     }
@@ -251,18 +229,6 @@ export default {
       if (amount == null) return ''
       // Format as ": xxx.xxx.xxx,00" (colon at the start, no CRC)
       return '₡ ' + amount.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
-    },
-    translateState(state) {
-      switch (state) {
-        case 'Open':
-          return 'Abierta'
-        case 'Closed':
-          return 'Cerrada'
-        case 'Processing':
-          return 'Procesando'
-        default:
-          return 'Desconocido'
-      }
     }
   }
 }
