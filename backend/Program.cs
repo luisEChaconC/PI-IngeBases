@@ -1,6 +1,8 @@
 using backend.Application.Commands.PaymentDetails;
 using backend.Application.Queries.PaymentDetails;
-using backend.Infrastructure;
+using backend.Infraestructure;
+using backend.Services;
+using backend.Application;
 
 var builder = WebApplication.CreateBuilder(args);
  
@@ -29,7 +31,12 @@ builder.Services.AddScoped<IGetPaymentDetailByIdQuery, GetPaymentDetailByIdQuery
 builder.Services.AddScoped<IGetPaymentDetailsByEmployeeIdQuery, GetPaymentDetailsByEmployeeIdQuery>();
 builder.Services.AddScoped<IGetPaymentDetailsByCompanyIdQuery, GetPaymentDetailsByCompanyIdQuery>();
 
-var app = builder.Build();
+ builder.Services.AddSwaggerGen();
+ 
+ builder.Services.AddScoped<IPayrollRepository, PayrollRepository>();
+ builder.Services.AddScoped<IPayrollService, PayrollService>();
+
+ var app = builder.Build();
  
  // Configure the HTTP request pipeline.
  if (app.Environment.IsDevelopment())
