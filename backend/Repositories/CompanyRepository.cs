@@ -212,16 +212,34 @@ namespace backend.Repositories
 
     	public void UpdateCompany(UpdateCompanyModel company)
         {
-            // TODO PONER LO DE LAST MODIFICATION DATE CON GETDATE Y EL AUTHOR ME LO TRAIGO DEL VIEW
             var query = @"
                 UPDATE Companies
                 SET Name = @Name,
-                    PaymentType = @PaymentType
+                    PaymentType = @PaymentType,
+                    LastModificationDate = GETDATE(),
+                    MaxBenefitsPerEmployee = @MaxBenefitsPerEmployee
                 WHERE Id = @Id
                 
                 UPDATE Persons
-                SET LegalId = @LegalId
-                WHERE Id = @Id;";
+                SET LegalId = @LegalId,
+                    Province = @Province,
+                    Canton = @Canton,   
+                    Neighborhood = @Neighborhood,
+                    AdditionalDirectionDetails = @AdditionalDirectionDetails
+                WHERE Id = @Id;
+                
+                
+               UPDATE Contacts
+                SET
+                    PhoneNumber = CASE 
+                        WHEN Email IS NULL OR Email = '' THEN @PhoneNumber
+                        ELSE PhoneNumber
+                    END,
+                    Email = CASE 
+                        WHEN PhoneNumber IS NULL OR PhoneNumber = '' THEN @Email
+                        ELSE Email
+                    END
+                WHERE PersonId = @Id";
 
             using (var connection = new SqlConnection(_connectionString))
             {
@@ -232,8 +250,15 @@ namespace backend.Repositories
                     {
                         command.Parameters.AddWithValue("@Id", company.Id);
                         command.Parameters.AddWithValue("@Name", company.Name);
-                        command.Parameters.AddWithValue("@LegalId", company.LegalId);
+                        command.Parameters.AddWithValue("@LegalId", company.Person.LegalId);
                         command.Parameters.AddWithValue("@PaymentType", company.PaymentType);
+                        command.Parameters.AddWithValue("@Province", company.Person.Province);
+                        command.Parameters.AddWithValue("@Canton", company.Person.Canton);
+                        command.Parameters.AddWithValue("@Neighborhood", company.Person.Neighborhood);
+                        command.Parameters.AddWithValue("@AdditionalDirectionDetails", company.Person.AdditionalDirectionDetails);
+                        command.Parameters.AddWithValue("@PhoneNumber", company.Contact.PhoneNumber);
+                        command.Parameters.AddWithValue("@Email", company.Contact.Email);
+                        command.Parameters.AddWithValue("@MaxBenefitsPerEmployee", company.MaxBenefits);
 
                         command.ExecuteNonQuery();
                     }

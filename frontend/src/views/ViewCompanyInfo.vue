@@ -37,10 +37,29 @@
 
                   <!-- Dirección -->
                   <div class="col-12 mb-3 position-relative">
-                    <label for="address" class="form-label">Dirección</label>
-                    <input type="text" class="form-control pe-5" id="address" :value="fullAddress" :disabled="!isEditing" />
+                    <label class="form-label">Dirección</label>
+
+                    <!-- Modo edición, se separan los inputs-->
+                    <div v-if="isEditing" class="row g-2">
+                      <div class="col-md-3">
+                        <input type="text" class="form-control" placeholder="Provincia" v-model="company.person.province" />
+                      </div>
+                      <div class="col-md-3">
+                        <input type="text" class="form-control" placeholder="Cantón" v-model="company.person.canton" />
+                      </div>
+                      <div class="col-md-3">
+                        <input type="text" class="form-control" placeholder="Barrio" v-model="company.person.neighborhood" />
+                      </div>
+                      <div class="col-md-3">
+                        <input type="text" class="form-control" placeholder="Detalles adicionales" v-model="company.person.additionalDirectionDetails" />
+                      </div>
+                    </div>
+
+                    <!-- Modo lectura, dirección completa en una sola línea -->
+                    <input v-else type="text" class="form-control pe-5" :value="fullAddress" disabled />
                     <i v-if="isEditing" class="bi bi-pencil-fill text-dark position-absolute" style="top: 40px; right: 17px;"></i>
                   </div>
+
                   
                   <!-- Tercera fila -->
                   <div class="col-md-6 mb-3">
@@ -84,6 +103,13 @@
                     <input type="tel" class="form-control pe-5" id="phoneNumber" v-model="company.contact.phoneNumber" :disabled="!isEditing" />
                     <i v-if="isEditing" class="bi bi-pencil-fill text-dark position-absolute" style="top: 40px; right: 17px;"></i>
                   </div>
+
+                  <!-- Cantidad máxima beneficios -->
+                  <div class="col-md-6 mb-3 position-relative">
+                    <label for="maxBenefits" class="form-label">Cantidad máxima de beneficios por empleado</label>
+                    <input type="tel" class="form-control pe-5" id="maxBenefits" v-model="company.maxBenefits" :disabled="!isEditing" />
+                    <i v-if="isEditing" class="bi bi-pencil-fill text-dark position-absolute" style="top: 40px; right: 17px;"></i>
+                  </div>
                   
                   <!-- Editar -->
                   <div class="mt-4 d-flex gap-3">
@@ -115,13 +141,9 @@ export default {
       isEditing: false,
       company: {
         name: "",
-        province: "",
-        canton: "",
-        neighborhood: "",
-        additionalDirectionDetails: "",
-        legalId: "", 
         employeesCount: 0,
         paymentType: "",
+        maxBenefits: 0,
         person: {
           province: "",
           canton: "",
@@ -133,15 +155,7 @@ export default {
           phoneNumber: "",
           email: ""
         },
-        employees: []
       },
-
-      companyUpdate: {
-        Id: "",
-        Name: "",
-        LegalId: "",
-        PaymentType: "",
-      }
     };
   },
 
@@ -152,7 +166,6 @@ export default {
           this.company = response.data;
           this.company.employeesCount = response.data.employeesDynamic.length;
           
-      
           const contactsList = response.data.contact; 
 
           this.company.contact = {
@@ -160,7 +173,10 @@ export default {
             email: contactsList.find(c => c.email)?.email || ""
           };
 
-          console.log("Company loaded:", this.company);
+          console.log(response.data);
+
+          this.company.maxBenefits = response.data.maxBenefitsPerEmployee;
+       
         })
         .catch((error) => {
           console.error("Error retrieving company:", error);
@@ -177,13 +193,7 @@ export default {
     updateCompany() {
       const currentUserInformation = currentUserService.getCurrentUserInformationFromLocalStorage();
 
-      // Separar en una función
-      this.companyUpdate.Id = currentUserInformation.companyId; 
-      this.companyUpdate.Name = this.company.name;
-      this.companyUpdate.LegalId = this.company.person.legalId;
-      this.companyUpdate.PaymentType = this.company.paymentType;
-
-      axios.put(`https://localhost:5000/api/Company/${this.companyUpdate.Id}`, this.companyUpdate)
+      axios.put(`https://localhost:5000/api/Company/${currentUserInformation.companyId}`, this.company)
         .then(() => {
           alert("Company updated successfully");
         })
@@ -198,7 +208,7 @@ export default {
 
   created() {
     const currentUserInformation = currentUserService.getCurrentUserInformationFromLocalStorage();
-    this.getCompanyById(currentUserInformation.companyId); // Changed ID
+    this.getCompanyById(currentUserInformation.companyId); 
   },
 
   computed: {
