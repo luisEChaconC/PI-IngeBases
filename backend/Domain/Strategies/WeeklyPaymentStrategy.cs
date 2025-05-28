@@ -1,10 +1,10 @@
 ﻿using backend.Domain.Strategies;
 
-namespace backend.Infraestructure.Strategies
+namespace backend.Domain.Strategies
 {
     public class WeeklyPaymentStrategy : IPaymentCalculationStrategy
     {
-        public decimal CalculateGrossSalary(DateTime startDate, DateTime endDate, decimal baseSalary, int? hoursWorked = null)
+        public decimal CalculateGrossPayment(DateTime startDate, DateTime endDate, decimal baseSalary, int? hoursWorked = null)
         {
             if (hoursWorked == null)
                 throw new ArgumentException("Hours worked must be provided for weekly employees.");
