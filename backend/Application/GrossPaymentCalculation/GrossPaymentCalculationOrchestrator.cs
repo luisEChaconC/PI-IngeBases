@@ -1,6 +1,5 @@
 ﻿using backend.Domain.Enums;
 using backend.Domain.Strategies;
-using backend.Infraestructure.Strategies;
 
 namespace backend.Application.GrossPaymentCalculation
 {
@@ -21,14 +20,14 @@ namespace backend.Application.GrossPaymentCalculation
             };
         }
 
-        public decimal CalculateGrossSalary(EmployeeTypePayment type, decimal baseSalary, DateTime startDate, DateTime endDate, int? workedHours = null)
+        public decimal CalculateGrossPayment(EmployeeTypePayment type, decimal baseSalary, DateTime startDate, DateTime endDate, int? workedHours = null)
         {
             if (!_strategies.TryGetValue(type, out var strategy))
             {
                 throw new ArgumentException($"No strategy found for employee type: {type}");
             }
 
-            return strategy.CalculateGrossSalary(startDate, endDate,baseSalary, workedHours);
+            return strategy.CalculateGrossPayment(startDate, endDate,baseSalary, workedHours);
         }
     }
 }

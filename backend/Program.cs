@@ -2,11 +2,10 @@ using backend.Application.Commands.PaymentDetails;
 using backend.Application.Queries.PaymentDetails;
 using backend.Application.GrossPaymentCalculation;
 using backend.Domain.Strategies;
-using backend.Infraestructure.Strategies;
 using backend.Services;
 using backend.Application;
 using backend.Infraestructure;
-using backend.Application.Commands.SalaryCalculation;
+using backend.Application.GrossPaymentCalculation;
 using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -53,7 +52,7 @@ builder.Services.AddScoped<WeeklyPaymentStrategy>();
 // Register Strategy Orchestrator
 builder.Services.AddScoped<GrossPaymentCalculationOrchestrator>();
 
-builder.Services.AddScoped<ICalculateSalaryCommand, CalculateSalaryCommand>();
+builder.Services.AddScoped<ICalculateGrossPaymentQuery, CalculateGrossPaymentQuery>();
 
 
 var app = builder.Build();

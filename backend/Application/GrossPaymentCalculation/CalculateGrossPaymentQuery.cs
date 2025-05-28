@@ -6,7 +6,7 @@ namespace backend.Application.GrossPaymentCalculation
 {
     public interface ICalculateGrossPaymentQuery
     {
-        decimal Execute(CalculateSalaryDto dto);
+        decimal Execute(CalculateGrossPaymentDto dto);
     }
 
     public class CalculateGrossPaymentQuery : ICalculateGrossPaymentQuery
@@ -18,9 +18,9 @@ namespace backend.Application.GrossPaymentCalculation
             _orchestrator = orchestrator;
         }
 
-        public decimal Execute(CalculateSalaryDto dto)
+        public decimal Execute(CalculateGrossPaymentDto dto)
         {
-            return _orchestrator.CalculateGrossSalary(
+            return _orchestrator.CalculateGrossPayment(
                 dto.EmployeeTypePayment,
                 dto.BaseSalary,
                 dto.StartDate,

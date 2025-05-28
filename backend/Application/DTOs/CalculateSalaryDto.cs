@@ -2,7 +2,7 @@
 
 namespace backend.Application.DTOs
 {
-    public class CalculateSalaryDto
+    public class CalculateGrossPaymentDto
     {
         public EmployeeTypePayment EmployeeTypePayment { get; set; }
         public decimal BaseSalary { get; set; }
