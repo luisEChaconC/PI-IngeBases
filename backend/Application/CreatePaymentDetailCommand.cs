@@ -1,5 +1,5 @@
 ﻿using backend.Domain;
-using backend.Infrastructure;
+using backend.Infraestructure;
 
 namespace backend.Application.Commands.PaymentDetails
 {
