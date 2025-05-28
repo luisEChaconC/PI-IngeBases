@@ -41,9 +41,9 @@ const routes = [
             { path: '/select-change-benefit', name: 'SelectChangeBenefit', component: SelectChangeBenefit },
             { path: '/view-employee-profile', name: 'ViewEmployeeProfile', component: ViewEmployeeProfile },
             { path: '/view-company-info', name: 'ViewCompanyInfo', component: ViewCompanyInfo },
+            { path: '/payrolls-list', name: 'PayrollsList', component: PayrollsList },
         ],
     },
-        { path: '/payrolls-list', name: 'PayrollsList', component: PayrollsList },
 ]
 
 const router = createRouter({
