@@ -1,0 +1,9 @@
+CREATE TABLE Timesheets (
+    Id UNIQUEIDENTIFIER NOT NULL PRIMARY KEY,
+    StartDate DATE NOT NULL,
+    EndDate DATE NOT NULL,
+    EmployeeId UNIQUEIDENTIFIER NOT NULL,
+    PayrollId UNIQUEIDENTIFIER,
+    FOREIGN KEY (EmployeeId) REFERENCES Employees(Id),
+    FOREIGN KEY (PayrollId) REFERENCES Payrolls(Id)
+)
