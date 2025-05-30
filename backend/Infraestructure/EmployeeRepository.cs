@@ -49,11 +49,7 @@ namespace backend.Infraestructure
 
                 // Open the database connection
                 _connection.Open();
-
-                // Execute the query
                 command.ExecuteNonQuery();
-
-                // Close the database connection
                 _connection.Close();
             }
         }
@@ -82,7 +78,6 @@ namespace backend.Infraestructure
             using (var command = new SqlCommand(query, _connection))
             {
                 command.Parameters.AddWithValue("@CompanyId", companyId);
-
                 _connection.Open();
 
                 using (var reader = command.ExecuteReader())
@@ -104,5 +99,118 @@ namespace backend.Infraestructure
 
             return employees;
         }
+
+        /// <summary>
+        /// Updates an existing employee across multiple tables.
+        /// </summary>
+        public void UpdateEmployee(UpdateEmployeeModel updated)
+        {
+            
+            var query = @"
+                UPDATE Employees
+                SET
+                    WorkerId = ISNULL(NULLIF(@WorkerId, ''), WorkerId),
+                    ContractType = ISNULL(NULLIF(@ContractType, ''), ContractType),
+                    GrossSalary = ISNULL(@GrossSalary, GrossSalary)
+                WHERE Id = @Id;
+
+                UPDATE NaturalPersons
+                SET
+                    FirstName = ISNULL(NULLIF(@FirstName, ''), FirstName),
+                    FirstSurname = ISNULL(NULLIF(@FirstSurname, ''), FirstSurname),
+                    SecondSurname = ISNULL(NULLIF(@SecondSurname, ''), SecondSurname)
+                WHERE Id = @Id;
+
+                UPDATE Persons
+                SET
+                    LegalId = ISNULL(NULLIF(@LegalId, ''), LegalId)
+                WHERE Id = @Id;
+               
+                UPDATE Contacts
+                SET
+                    Email = ISNULL(NULLIF(@Email, ''), Email)
+                WHERE PersonId = @Id AND Type = 'Email';
+
+                UPDATE Contacts
+                SET
+                     PhoneNumber = ISNULL(NULLIF(@PhoneNumber, ''), PhoneNumber)
+                WHERE PersonId = @Id AND Type = 'Phone Number';
+            ";
+
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                try
+                {
+                    connection.Open();
+                    var checkDuplicates = @"
+            SELECT COUNT(*) FROM Persons WHERE LegalId = @LegalId AND Id != @Id;
+            SELECT COUNT(*) FROM Employees WHERE WorkerId = @WorkerId AND Id != @Id;
+        ";
+
+       var checkLegalIdQuery = "SELECT COUNT(*) FROM Persons WHERE LegalId = @LegalId AND Id != @Id";
+using (var checkCmd = new SqlCommand(checkLegalIdQuery, connection))
+{
+    checkCmd.Parameters.AddWithValue("@LegalId", updated.LegalId ?? "");
+    checkCmd.Parameters.AddWithValue("@Id", updated.Id);
+
+    int count = (int)checkCmd.ExecuteScalar();
+    if (count > 0)
+        throw new InvalidOperationException("CEDULA_DUPLICADA");
+}
+
+// Verifie duplicate worker id
+var checkWorkerIdQuery = "SELECT COUNT(*) FROM Employees WHERE WorkerId = @WorkerId AND Id != @Id";
+using (var checkCmd = new SqlCommand(checkWorkerIdQuery, connection))
+{
+    checkCmd.Parameters.AddWithValue("@WorkerId", updated.WorkerId ?? "");
+    checkCmd.Parameters.AddWithValue("@Id", updated.Id);
+
+    int count = (int)checkCmd.ExecuteScalar();
+    if (count > 0)
+        throw new InvalidOperationException("WORKERID_DUPLICADO");
+}
+
+                    using (var command = new SqlCommand(query, connection))
+                    {
+                        command.Parameters.AddWithValue("@Id", updated.Id);
+                        command.Parameters.AddWithValue("@WorkerId", (object?)updated.WorkerId ?? DBNull.Value);
+                        command.Parameters.AddWithValue("@ContractType", (object?)updated.ContractType ?? DBNull.Value);
+                        command.Parameters.AddWithValue("@GrossSalary", (object?)updated.GrossSalary ?? DBNull.Value);
+
+                        command.Parameters.AddWithValue("@FirstName", (object?)updated.FirstName ?? DBNull.Value);
+                        command.Parameters.AddWithValue("@FirstSurname", (object?)updated.FirstSurname ?? DBNull.Value);
+                        command.Parameters.AddWithValue("@SecondSurname", (object?)updated.SecondSurname ?? DBNull.Value);
+
+                        command.Parameters.AddWithValue("@LegalId", (object?)updated.LegalId ?? DBNull.Value);
+                        command.Parameters.AddWithValue("@Email", (object?)updated.Email ?? DBNull.Value);
+                        command.Parameters.AddWithValue("@PhoneNumber", (object?)updated.PhoneNumber ?? DBNull.Value);
+
+                        command.ExecuteNonQuery();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error updating employee: {ex.Message}");
+                    throw;
+                }
+            }
+        }
+        
+        public bool HasPaymentRecords(string employeeId)
+{
+    var query = @"
+        SELECT COUNT(*) 
+        FROM PaymentDetails 
+        WHERE EmployeeId = @EmployeeId";
+
+    using (var connection = new SqlConnection(_connectionString))
+    using (var command = new SqlCommand(query, connection))
+    {
+        command.Parameters.AddWithValue("@EmployeeId", employeeId);
+        connection.Open();
+        var count = (int)command.ExecuteScalar();
+        return count > 0;
+    }
+}
     }
 }
