@@ -1,10 +1,6 @@
 <template>
   <div class="d-flex justify-content-center align-items-center position-relative" style="min-height: calc(100vh - 200px);">
-    <router-link
-      to="/employees-list"
-      class="btn btn-outline-secondary position-absolute top-0 start-0 m-3"
-      title="Volver"
-    >
+    <router-link to="/employees-list" class="btn btn-outline-secondary position-absolute top-0 start-0 m-3" title="Volver">
       ← Volver
     </router-link>
 
@@ -24,73 +20,65 @@
         <h2 class="card-title">Perfil de Empleado</h2>
         <div class="row">
           <div class="col-md-6">
-            <div class="mb-3">
-              <label for="firstName" class="form-label">Nombre</label>
-              <input type="text" class="form-control" id="firstName" v-model="employee.firstName" disabled />
-            </div>
-            <div class="mb-3">
-              <label for="secondLastName" class="form-label">Segundo apellido</label>
-              <input type="text" class="form-control" id="secondLastName" v-model="employee.secondLastName" disabled />
-            </div>
-            <div class="mb-3">
-              <label for="workerId" class="form-label">ID Trabajador</label>
-              <input type="text" class="form-control" id="workerId" v-model="employee.workerId" disabled />
-            </div>
-            <div class="mb-3">
-              <label for="contractType" class="form-label">Tipo de Contrato</label>
-              <input type="text" class="form-control" id="contractType" v-model="employee.contractType" disabled />
-            </div>
-            <div class="mb-3">
-              <label for="email" class="form-label">Email</label>
-              <input type="email" class="form-control" id="email" v-model="employee.email" disabled />
+            <div class="mb-3" v-for="field in leftFields" :key="field.key">
+              <label :for="field.key" class="form-label">{{ field.label }}</label>
+              <input
+                :type="field.type"
+                class="form-control"
+                :id="field.key"
+                v-model="employee[field.key]"
+                :disabled="!editMode || (hasPayments && ['firstName', 'firstSurname', 'secondSurname', 'legalId'].includes(field.key))"
+
+                :class="{ 'is-invalid': editMode && !validations[field.key] }"
+                @input="onInputChange(field.key)"
+              />
+              <div v-if="editMode && !validations[field.key]" class="invalid-feedback">
+                El formato no es correcto, por favor revisa nuevamente.
+              </div>
             </div>
           </div>
           <div class="col-md-6">
-            <div class="mb-3">
-              <label for="firstLastName" class="form-label">Primer apellido</label>
-              <input type="text" class="form-control" id="firstLastName" v-model="employee.firstLastName" disabled />
-            </div>
-            <div class="mb-3">
-              <label for="identityCard" class="form-label">Cédula</label>
-              <input type="text" class="form-control" id="identityCard" v-model="employee.identityCard" disabled />
-            </div>
-            <div class="mb-3">
-              <label for="role" class="form-label">Rol</label>
-              <input type="text" class="form-control" id="role" v-model="employee.role" disabled />
-            </div>
-            <div class="mb-3">
-              <label for="grossSalary" class="form-label">Salario Bruto</label>
-              <div class="input-group">
-                <span class="input-group-text">₡</span>
-                <input type="number" class="form-control" id="grossSalary" v-model="employee.grossSalary" disabled />
+            <div class="mb-3" v-for="field in rightFields" :key="field.key">
+              <label :for="field.key" class="form-label">{{ field.label }}</label>
+              <input
+                :type="field.type"
+                class="form-control"
+                :id="field.key"
+                v-model="employee[field.key]"
+                :disabled="!editMode || (hasPayments && ['firstName', 'firstSurname', 'secondSurname', 'legalId'].includes(field.key))"
+
+                :class="{ 'is-invalid': editMode && !validations[field.key] }"
+                @input="onInputChange(field.key)"
+              />
+              <div v-if="editMode && !validations[field.key]" class="invalid-feedback">
+                El formato no es correcto, por favor revisa nuevamente.
               </div>
-            </div>
-            <div class="mb-3">
-              <label for="phone" class="form-label">Número de Teléfono</label>
-              <input type="tel" class="form-control" id="phone" v-model="employee.phone" disabled />
             </div>
           </div>
         </div>
+
         <div class="d-flex justify-content-start mt-3 gap-2">
-          <button type="button" class="btn btn-dark">Editar</button>
+          <button type="button" class="btn btn-dark" @click="toggleEdit">
+            {{ editMode ? 'Cancelar' : 'Editar' }}
+          </button>
+          <button v-if="editMode" type="button" class="btn btn-primary" @click="submitEdit" :disabled="!formValid">
+            Guardar cambios
+          </button>
           <button type="button" class="btn btn-danger" @click="openModal">Eliminar</button>
         </div>
       </div>
     </div>
 
-    <!-- Modal -->
-    <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true" ref="deleteModal">
+    <div class="modal fade" id="deleteModal" tabindex="-1" ref="deleteModal">
       <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
           <div class="modal-header bg-danger text-white">
-            <h5 class="modal-title" id="deleteModalLabel">Confirmar Eliminación</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            <h5 class="modal-title">Confirmar Eliminación</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
           </div>
-          <div class="modal-body">
-            ¿Seguro que deseas eliminar este perfil de la Empresa?
-          </div>
+          <div class="modal-body">¿Seguro que deseas eliminar este perfil?</div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
             <button type="button" class="btn btn-danger" @click="confirmDelete">Sí, eliminar</button>
           </div>
         </div>
@@ -101,7 +89,7 @@
 
 <script>
 import axios from 'axios';
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import { useRoute } from 'vue-router';
 import { Modal } from 'bootstrap';
 
@@ -109,51 +97,159 @@ export default {
   name: 'ViewEmployeeProfile',
   setup() {
     const employee = ref({});
+    const validations = ref({});
     const loading = ref(true);
     const error = ref(null);
+    const editMode = ref(false);
     const route = useRoute();
     const deleteModal = ref(null);
-    let deleteModalInstance = null;
+    let deleteInstance = null;
+    const hasPayments = ref(false);
+
+
+    const regex = {
+      email: /^[\w.-]+@([\w-]+\.)+[\w-]{2,4}$/,
+      phoneNumber: /^$|^\d{8}$/,
+      grossSalary: /^\d+(\.\d{1,2})?$/,
+      legalId: /^(\d{9,12}|\d{1,2}-\d{4}-\d{4}|\d-\d{3}-\d{6})$/,
+      workerId: /^[A-Z0-9#-]{3,20}$/,
+      contractType: /^.+$/,
+      firstName: /^[A-Za-zÁÉÍÓÚñáéíóú\s]{2,40}$/,
+      firstSurname: /^[A-Za-zÁÉÍÓÚñáéíóú\s]{2,40}$/,
+      secondSurname: /^[A-Za-zÁÉÍÓÚñáéíóú\s]{2,40}$/
+    };
+
+    const fieldErrors = ref({});
+
+    const leftFields = [
+      { key: 'firstName', label: 'Nombre', type: 'text' },
+      { key: 'secondSurname', label: 'Segundo Apellido', type: 'text' },
+      { key: 'workerId', label: 'ID Trabajador', type: 'text' },
+      { key: 'contractType', label: 'Tipo de Contrato', type: 'text' },
+      { key: 'email', label: 'Correo Electrónico', type: 'email' }
+    ];
+
+    const rightFields = [
+      { key: 'firstSurname', label: 'Primer Apellido', type: 'text' },
+      { key: 'legalId', label: 'Cédula', type: 'text' },
+      { key: 'role', label: 'Rol', type: 'text' },
+      { key: 'grossSalary', label: 'Salario Bruto', type: 'number' },
+      { key: 'phoneNumber', label: 'Teléfono', type: 'tel' }
+    ];
+
+    const capitalizeWords = (text) => {
+      return text
+        .toLowerCase()
+        .replace(/\b\w/g, char => char.toUpperCase());
+    };
+
+    const onInputChange = (key) => {
+      if (["firstName", "firstSurname", "secondSurname"].includes(key)) {
+        employee.value[key] = capitalizeWords(employee.value[key]);
+      }
+      validateField(key);
+    };
+
+    const validateField = (key) => {
+      const value = employee.value[key];
+      if (regex[key]) {
+        const valid = regex[key].test(value ?? '');
+        validations.value[key] = valid;
+        fieldErrors.value[key] = valid ? '' : `Invalid field: ${key}`;
+      } else {
+        const required = key !== 'phoneNumber';
+        const valid = !required || (value !== null && value !== '');
+        validations.value[key] = valid;
+        fieldErrors.value[key] = valid ? '' : `This field is required.`;
+      }
+    };
+
+    const formValid = computed(() =>
+      Object.values(validations.value).every(Boolean)
+    );
 
     const getEmployee = async () => {
       try {
-        loading.value = true;
-        error.value = null;
-
         const id = route.params.id;
         const response = await axios.get(`https://localhost:5000/api/EmployeeGetID/GetEmployeeById/${id}`);
-
         employee.value = {
-          id: response.data.id || '',
-          firstName: response.data.firstName || '',
-          firstLastName: response.data.firstSurname || '',
-          secondLastName: response.data.secondSurname || '',
-          identityCard: response.data.cedula || '',
-          workerId: response.data.workerId || '',
+          id: response.data.id,
+          firstName: response.data.firstName,
+          firstSurname: response.data.firstSurname,
+          secondSurname: response.data.secondSurname,
+          legalId: response.data.cedula,
+          workerId: response.data.workerId,
           role: response.data.isAdmin ? 'Admin' : 'Employee',
-          contractType: response.data.contractType || '',
-          grossSalary: response.data.grossSalary || 0,
-          email: response.data.email || '',
-          phone: response.data.phoneNumber || ''
+          contractType: response.data.contractType,
+          grossSalary: response.data.grossSalary,
+          email: response.data.email,
+          phoneNumber: response.data.phoneNumber
         };
+        Object.keys(employee.value).forEach(validateField);
+        const paymentCheck = await axios.get(`https://localhost:5000/api/Employer/HasPayments/${employee.value.id}`);
+    hasPayments.value = paymentCheck.data.hasPayments;
       } catch (err) {
-        console.error("Error to get employee data:", err);
-        error.value = "Errorto load information";
+        error.value = "Error loading employee data.";
       } finally {
         loading.value = false;
       }
     };
 
-    const openModal = () => {
-      if (!deleteModalInstance) {
-        deleteModalInstance = new Modal(deleteModal.value);
+    const toggleEdit = () => {
+      if (editMode.value) getEmployee();
+      editMode.value = !editMode.value;
+    };
+
+    const submitEdit = async () => {
+      Object.keys(employee.value).forEach(validateField);
+      if (!formValid.value) {
+        alert("There are errors in the form. Check highlighted fields.");
+        return;
       }
-      deleteModalInstance.show();
+      try {
+        const payload = {
+          Id: employee.value.id,
+          FirstName: employee.value.firstName,
+          FirstSurname: employee.value.firstSurname,
+          SecondSurname: employee.value.secondSurname,
+          LegalId: employee.value.legalId,
+          WorkerId: employee.value.workerId,
+          ContractType: employee.value.contractType,
+          GrossSalary: employee.value.grossSalary,
+          Email: employee.value.email,
+          PhoneNumber: employee.value.phoneNumber
+        };
+        await axios.patch('https://localhost:5000/api/Employer/UpdateEmployee', payload);
+        editMode.value = false;
+        await getEmployee();
+      } catch (err) {
+        const errorCode = err.response?.data?.error || "";
+        let msg;
+        switch (errorCode) {
+          case "CEDULA_DUPLICADA":
+            msg = "Duplicate legal ID.";
+            validations.value.legalId = false;
+            break;
+          case "WORKERID_DUPLICADO":
+            msg = "Worker ID already in use.";
+            validations.value.workerId = false;
+            break;
+          default:
+            msg = "Failed to save changes. Check your input.";
+        }
+        alert(msg);
+        console.error(err);
+      }
+    };
+
+    const openModal = () => {
+      if (!deleteInstance) deleteInstance = new Modal(deleteModal.value);
+      deleteInstance.show();
     };
 
     const confirmDelete = () => {
-      deleteModalInstance.hide();
-      alert('Perfil eliminado');
+      deleteInstance.hide();
+      alert("Employee deleted");
     };
 
     onMounted(() => {
@@ -162,22 +258,35 @@ export default {
 
     return {
       employee,
+      validations,
+      fieldErrors,
       loading,
       error,
+      editMode,
+      toggleEdit,
+      submitEdit,
+      formValid,
       deleteModal,
       openModal,
-      confirmDelete
+      confirmDelete,
+      leftFields,
+      rightFields,
+      validateField,
+      hasPayments,
+      onInputChange
     };
   }
 };
 </script>
 
 <style scoped>
-    .card-title {
-        margin-bottom: 1.5rem;
-    }
-
-    .gap-2 {
-        gap: 0.5rem;
-    }
+.card-title {
+  margin-bottom: 1.5rem;
+}
+.gap-2 {
+  gap: 0.5rem;
+}
+.is-invalid {
+  border-color: red;
+}
 </style>
