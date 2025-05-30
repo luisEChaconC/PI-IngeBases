@@ -31,10 +31,10 @@ namespace backend.Application.DeductionCalculation
                 total += strategy.CalculateDeduction(employee, grossSalary);
             }
 
-           /* foreach (var benefit in benefits)
+           foreach (var benefit in benefits)
             {
                 total += _benefitStrategy.CalculateDeduction(employee, grossSalary, benefit);
-            }*/
+            }
 
             return total;
         }
