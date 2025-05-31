@@ -1,6 +1,7 @@
 using backend.Domain;
 using backend.Domain.Requests;
 using backend.Infraestructure;
+using backend.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -176,14 +177,18 @@ namespace backend.API
             try
             {
                 if (id != company.Id)
-                    return BadRequest("URL ID does not match the company ID");
+                    return BadRequest("El ID de la compañía no coincide con el ID proporcionado en el URL");
 
                 _companyRepository.UpdateCompany(company);
-                return Ok("Company updated successfully");
+                return Ok("La compañía ha sido actualizada correctamente");
             }
             catch (Exception ex)
             {
-                return StatusCode(500, $"An update error ocurred: {ex.Message}");
+                // Check for known validation errors
+                if (ex.Message.Contains("ya existe"))
+                    return Conflict(new { message = ex.Message }); 
+
+                return StatusCode(500, $"An update error occurred: {ex.Message}");
             }
         }
 

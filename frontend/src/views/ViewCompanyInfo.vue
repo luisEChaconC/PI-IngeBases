@@ -195,6 +195,11 @@ export default {
           alert("Company updated successfully");
         })
         .catch((error) => {
+          if (error.response && error.response.status === 409) {
+            alert(error.response.data.message || "There's a register with this data already.");
+          } else {
+            alert("An error occurred while updating the company.");
+          }
           console.error("Error while updating company", error);
           console.error("Data sent:", this.company);
           console.error("Error while updating company", error.response?.data);
