@@ -9,11 +9,7 @@ INSERT INTO EmployeeTypes (Id, Name) VALUES
 -- Beneficios
 INSERT INTO Benefits (Id, Name, Description, IsActive, Type, LinkAPI, FixedPercentage, FixedAmount, RequiredMonthsWorked)
 VALUES
-<<<<<<< HEAD
-(NEWID(), 'Health Insurance', 'Full medical coverage', 1, 'papa', NULL, NULL, 25000, 6),
-=======
 (NEWID(), 'Health Insurance', 'Full medical coverage', 1, 'FixedAmount', NULL, NULL, 25000, 6),
->>>>>>> develop
 (NEWID(), 'Gym Membership', 'Monthly gym access', 1, 'FixedPercentage', NULL, 50, NULL, 3),
 (NEWID(), 'Learning Platform', 'Access to online courses', 1, 'API', 'https://learning.api', NULL, NULL, 0);
 
@@ -27,7 +23,7 @@ DECLARE @HealthBenefitId UNIQUEIDENTIFIER = (SELECT TOP 1 Id FROM Benefits WHERE
 DECLARE @GymBenefitId UNIQUEIDENTIFIER = (SELECT TOP 1 Id FROM Benefits WHERE Name = 'Gym Membership');
 DECLARE @LearningBenefitId UNIQUEIDENTIFIER = (SELECT TOP 1 Id FROM Benefits WHERE Name = 'Learning Platform');
 
--- Inserts en tabla de relación
+-- Inserts en tabla de relaciï¿½n
 INSERT INTO EmployeeTypesXBenefits (EmployeeTypeId, BenefitId)
 VALUES 
 (@FullTimeId, @HealthBenefitId),

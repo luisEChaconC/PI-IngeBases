@@ -1,5 +1,6 @@
 using backend.Application.Commands.PaymentDetails;
 using backend.Application.Queries.PaymentDetails;
+using backend.Application.Queries;
 using backend.Application.GrossPaymentCalculation;
 using backend.Domain.Strategies;
 using backend.Services;
@@ -38,9 +39,12 @@ builder.Services.AddScoped<ICreatePaymentDetailCommand, CreatePaymentDetailComma
 builder.Services.AddScoped<IGetPaymentDetailByIdQuery, GetPaymentDetailByIdQuery>();
 builder.Services.AddScoped<IGetPaymentDetailsByEmployeeIdQuery, GetPaymentDetailsByEmployeeIdQuery>();
 builder.Services.AddScoped<IGetPaymentDetailsByCompanyIdQuery, GetPaymentDetailsByCompanyIdQuery>();
+builder.Services.AddScoped<IGetDaysByTimesheetIdQuery, GetDaysByTimesheetIdQuery>();
+builder.Services.AddScoped<IGetEmployeeHoursInPeriodQuery, GetEmployeeHoursInPeriodQuery>();
 
 builder.Services.AddScoped<IPayrollRepository, PayrollRepository>();
 builder.Services.AddScoped<IPayrollService, PayrollService>();
+builder.Services.AddScoped<ITimesheetRepository, TimesheetRepository>();
 
 
 // Register Payment Calculation Strategies
