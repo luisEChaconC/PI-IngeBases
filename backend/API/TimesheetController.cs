@@ -44,7 +44,7 @@ namespace backend.API
         }
 
         [HttpGet("employee/{employeeId}/hours")]
-        public IActionResult GetEmployeeHoursInPeriod(Guid employeeId, [FromQuery] EmployeeHoursPeriodDto request)
+        public IActionResult GetEmployeeHoursInPeriod(Guid employeeId, [FromQuery] DateTime startDate, [FromQuery] DateTime endDate)
         {
             try
             {
@@ -53,12 +53,17 @@ namespace backend.API
                     return BadRequest("EmployeeId is required");
                 }
 
-                if (!ModelState.IsValid)
+                if (startDate == default || endDate == default)
                 {
-                    return BadRequest(ModelState);
+                    return BadRequest("StartDate and EndDate are required");
                 }
 
-                int hours = _getEmployeeHoursInPeriodQuery.Execute(employeeId, request.StartDate, request.EndDate);
+                if (endDate <= startDate)
+                {
+                    return BadRequest("EndDate must be after StartDate");
+                }
+
+                int hours = _getEmployeeHoursInPeriodQuery.Execute(employeeId, startDate, endDate);
 
                 return Ok(new { TotalHours = hours });
             }
