@@ -12,6 +12,50 @@ namespace backend.Infraestructure
         {
         }
 
+        public List<TimesheetModel> GetTimesheetByEmployeeAndPeriod(Guid employeeId, DateTime startDate, DateTime endDate)
+        {
+            var timesheets = new List<TimesheetModel>();
+            var query = @"SELECT Id, StartDate, EndDate, PayrollId
+                FROM Timesheets
+                WHERE (EmployeeId = @EmployeeId)
+                    AND (StartDate >= @PeriodStartDate AND EndDate <= @PeriodEndDate)
+                ORDER BY StartDate ASC";
+            try
+            {
+                _connection.Open();
+                using (var command = new SqlCommand(query, _connection))
+                {
+                    command.Parameters.AddWithValue("@EmployeeId", employeeId);
+                    command.Parameters.AddWithValue("@PeriodStartDate", startDate);
+                    command.Parameters.AddWithValue("@PeriodEndDate", endDate);
+                    using (var reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            timesheets.Add(new TimesheetModel
+                            {
+                                Id = reader.GetGuid(reader.GetOrdinal("Id")),
+                                StartDate = reader.GetDateTime(reader.GetOrdinal("StartDate")),
+                                EndDate = reader.GetDateTime(reader.GetOrdinal("EndDate")),
+                                EmployeeId = employeeId,
+                                PayrollId = reader["PayrollId"] != DBNull.Value ? reader.GetGuid(reader.GetOrdinal("PayrollId")) : (Guid?)null
+                            });
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error retrieving timesheets: {ex.Message}");
+            }
+            finally
+            {
+                _connection.Close();
+            }
+
+            return timesheets;
+        }
+
         public List<DayModel> GetDaysByTimesheetId(Guid timesheetId)
         {
             var days = new List<DayModel>();
@@ -52,6 +96,34 @@ namespace backend.Infraestructure
             }
 
             return days;
+        }
+
+        public int GetTotalWorkHoursByTimesheetId(Guid timesheetId)
+        {
+            int totalWorkHours = 0;
+            var query = @"SELECT ISNULL(SUM(HoursWorked), 0)
+                FROM Days
+                WHERE TimesheetId = @TimesheetId AND HoursWorked IS NOT NULL";
+            try
+            {
+                _connection.Open();
+                using (var command = new SqlCommand(query, _connection))
+                {
+                    command.Parameters.AddWithValue("@TimesheetId", timesheetId);
+                    var result = command.ExecuteScalar();
+                    totalWorkHours = result != DBNull.Value ? Convert.ToInt32(result) : 0;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error retrieving total work hours: {ex.Message}");
+            }
+            finally
+            {
+                _connection.Close();
+            }
+
+            return totalWorkHours;
         }
     }
 }
