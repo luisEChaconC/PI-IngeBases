@@ -1,4 +1,5 @@
 using backend.Domain;
+using backend.Application.DTOs;
 using Microsoft.Data.SqlClient;
 using System.Data;
 
@@ -14,7 +15,7 @@ namespace backend.Infraestructure
             _connectionString = configuration.GetConnectionString("DefaultConnection")!;
         }
 
-        public async Task<List<PayrollModel>> GetByCompanyIdAsync(Guid companyId) 
+        public async Task<List<PayrollModel>> GetByCompanyIdAsync(Guid companyId)
         {
             var payrolls = new List<PayrollModel>();
 
@@ -50,6 +51,46 @@ namespace backend.Infraestructure
                 _connection.Close();
             }
             return payrolls;
+        }
+        
+        public async Task<List<PayrollSummaryDto>> GetSummaryByCompanyIdAsync(Guid companyId)
+        {
+            var summaries = new List<PayrollSummaryDto>();
+
+            var query = "sp_GetPayrollSummaryByCompanyId";
+            using var _connection = new SqlConnection(_connectionString);
+            try
+            {
+                using var command = new SqlCommand(query, _connection);
+                command.CommandType = CommandType.StoredProcedure;
+                command.Parameters.AddWithValue("@CompanyId", companyId);
+
+                await _connection.OpenAsync();
+                using (var reader = await command.ExecuteReaderAsync())
+                {
+                    while (await reader.ReadAsync())
+                    {
+                        summaries.Add(new PayrollSummaryDto
+                        {
+                            Id = reader.GetGuid(reader.GetOrdinal("PayrollId")),
+                            StartDate = reader.GetDateTime(reader.GetOrdinal("StartDate")),
+                            EndDate = reader.GetDateTime(reader.GetOrdinal("EndDate")),
+                            PayrollManagerFullName = reader.GetString(reader.GetOrdinal("PayrollManagerFullName")),
+                            TotalGrossSalary = reader.GetDecimal(reader.GetOrdinal("TotalGrossSalary")),
+                            TotalAmountDeducted = reader.GetDecimal(reader.GetOrdinal("TotalAmountDeducted"))
+                        });
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error retrieving payroll summary: {ex.Message}");
+            }
+            finally
+            {
+                _connection.Close();
+            }
+            return summaries;
         }
     }
 }

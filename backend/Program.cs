@@ -45,6 +45,7 @@ builder.Services.AddScoped<IGetEmployeeHoursInPeriodQuery, GetEmployeeHoursInPer
 
 builder.Services.AddScoped<IPayrollRepository, PayrollRepository>();
 builder.Services.AddScoped<IGetPayrollsByCompanyIdQuery, GetPayrollsByCompanyIdQuery>();
+builder.Services.AddScoped<IGetPayrollsSummaryByCompanyIdQuery, GetPayrollsSummaryByCompanyIdQuery>();
 builder.Services.AddScoped<ITimesheetRepository, TimesheetRepository>();
 
 
