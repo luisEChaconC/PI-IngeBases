@@ -1,7 +1,6 @@
-using backend.Application;
+using backend.Application.Queries.Payroll;
 using backend.Domain;
 using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
 
 namespace backend.API
 {
@@ -9,34 +8,18 @@ namespace backend.API
     [Route("api/[controller]")]
     public class PayrollController : ControllerBase
     {
-        private readonly IPayrollService _payrollService;
+        private readonly IGetPayrollsByCompanyIdQuery _getByCompanyIdQuery;
 
-        public PayrollController(IPayrollService payrollService)
+        public PayrollController(IGetPayrollsByCompanyIdQuery getByCompanyIdQuery)
         {
-            _payrollService = payrollService;
+            _getByCompanyIdQuery = getByCompanyIdQuery;
         }
 
-        [HttpGet]
-        public IActionResult GetPayrollsByCompanyId([FromQuery] string companyId)
+        [HttpGet("company/{companyId}")]
+        public async Task<IActionResult> GetByCompanyId(Guid companyId)
         {
-            try
-            {
-                if (string.IsNullOrEmpty(companyId))
-                {
-                    return BadRequest("CompanyId is required.");
-                }
-
-                var payrolls = _payrollService.GetPayrollsByCompanyId(companyId);
-                return Ok(payrolls);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, new
-                {
-                    message = "An error occurred while retrieving the payrolls.",
-                    error = ex.Message
-                });
-            }
+            var details = await _getByCompanyIdQuery.ExecuteAsync(companyId);
+            return Ok(details);
         }
     }
 }

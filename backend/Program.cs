@@ -7,6 +7,7 @@ using backend.Application;
 using backend.Infraestructure;
 using backend.Application.GrossPaymentCalculation;
 using System.Text.Json.Serialization;
+using backend.Application.Queries.Payroll;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -40,7 +41,7 @@ builder.Services.AddScoped<IGetPaymentDetailsByEmployeeIdQuery, GetPaymentDetail
 builder.Services.AddScoped<IGetPaymentDetailsByCompanyIdQuery, GetPaymentDetailsByCompanyIdQuery>();
 
 builder.Services.AddScoped<IPayrollRepository, PayrollRepository>();
-builder.Services.AddScoped<IPayrollService, PayrollService>();
+builder.Services.AddScoped<IGetPayrollsByCompanyIdQuery, GetPayrollsByCompanyIdQuery>();
 
 
 // Register Payment Calculation Strategies

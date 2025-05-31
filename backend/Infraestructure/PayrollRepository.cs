@@ -1,40 +1,43 @@
 using backend.Domain;
 using Microsoft.Data.SqlClient;
-using System;
-using System.Collections.Generic;
+using System.Data;
 
 namespace backend.Infraestructure
 {
-    public class PayrollRepository : BaseRepository, IPayrollRepository
+    public class PayrollRepository : IPayrollRepository
     {
 
-        public PayrollRepository() : base()
+        private readonly string _connectionString;
+
+        public PayrollRepository(IConfiguration configuration)
         {
+            _connectionString = configuration.GetConnectionString("DefaultConnection")!;
         }
 
-        public List<PayrollModel> GetPayrollsByCompanyId(string companyId) 
+        public async Task<List<PayrollModel>> GetByCompanyIdAsync(Guid companyId) 
         {
             var payrolls = new List<PayrollModel>();
+
             var query = @"SELECT Id, StartDate, EndDate, CompanyId, PayrollManagerId FROM Payrolls WHERE CompanyId = @CompanyId ORDER BY EndDate DESC";
+            using var _connection = new SqlConnection(_connectionString);
             try
             {
-                _connection.Open();
-                using (var command = new SqlCommand(query, _connection))
+                var command = new SqlCommand(query, _connection);
+                command.Parameters.AddWithValue("@CompanyId", companyId);
+
+                await _connection.OpenAsync();
+                using (var reader = await command.ExecuteReaderAsync())
                 {
-                    command.Parameters.AddWithValue("@CompanyId", companyId);
-                    using (var reader = command.ExecuteReader())
+                    while (await reader.ReadAsync())
                     {
-                        while (reader.Read())
+                        payrolls.Add(new PayrollModel
                         {
-                            payrolls.Add(new PayrollModel
-                            {
-                                Id = reader["Id"].ToString(),
-                                StartDate = reader.GetDateTime(reader.GetOrdinal("StartDate")),
-                                EndDate = reader.GetDateTime(reader.GetOrdinal("EndDate")),
-                                CompanyId = reader["CompanyId"].ToString(),
-                                PayrollManagerId = reader["PayrollManagerId"].ToString()
-                            });
-                        }
+                            Id = reader["Id"].ToString(),
+                            StartDate = reader.GetDateTime(reader.GetOrdinal("StartDate")),
+                            EndDate = reader.GetDateTime(reader.GetOrdinal("EndDate")),
+                            CompanyId = reader["CompanyId"].ToString(),
+                            PayrollManagerId = reader["PayrollManagerId"].ToString()
+                        });
                     }
                 }
             }
