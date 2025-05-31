@@ -20,8 +20,8 @@ namespace backend.API
             _getEmployeeHoursInPeriodQuery = getEmployeeHoursInPeriodQuery;
         }
 
-        [HttpGet("days")]
-        public IActionResult GetDaysByTimesheetId([FromQuery] Guid timesheetId)
+        [HttpGet("{timesheetId}/days")]
+        public IActionResult GetDaysByTimesheetId(Guid timesheetId)
         {
             try
             {
