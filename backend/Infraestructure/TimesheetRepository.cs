@@ -103,7 +103,7 @@ namespace backend.Infraestructure
             int totalWorkHours = 0;
             var query = @"SELECT ISNULL(SUM(HoursWorked), 0)
                 FROM Days
-                WHERE TimesheetId = @TimesheetId AND HoursWorked IS NOT NULL";
+                WHERE TimesheetId = @TimesheetId AND HoursWorked IS NOT NULL AND IsApproved = 1";
             try
             {
                 _connection.Open();
