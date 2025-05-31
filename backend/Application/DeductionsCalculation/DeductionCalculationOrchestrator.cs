@@ -39,13 +39,13 @@ namespace backend.Application.DeductionCalculation
                         PaymentDetailsId = paymentDetailsId,
                         DeductionType = "mandatory"
                     });
-                }
+            }
             }
 
             if (benefits != null)
             {
-                foreach (var benefit in benefits)
-                {
+            foreach (var benefit in benefits)
+            {
                     var amount = _benefitStrategy.CalculateDeduction(grossSalary, benefit);
                     if (amount > 0)
                     {
