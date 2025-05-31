@@ -22,13 +22,13 @@ namespace backend.Application.DeductionCalculation
             _benefitStrategy = benefitStrategy;
         }
 
-        public decimal CalculateTotalDeductions(Guid employee, decimal grossSalary, List<Benefit>? benefits)
+        public decimal CalculateTotalDeductions(decimal grossSalary, List<Benefit>? benefits)
         {
             decimal total = 0;
 
             foreach (var strategy in _strategies)
             {
-                total += strategy.CalculateDeduction(employee, grossSalary);
+                total += strategy.CalculateDeduction( grossSalary);
             }
 
            /* foreach (var benefit in benefits)
