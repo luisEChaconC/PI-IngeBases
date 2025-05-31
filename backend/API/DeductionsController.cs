@@ -9,30 +9,18 @@ using Microsoft.AspNetCore.Mvc;
 [Route("api/[controller]")]
 public class DeductionsController : ControllerBase
 {
-    private readonly ICalculateGrossPaymentQuery _grossPaymentQuery;
-    private readonly DeductionCalculationOrchestrator _deductionOrchestrator;
-    private readonly BenefitService _benefitService;
-    private readonly IInsertDeductionDetailsCommand _insertDeductionDetailsCommand;
+    private DeductionService _deductionService;
 
     public DeductionsController(
-        ICalculateGrossPaymentQuery grossPaymentQuery,
-        DeductionCalculationOrchestrator deductionOrchestrator,
-        BenefitService benefitService, IInsertDeductionDetailsCommand insertDeductionDetailsCommand)
+        DeductionService deductionService)
     {
-        _grossPaymentQuery = grossPaymentQuery;
-        _deductionOrchestrator = deductionOrchestrator;
-        _benefitService = benefitService;
-        _insertDeductionDetailsCommand = insertDeductionDetailsCommand;
+        _deductionService = deductionService;
     }
 
     [HttpPost("")]
     public IActionResult CalculateDeductions([FromBody] CalculateDeductionDto dto)
     {
-        var gross = _grossPaymentQuery.Execute(dto.GrossPayment);
-        var deductions = _deductionOrchestrator.CalculateTotalDeductions(gross, dto.Benefits, dto.PaymentDetailsId);
-        
-        _insertDeductionDetailsCommand.Execute(deductions);
-
-        return Ok(new { gross, deductions });
+        var result = _deductionService.CalculateDeductions(dto);
+        return Ok(new { result.gross, result.deductions });
     }
 }

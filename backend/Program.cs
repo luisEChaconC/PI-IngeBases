@@ -44,6 +44,7 @@ builder.Services.AddScoped<IGetPaymentDetailsByCompanyIdQuery, GetPaymentDetails
 builder.Services.AddScoped<IPayrollRepository, PayrollRepository>();
 builder.Services.AddScoped<IPayrollService, PayrollService>();
 builder.Services.AddScoped<BenefitService>();
+builder.Services.AddScoped<DeductionService>();
 
 
 // Register Payment Calculation Strategies
