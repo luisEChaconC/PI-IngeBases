@@ -44,7 +44,7 @@ namespace backend.API
         }
 
         [HttpGet("employee/{employeeId}/hours")]
-        public IActionResult GetEmployeeHoursInPeriod(Guid employeeId, [FromBody] EmployeeHoursPeriodDto request)
+        public IActionResult GetEmployeeHoursInPeriod(Guid employeeId, [FromQuery] EmployeeHoursPeriodDto request)
         {
             try
             {
