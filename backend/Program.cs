@@ -9,6 +9,7 @@ using backend.Application.GrossPaymentCalculation;
 using backend.Application.DeductionCalculation;
 using System.Text.Json.Serialization;
 
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Configurar CORS
@@ -58,7 +59,8 @@ builder.Services.AddScoped<BenefitDeductionStrategy>();
 // Register Calculation Orchestrator
 builder.Services.AddScoped<DeductionCalculationOrchestrator>();
 
-
+builder.Services.AddScoped<IDeductionDetailRepository, DeductionDetailRepository>();
+builder.Services.AddScoped<IInsertDeductionDetailsCommand, InsertDeductionDetailsCommand>();
 
 
 // Register Strategy Orchestrator

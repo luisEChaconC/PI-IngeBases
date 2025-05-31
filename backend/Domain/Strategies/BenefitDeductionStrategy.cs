@@ -2,7 +2,7 @@ namespace backend.Domain.Strategies
 {
     public class BenefitDeductionStrategy : IDeductionCalculationStrategy
     {
-        public decimal CalculateDeduction(Guid employee, decimal grossSalary, Benefit? benefit = null)
+        public decimal CalculateDeduction(decimal grossSalary, Benefit? benefit = null)
         {
             if (benefit == null) return 0;
 
@@ -14,13 +14,13 @@ namespace backend.Domain.Strategies
                     return Math.Round(grossSalary * ((benefit.FixedPercentage ?? 0) / 100m), 2);
                 case "API":
              
-                    return CallBenefitApi(employee, benefit);
+                    return CallBenefitApi(benefit);
                 default:
                     return 0;
             }
         }
 
-        private decimal CallBenefitApi(Guid employee, Benefit benefit)
+        private decimal CallBenefitApi(Benefit benefit)
         {
             // TODO: implementar llamada a API
             return 0;

@@ -1,5 +1,7 @@
+using backend.Application;
 using backend.Application.DeductionCalculation;
 using backend.Application.GrossPaymentCalculation;
+using backend.Infraestructure;
 using backend.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,23 +12,26 @@ public class DeductionsController : ControllerBase
     private readonly ICalculateGrossPaymentQuery _grossPaymentQuery;
     private readonly DeductionCalculationOrchestrator _deductionOrchestrator;
     private readonly BenefitService _benefitService;
+    private readonly IInsertDeductionDetailsCommand _insertDeductionDetailsCommand;
 
     public DeductionsController(
         ICalculateGrossPaymentQuery grossPaymentQuery,
         DeductionCalculationOrchestrator deductionOrchestrator,
-        BenefitService benefitService)
+        BenefitService benefitService, IInsertDeductionDetailsCommand insertDeductionDetailsCommand)
     {
         _grossPaymentQuery = grossPaymentQuery;
         _deductionOrchestrator = deductionOrchestrator;
         _benefitService = benefitService;
+        _insertDeductionDetailsCommand = insertDeductionDetailsCommand;
     }
 
     [HttpPost("")]
     public IActionResult CalculateDeductions([FromBody] CalculateDeductionDto dto)
     {
         var gross = _grossPaymentQuery.Execute(dto.GrossPayment);
-        var benefits = _benefitService.GetAssignedBenefitsForEmployee(dto.EmployeeId);
-        var deductions = _deductionOrchestrator.CalculateTotalDeductions(dto.EmployeeId, gross, benefits);
+        var deductions = _deductionOrchestrator.CalculateTotalDeductions(gross, dto.Benefits, dto.PaymentDetailsId);
+        
+        _insertDeductionDetailsCommand.Execute(deductions);
 
         return Ok(new { gross, deductions });
     }
