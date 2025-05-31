@@ -20,15 +20,44 @@ namespace backend.API
         [HttpGet("company/{companyId}")]
         public async Task<IActionResult> GetByCompanyId(Guid companyId)
         {
-            var details = await _getByCompanyIdQuery.ExecuteAsync(companyId);
-            return Ok(details);
+            try
+            {
+                if (companyId == Guid.Empty)
+                {
+                    return BadRequest("CompanyId is required");
+                }
+
+                var details = await _getByCompanyIdQuery.ExecuteAsync(companyId);
+                return Ok(details);
+            } catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new
+                {
+                    message = "An error occurred while retrieving the payrolls",
+                    error = ex.Message
+                });
+            }
         }
 
         [HttpGet("company/{companyId}/summary")]
         public async Task<IActionResult> GetSummaryByCompanyId(Guid companyId)
         {
-            var details = await _getSummaryByCompanyIdQuery.ExecuteAsync(companyId);
-            return Ok(details);
+            try
+            {
+                if (companyId == Guid.Empty)
+                {
+                    return BadRequest("CompanyId is required");
+                }
+                var details = await _getSummaryByCompanyIdQuery.ExecuteAsync(companyId);
+                return Ok(details);
+            } catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new
+                {
+                    message = "An error occurred while retrieving the payrolls summary",
+                    error = ex.Message
+                });
+            }
         }
     }
 }
