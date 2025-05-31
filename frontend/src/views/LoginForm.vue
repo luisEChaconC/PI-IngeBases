@@ -114,7 +114,7 @@ export default {
           await currentUserService.fetchAndSaveCurrentUserInformationToLocalStorage(this.email);
 
           // Uncomment the following line to enable navigation
-          this.$router.push({ name: "MainMenu" });
+          this.$router.push({ name: "HomeView" });
         }
       } catch (error) {
         // Handle errors that occur during the API call
