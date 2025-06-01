@@ -74,11 +74,15 @@ namespace backend.Infraestructure
                                 Email = reader["Email"]?.ToString(),
                                 IsAdmin = reader["IsAdmin"] != DBNull.Value ? Convert.ToBoolean(reader["IsAdmin"]) : (bool?)null,
                                 PhoneNumber = reader["PhoneNumber"]?.ToString(),
-                                Gender = reader["Gender"]?.ToString() // ← agregado aquí
+                                Gender = reader["Gender"]?.ToString()
                             };
                         }
                     }
                 }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error retrieving employee: {ex.Message}");
             }
             finally
             {

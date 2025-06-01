@@ -66,7 +66,7 @@ namespace backend.Infraestructure
                                 Email = reader["Email"]?.ToString(),
                                 IsAdmin = reader["IsAdmin"] != DBNull.Value ? Convert.ToBoolean(reader["IsAdmin"]) : null,
                                 PhoneNumber = reader["PhoneNumber"]?.ToString(),
-                                Gender = reader["Gender"]?.ToString() // ← agregado aquí
+                                Gender = reader["Gender"]?.ToString()
                             };
                         }
                     }
@@ -84,6 +84,5 @@ namespace backend.Infraestructure
 
             return employer;
         }
-
     }
 }
