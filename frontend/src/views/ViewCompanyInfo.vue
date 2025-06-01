@@ -1,12 +1,12 @@
 <template>
   <div class="position-relative">
-    <router-link
-      to="/home-view"
+    <button
       class="btn btn-outline-secondary position-absolute top-0 start-0 mt-2 ms-3"
       title="Volver"
+      @click="handleBack"
     >
       ← Volver
-    </router-link>
+    </button>
 
     <!-- Contenido principal con espaciado para evitar la barra superior -->
     <div class="main-content">
@@ -121,13 +121,37 @@ export default {
         .catch((error) => {
           console.error("Error retrieving company:", error);
         });
+    },
+
+    handleBack() {
+      const raw = localStorage.getItem("currentUserInformation");
+      const user = raw ? JSON.parse(raw) : null;
+
+      if (user?.position?.trim() === "SoftwareManager") {
+        this.$router.push("/view-companies-list");
+      } else {
+        this.$router.push("/home-view");
+      }
     }
   },
 
   created() {
-    const currentUserInformation = currentUserService.getCurrentUserInformationFromLocalStorage();
-    this.getCompanyById(currentUserInformation.companyId); // Changed ID
-  },
+  let companyId = null;
+
+  const currentUserInformation = currentUserService.getCurrentUserInformationFromLocalStorage();
+  
+  if (currentUserInformation.companyId) {
+    companyId = currentUserInformation.companyId;
+  } else {
+    companyId = localStorage.getItem("selectedCompanyId");
+  }
+
+  if (companyId) {
+    this.getCompanyById(companyId);
+  } else {
+    console.error("No se encontró un companyId para mostrar.");
+  }
+},
 
   computed: {
     fullAddress() {
