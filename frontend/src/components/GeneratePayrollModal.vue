@@ -86,7 +86,7 @@ export default {
     },
     handleDayChange(date) {
       const type = 'weekly'; // Change as needed
-      const days = type === 'biweekly' ? 15 : type === 'monthly' ? 30 : 8;
+      const days = type === 'biweekly' ? 15 : type === 'monthly' ? 30 : 7;
 
       if (!date) {
         this.highlightedDates = [];
