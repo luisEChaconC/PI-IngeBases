@@ -13,11 +13,15 @@
       <div class="card-body">
         <div class="d-flex justify-content-between mx-2 mb-4">
           <h2 class="card-title">Planillas</h2>
-          <router-link to="/add-payroll" class="btn btn-dark">
+          <button class="btn btn-dark" @click="showModal = true">
             <i class="fas fa-plus me-2" />
             Nueva Planilla
-          </router-link>
+          </button>
         </div>
+        <GeneratePayrollModal
+          :visible="showModal"
+          @close="showModal = false"
+        />
         <div class="table-responsive" style="max-height: 600px; overflow-y: auto">
           <table class="table table-striped table-bordered">
             <thead class="table-dark sticky-header">
@@ -53,12 +57,15 @@
 <script>
 import axios from "axios";
 import currentUserService from "@/services/currentUserService";
+import GeneratePayrollModal from "@/components/GeneratePayrollModal.vue";
 
 export default {
+  components: { GeneratePayrollModal },
   name: 'PayrollsList',
   data() {
     return {
       payrolls: [],
+      showModal: false,
     }
   },
   async mounted() {
