@@ -1,5 +1,9 @@
 <template>
-  <div v-if="visible" class="modal-backdrop">
+  <div
+    v-if="visible"
+    class="modal-backdrop"
+    @mousedown.self="$emit('close')"
+  >
     <div class="modal-dialog">
       <div class="modal-content p-5">
         <h5 class="text-center">Seleccione el periodo de la planilla</h5>
