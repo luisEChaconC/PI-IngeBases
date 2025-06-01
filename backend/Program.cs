@@ -9,6 +9,7 @@ using backend.Infraestructure;
 using backend.Application.GrossPaymentCalculation;
 using backend.Application.DeductionCalculation;
 using System.Text.Json.Serialization;
+using backend.Application.Queries.Payroll;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -45,7 +46,8 @@ builder.Services.AddScoped<IGetDaysByTimesheetIdQuery, GetDaysByTimesheetIdQuery
 builder.Services.AddScoped<IGetEmployeeHoursInPeriodQuery, GetEmployeeHoursInPeriodQuery>();
 
 builder.Services.AddScoped<IPayrollRepository, PayrollRepository>();
-builder.Services.AddScoped<IPayrollService, PayrollService>();
+builder.Services.AddScoped<IGetPayrollsByCompanyIdQuery, GetPayrollsByCompanyIdQuery>();
+builder.Services.AddScoped<IGetPayrollsSummaryByCompanyIdQuery, GetPayrollsSummaryByCompanyIdQuery>();
 builder.Services.AddScoped<ITimesheetRepository, TimesheetRepository>();
 builder.Services.AddScoped<BenefitService>();
 builder.Services.AddScoped<DeductionService>();
