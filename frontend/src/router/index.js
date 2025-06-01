@@ -18,6 +18,8 @@ import UnauthorizedView from '@/views/UnauthorizedView.vue'
 
 import CurrentUserService from '@/services/currentUserService'
 
+import PayrollsList from '../views/PayrollsList.vue'
+
 const routes = [
     { path: '/', redirect: '/login' },
     { path: '/login', name: 'LoginForm', component: Login },
@@ -38,9 +40,10 @@ const routes = [
             { path: '/benefits', name: 'Benefits', component: BenefitList, meta: {allowedPositions: ['Employer']} },
             { path: '/benefit/:id', name: 'Benefit', component: Benefit, props: true, meta: {allowedPositions: ['Employer']} },
             { path: '/benefit/create', name: 'CreateBenefit', component: BenefitCreate, meta: {allowedPositions: ['Employer']} },
-            { path: '/select-change-benefit', name: 'SelectChangeBenefit', component: SelectChangeBenefit, meta: {allowedPositions: ['Employer', 'Collaborator', "Payroll Manager", "Supervisor"]} },
-            { path: '/view-employee-profile', name: 'ViewEmployeeProfile', component: ViewEmployeeProfile, meta: {allowedPositions: ['Employer', 'Collaborator', "Payroll Manager","Supervisor", "SoftwareManager"]} },
-            { path: '/view-company-info', name: 'ViewCompanyInfo', component: ViewCompanyInfo, meta: {allowedPositions: ['Employer, SoftwareManager']} },
+            { path: '/select-change-benefit', name: 'SelectChangeBenefit', component: SelectChangeBenefit, meta: {allowedPositions: ['Employer', 'Collaborator', 'Payroll Manager', 'Supervisor']} },
+            { path: '/view-employee-profile', name: 'ViewEmployeeProfile', component: ViewEmployeeProfile, meta: {allowedPositions: ['Employer', 'Collaborator', 'Payroll Manager', 'Supervisor', 'SoftwareManager']} },
+            { path: '/view-company-info', name: 'ViewCompanyInfo', component: ViewCompanyInfo, meta: {allowedPositions: ['Employer', 'SoftwareManager']} },
+            { path: '/payrolls-list', name: 'PayrollsList', component: PayrollsList, meta: {allowedPositions: ['Payroll Manager']} },
         ],
     },
 ]
