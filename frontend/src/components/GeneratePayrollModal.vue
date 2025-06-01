@@ -1,26 +1,19 @@
 <template>
   <div v-if="visible" class="modal-backdrop">
     <div class="modal-dialog">
-      <div class="modal-content p-4">
-        <div class="mb-3 mt-2">
-          <h5>Seleccione el periodo de la planilla</h5>
+      <div class="modal-content p-5">
+        <h5 class="text-center">Seleccione el periodo de la planilla</h5>
+        <div class="my-4">
           <DatePicker
             :enable-time-picker="false"
             @date-update="handleDayChange"
             v-model="period"
-            :locale="'es'"
+            locale="es"
             :highlight="highlightedDates"
+            select-text="Seleccionar"
+            cancel-text="Cancelar"
+            :format="formatPicker"
           />
-        </div>
-        <div class="mb-3">
-          <div>
-            <strong>Fecha de inicio:</strong>
-            <span>{{ formattedStartDate }}</span>
-          </div>
-          <div>
-            <strong>Fecha de fin:</strong>
-            <span>{{ formattedEndDate }}</span>
-          </div>
         </div>
         <div class="d-flex justify-content-center gap-2">
           <button class="btn btn-dark" @click="handleGenerate">Generar</button>
@@ -35,63 +28,86 @@
 import DatePicker from '@vuepic/vue-datepicker';
 import '@vuepic/vue-datepicker/dist/main.css';
 
-function formatDate(dateStr) {
-  if (!dateStr) return '';
-  // Always show as DD/MM/YYYY in Costa Rica timezone
-  const date = new Date(dateStr);
-  return date.toLocaleDateString('es-CR', { timeZone: 'America/Costa_Rica' });
+// --- Utility functions ---
+function pad(n) {
+  return n.toString().padStart(2, '0');
 }
 
+function toCRDate(date) {
+  // Returns a Date object in Costa Rica time
+  return new Date(date.toLocaleString('en-US', { timeZone: 'America/Costa_Rica' }));
+}
+
+function toCRDateString(date) {
+  // Returns YYYY-MM-DD in Costa Rica time
+  const d = toCRDate(date);
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+}
+
+function formatDateDisplay(dateStr) {
+  if (!dateStr) return '';
+  const [year, month, day] = dateStr.split('-');
+  return `${day}/${month}/${year}`;
+}
+
+function getRangeDates(baseDate, days, formatter) {
+  // Returns an array of formatted dates for the range
+  return Array.from({ length: days }, (_, i) => {
+    const d = new Date(baseDate.getTime());
+    d.setDate(baseDate.getDate() + i);
+    return formatter(d);
+  });
+}
+
+// --- Vue component ---
 export default {
   name: 'GeneratePayrollModal',
   components: { DatePicker },
-  props: {
-    visible: { type: Boolean, required: true }
-  },
+  props: { visible: { type: Boolean, required: true } },
   data() {
     return {
-      period: null, // The selected day by the user
+      period: null,
       startDate: null,
       endDate: null,
       highlightedDates: [],
     }
   },
   computed: {
-    formattedStartDate() {
-      return formatDate(this.startDate);
-    },
-    formattedEndDate() {
-      return formatDate(this.endDate);
-    }
+    formattedStartDate() { return formatDateDisplay(this.startDate); },
+    formattedEndDate() { return formatDateDisplay(this.endDate); }
   },
   methods: {
     handleGenerate() {
       this.$emit('generate', { startDate: this.startDate, endDate: this.endDate });
     },
     handleDayChange(date) {
-      // Mocked type for demonstration
-      const type = 'weekly'; // Change to 'weekly', 'biweekly', or 'monthly' as needed
-
-      let days = 8;
-      if (type === 'biweekly') days = 15;
-      if (type === 'monthly') days = 30;
+      const type = 'weekly'; // Change as needed
+      const days = type === 'biweekly' ? 15 : type === 'monthly' ? 30 : 8;
 
       if (!date) {
         this.highlightedDates = [];
-        this.startDate = null;
-        this.endDate = null;
+        this.startDate = this.endDate = null;
         return;
       }
-      const baseDate = new Date(date);
-      this.highlightedDates = Array.from({ length: days }, (_, i) => {
-        const d = new Date(baseDate);
-        d.setDate(baseDate.getDate() + i);
-        return d.toISOString().split('T')[0];
-      });
-      this.startDate = baseDate.toISOString().split('T')[0];
-      const lastDate = new Date(baseDate);
-      lastDate.setDate(baseDate.getDate() + days - 1);
-      this.endDate = lastDate.toISOString().split('T')[0];
+
+      const baseDateCR = toCRDate(date);
+
+      // Highlight uses ISO (picker expects this format)
+      this.highlightedDates = getRangeDates(baseDateCR, days, d => d.toISOString().split('T')[0]);
+
+      // Start/end use Costa Rica time string
+      this.startDate = toCRDateString(baseDateCR);
+      const endDateCR = new Date(baseDateCR.getTime());
+      endDateCR.setDate(baseDateCR.getDate() + days - 1);
+      this.endDate = toCRDateString(endDateCR);
+    },
+    formatPicker() {
+      if (this.startDate && this.endDate) {
+        const [sy, sm, sd] = this.startDate.split('-');
+        const [ey, em, ed] = this.endDate.split('-');
+        return `${sd}/${sm}/${sy} - ${ed}/${em}/${ey}`;
+      }
+      return '';
     }
   }
 }
@@ -110,7 +126,7 @@ export default {
 .modal-dialog {
   background: #fff;
   border-radius: 8px;
-  min-width: 350px;
+  min-width: 500px;
   max-width: 90vw;
   box-shadow: 0 2px 16px rgba(0,0,0,0.2);
 }
