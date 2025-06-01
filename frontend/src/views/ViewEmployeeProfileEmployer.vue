@@ -55,6 +55,10 @@
               <input type="text" class="form-control" id="identityCard" v-model="employee.identityCard" disabled />
             </div>
             <div class="mb-3">
+              <label for="gender" class="form-label">Género</label>
+              <input type="text" class="form-control" id="gender" :value="genderLabel" disabled />
+            </div>
+            <div class="mb-3">
               <label for="role" class="form-label">Rol</label>
               <input type="text" class="form-control" id="role" v-model="employee.role" disabled />
             </div>
@@ -103,6 +107,7 @@
 import axios from 'axios';
 import { ref, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
+import { computed } from 'vue';
 import { Modal } from 'bootstrap';
 
 export default {
@@ -114,6 +119,12 @@ export default {
     const route = useRoute();
     const deleteModal = ref(null);
     let deleteModalInstance = null;
+
+    const genderLabel = computed(() => {
+      if (employee.value.gender === 'M') return 'Masculino';
+      if (employee.value.gender === 'F') return 'Femenino';
+      return 'Otro';
+    });
 
     const getEmployee = async () => {
       try {
@@ -134,7 +145,8 @@ export default {
           contractType: response.data.contractType || '',
           grossSalary: response.data.grossSalary || 0,
           email: response.data.email || '',
-          phone: response.data.phoneNumber || ''
+          phone: response.data.phoneNumber || '',
+          gender: response.data.gender || ''
         };
       } catch (err) {
         console.error("Error to get employee data:", err);
@@ -166,7 +178,8 @@ export default {
       error,
       deleteModal,
       openModal,
-      confirmDelete
+      confirmDelete,
+      genderLabel
     };
   }
 };
