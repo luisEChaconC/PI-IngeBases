@@ -196,20 +196,18 @@ using (var checkCmd = new SqlCommand(checkWorkerIdQuery, connection))
             }
         }
         
-        public bool HasPaymentRecords(string employeeId)
+public bool HasPaymentRecords(string employeeId)
 {
-    var query = @"
-        SELECT COUNT(*) 
-        FROM PaymentDetails 
-        WHERE EmployeeId = @EmployeeId";
+    var query = "SELECT dbo.HasPaymentRecords(@EmployeeId) AS Result";
+
 
     using (var connection = new SqlConnection(_connectionString))
     using (var command = new SqlCommand(query, connection))
     {
         command.Parameters.AddWithValue("@EmployeeId", employeeId);
         connection.Open();
-        var count = (int)command.ExecuteScalar();
-        return count > 0;
+        var result = command.ExecuteScalar();
+        return result != null && Convert.ToBoolean(result);
     }
 }
     }
