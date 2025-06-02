@@ -27,7 +27,7 @@ namespace backend.Application.Orchestrators.Payroll
 
             // Step 1 validate there is not an existing payroll for the given period
             // use query approach neeed to create a new query for this
-            var existingPayrolls = await _repository.ExistsPayrollForPeriodAsync(companyId, startDate, endDate);
+            //var existingPayrolls = await _repository.ExistsPayrollForPeriodAsync(companyId, startDate, endDate);
 
             // Step 2 if there is an existing payroll, throw an exception
 
@@ -54,7 +54,8 @@ namespace backend.Application.Orchestrators.Payroll
             // leave a todo cause this will be implemented later
 
             // Step 9 return the payroll id
-            return await _repository.GeneratePayrollAsync(companyId, startDate, endDate);
+            //return await _repository.GeneratePayrollAsync(companyId, startDate, endDate);
+            return new Guid();
         }
     }
 }
