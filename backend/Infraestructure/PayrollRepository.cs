@@ -33,11 +33,11 @@ namespace backend.Infraestructure
                     {
                         payrolls.Add(new PayrollModel
                         {
-                            Id = reader["Id"].ToString(),
+                            Id = reader.GetGuid(reader.GetOrdinal("Id")),
                             StartDate = reader.GetDateTime(reader.GetOrdinal("StartDate")),
                             EndDate = reader.GetDateTime(reader.GetOrdinal("EndDate")),
-                            CompanyId = reader["CompanyId"].ToString(),
-                            PayrollManagerId = reader["PayrollManagerId"].ToString()
+                            CompanyId = reader.GetGuid(reader.GetOrdinal("CompanyId")),
+                            PayrollManagerId = reader.GetGuid(reader.GetOrdinal("PayrollManagerId"))
                         });
                     }
                 }
@@ -52,7 +52,7 @@ namespace backend.Infraestructure
             }
             return payrolls;
         }
-        
+
         public async Task<List<PayrollSummaryDto>> GetSummaryByCompanyIdAsync(Guid companyId)
         {
             var summaries = new List<PayrollSummaryDto>();
@@ -91,6 +91,31 @@ namespace backend.Infraestructure
                 _connection.Close();
             }
             return summaries;
+        }
+        
+        public async Task<bool> CheckPayrollExistsAsync(Guid companyId, DateTime startDate, DateTime endDate)
+        {
+            var query = "SELECT dbo.fn_CheckPayrollExists(@CompanyId, @StartDate, @EndDate)";
+            using var _connection = new SqlConnection(_connectionString);
+            try
+            {
+                using var command = new SqlCommand(query, _connection);
+                command.Parameters.AddWithValue("@CompanyId", companyId);
+                command.Parameters.AddWithValue("@StartDate", startDate);
+                command.Parameters.AddWithValue("@EndDate", endDate);
+
+                await _connection.OpenAsync();
+                var result = await command.ExecuteScalarAsync();
+                return Convert.ToBoolean(result);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error checking payroll existence: {ex.Message}");
+            }
+            finally
+            {
+                _connection.Close();
+            }
         }
     }
 }
