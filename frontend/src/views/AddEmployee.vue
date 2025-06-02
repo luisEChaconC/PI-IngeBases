@@ -116,6 +116,24 @@
                             </div>
                         </div>
                         <div class="mb-3">
+                            <label for="gender" class="form-label">Género</label>
+                            <select
+                                class="form-select"
+                                id="gender"
+                                v-model="formData.naturalPerson.gender"
+                                @blur="validateGender"
+                                :class="{ 'is-invalid': errors.gender }"
+                                required
+                            >
+                                <option value="">Seleccione una opción</option>
+                                <option value="M">Masculino</option>
+                                <option value="F">Femenino</option>
+                            </select>
+                            <div class="invalid-feedback" v-if="errors.gender">
+                                {{ errors.gender }}
+                            </div>
+                        </div>
+                        <div class="mb-3">
                             <label for="legalId" class="form-label">Cédula de identidad</label>
                             <input
                                 type="text"
@@ -222,6 +240,7 @@ export default {
                     firstName: "",
                     firstSurname: "",
                     secondSurname: "",
+                    gender:"",
                 },
                 contact: {
                     type:"Phone Number",
@@ -247,6 +266,7 @@ export default {
                 contractType: "",
                 grossSalary: "",
                 employeeRole: "",
+                gender:"",
             },
         };
     },
@@ -269,6 +289,13 @@ export default {
                 this.errors.secondSurname = "El segundo apellido solo puede contener letras y espacios.";
             } else {
                 this.errors.secondSurname = "";
+            }
+        },
+        validateGender() {
+            if (!this.formData.naturalPerson.gender) {
+                this.errors.gender = "El género es requerido.";
+            } else {
+                this.errors.gender = "";
             }
         },
         validateWorkerId() {
@@ -350,6 +377,7 @@ export default {
             this.validateEmployeeRole();
             this.validateLegalId();
             this.validateFirstSurname();
+            this.validateGender();
         },
         hasErrors() {
             return Object.values(this.errors).some(error => error !== "");

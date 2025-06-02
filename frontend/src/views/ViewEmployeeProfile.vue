@@ -55,6 +55,10 @@
                 <input type="text" class="form-control" id="identityCard" v-model="employee.identityCard" disabled />
               </div>
               <div class="mb-3">
+                <label for="gender" class="form-label">Género</label>
+                <input type="text" class="form-control" id="gender" :value="genderLabel" disabled />
+              </div>
+              <div class="mb-3">
                 <label for="role" class="form-label">Rol</label>
                 <input type="text" class="form-control" id="role" v-model="employee.role" disabled />
               </div>
@@ -82,16 +86,24 @@
 <script>
 import axios from 'axios';
 import { ref, onMounted } from 'vue';
+import { computed } from 'vue';
 //import { useRoute } from 'vue-router';
 import currentUserService from "@/services/currentUserService";
 
 export default {
   name: 'ViewEmployeeProfile',
   setup() {
+    
     const employee = ref({});
     const loading = ref(true);
     const error = ref(null);
     const userPosition = ref('');
+
+    const genderLabel = computed(() => {
+      if (employee.value.gender === 'M') return 'Masculino';
+      if (employee.value.gender === 'F') return 'Femenino';
+      return 'Otro';
+    });
 
     const getEmployee = async () => {
       try {
@@ -119,7 +131,8 @@ export default {
           contractType: response.data.contractType || '',
           grossSalary: response.data.grossSalary || 0,
           email: response.data.email || '',
-          phone: response.data.phoneNumber || ''
+          phone: response.data.phoneNumber || '',
+          gender: response.data.gender || ''
         };
 
       } catch (err) {
@@ -138,7 +151,8 @@ export default {
       employee,
       loading,
       error,
-      userPosition
+      userPosition,
+      genderLabel
     };
   }
 };
