@@ -108,7 +108,11 @@ export default {
   },
   methods: {
     handleGenerate() {
-      this.$emit('generate', { startDate: this.startDate, endDate: this.endDate });
+      const currentUserInformation = currentUserService.getCurrentUserInformationFromLocalStorage();
+      const companyId = currentUserInformation.companyId;
+      const payrollManagerId = currentUserInformation.PersonId;
+      const response = await axios.get(`https://localhost:5000/api/Company/GetCompanyById/${companyId}`);
+
     },
     async handleDayChange(date) {
       // Use the fetched paymentType

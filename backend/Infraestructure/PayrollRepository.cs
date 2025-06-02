@@ -15,6 +15,27 @@ namespace backend.Infraestructure
             _connectionString = configuration.GetConnectionString("DefaultConnection")!;
         }
 
+        public async Task<Guid> CreateAsync(PayrollModel model)
+        {
+            var id = Guid.NewGuid();
+
+            using var connection = new SqlConnection(_connectionString);
+            var command = new SqlCommand(@"
+                INSERT INTO Payrolls (Id, StartDate, EndDate, CompanyId, PayrollManagerId)
+                VALUES (@Id, @StartDate, @EndDate, @CompanyId, @PayrollManagerId)", connection);
+
+            command.Parameters.AddWithValue("@Id", id);
+            command.Parameters.AddWithValue("@StartDate", model.StartDate);
+            command.Parameters.AddWithValue("@EndDate", model.EndDate);
+            command.Parameters.AddWithValue("@CompanyId", model.CompanyId);
+            command.Parameters.AddWithValue("@PayrollManagerId", model.PayrollManagerId);
+
+            await connection.OpenAsync();
+            await command.ExecuteNonQueryAsync();
+
+            return id;
+        }
+
         public async Task<List<PayrollModel>> GetByCompanyIdAsync(Guid companyId)
         {
             var payrolls = new List<PayrollModel>();

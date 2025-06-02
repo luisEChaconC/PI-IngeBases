@@ -1,6 +1,14 @@
 using backend.Domain;
-using backend.Infraestructure;
+using backend.Application.DTOs;
 using backend.Application.Queries.Payroll;
+using backend.Application.Queries.Employees;
+using backend.Application.Commands.Payroll;
+using backend.Application.Queries;
+using backend.Application.GrossPaymentCalculation;
+using backend.Application.Queries.Company;
+using backend.Domain.Enums;
+using backend.Application.Commands.PaymentDetails;
+using backend.Application.Orchestrators.Deduction;
 
 namespace backend.Application.Orchestrators.Payroll
 {
@@ -11,50 +19,86 @@ namespace backend.Application.Orchestrators.Payroll
 
     public class PayrollOrchestrator : IPayrollOrchestrator
     {
-        private readonly IPayrollRepository _repository;
         private readonly ICheckPayrollExistsQuery _checkPayrollExistsQuery;
-        
-        public PayrollOrchestrator(IPayrollRepository repository, ICheckPayrollExistsQuery checkPayrollExistsQuery)
+        private readonly IGetEmployeesByCompanyIdQuery _getEmployeesByCompanyIdQuery;
+        private readonly ICreatePayrollCommand _createPayrollCommand;
+        private readonly IGetEmployeeHoursInPeriodQuery _getEmployeeHoursInPeriodQuery;
+        private readonly ICalculateGrossPaymentQuery _calculateGrossPaymentQuery;
+        private readonly IGetCompanyPaymentTypeByCompanyIdQuery _getCompanyPaymentTypeByCompanyIdQuery;
+        private readonly ICreatePaymentDetailCommand _createPaymentDetailCommand;
+        private readonly IDeductionOrchestrator _deductionOrchestrator;
+        public PayrollOrchestrator(
+            ICheckPayrollExistsQuery checkPayrollExistsQuery,
+            IGetEmployeesByCompanyIdQuery getEmployeesByCompanyIdQuery,
+            ICreatePayrollCommand createPayrollCommand,
+            IGetEmployeeHoursInPeriodQuery getEmployeeHoursInPeriodQuery,
+            ICalculateGrossPaymentQuery calculateGrossPaymentQuery,
+            IGetCompanyPaymentTypeByCompanyIdQuery getCompanyPaymentTypeByCompanyIdQuery,
+            ICreatePaymentDetailCommand createPaymentDetailCommand,
+            IDeductionOrchestrator deductionOrchestrator)
         {
-            _repository = repository;
             _checkPayrollExistsQuery = checkPayrollExistsQuery;
+            _getEmployeesByCompanyIdQuery = getEmployeesByCompanyIdQuery;
+            _createPayrollCommand = createPayrollCommand;
+            _getEmployeeHoursInPeriodQuery = getEmployeeHoursInPeriodQuery;
+            _calculateGrossPaymentQuery = calculateGrossPaymentQuery;
+            _getCompanyPaymentTypeByCompanyIdQuery = getCompanyPaymentTypeByCompanyIdQuery;
+            _createPaymentDetailCommand = createPaymentDetailCommand;
+            _deductionOrchestrator = deductionOrchestrator;
         }
 
         public async Task<Guid> GeneratePayroll(PayrollModel model)
         {
-            // Step 0 validate if the id match a payroll manager // veremos
-            // step 0.1 validate if the period matches the payment period of the company // veremos
-
-            // Step 1 validate there is not an existing payroll for the given period
             bool payrollExistsForPeriod = await _checkPayrollExistsQuery.ExecuteAsync(model.StartDate, model.EndDate, model.CompanyId);
-            // Step 2 if there is an existing payroll, throw an exception
             if (payrollExistsForPeriod) throw new InvalidOperationException("A payroll already exists for the given period.");
 
-            // Maybe we should validate first we have employees before creating a payroll
-            // Step 2.1 generate a new payroll row and gather the id
+            var employees = await _getEmployeesByCompanyIdQuery.ExecuteAsync(model.CompanyId);
+            if (employees.Count == 0) throw new InvalidOperationException("No employees found for the given company.");
 
-            // Step 3 get the list of employees for the company
-            // generate a query
+            var payrollId = await _createPayrollCommand.ExecuteAsync(model);
 
-            // Step 4 get the worked hours for each employee in the given period
-            // use existing query GetEmployeeHoursInPeriod
+            var companyPaymentType = await _getCompanyPaymentTypeByCompanyIdQuery.ExecuteAsync(model.CompanyId);
+            if (!Enum.TryParse<EmployeeTypePayment>(companyPaymentType, true, out var companyPaymentTypeEnum))
+                throw new InvalidOperationException("Invalid payment type from company.");
 
-            // Step 5 calculate the payroll for each employee based on their worked hours and salary
-            // for gross salary calculation assume the startDate is the employeeStartDate if the employee StartDate is after the startDate of the payroll
-            // use GrossPaymentCalculationQuery
+            foreach (var employee in employees)
+            {
+                // This is required cause an employee can start working after the payroll start date
+                var startDate = employee.EmployeeStartDate > model.StartDate ? employee.EmployeeStartDate : model.StartDate;
 
-            // Step 6 save the payment details in the database
-            // use command create payment details 
+                var employeeHoursWorked = _getEmployeeHoursInPeriodQuery.Execute(employee.Id, startDate, model.EndDate);
 
-            // Step 7 calculate deductions and taxes for each employee
-            // leave a todo cause this will be implemented later
+                var grossPaymentDto = new CalculateGrossPaymentDto
+                {
+                    EmployeeTypePayment = companyPaymentTypeEnum,
+                    BaseSalary = employee.GrossSalary,
+                    StartDate = startDate,
+                    EndDate = model.EndDate,
+                    WorkedHours = employeeHoursWorked
+                };
 
-            // Step 8 save the deductions and taxes in the database
-            // leave a todo cause this will be implemented later
+                var grossPayment = _calculateGrossPaymentQuery.Execute(grossPaymentDto);
 
-            // Step 9 return the payroll id
-            //return await _repository.GeneratePayrollAsync(companyId, startDate, endDate);
-            return new Guid();
+                var paymentDetail = new PaymentDetailModel
+                {
+                    PayrollId = payrollId,
+                    EmployeeId = employee.Id,
+                    GrossSalary = grossPayment,
+                    IssueDate = DateTime.UtcNow
+                };
+
+                var paymentDetailId = await _createPaymentDetailCommand.ExecuteAsync(paymentDetail);
+
+                var deductionsDto = new CalculateDeductionDto
+                {
+                    EmployeeId = employee.Id,
+                    GrossSalary = grossPayment,
+                    PaymentDetailsId = paymentDetailId
+                };
+
+                _deductionOrchestrator.CalculateDeductions(deductionsDto);
+            }
+            return payrollId;
         }
     }
 }

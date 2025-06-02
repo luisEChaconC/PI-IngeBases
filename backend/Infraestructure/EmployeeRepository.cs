@@ -6,7 +6,7 @@ namespace backend.Infraestructure
     /// <summary>
     /// Repository for managing operations related to the Employees table.
     /// </summary>
-    public class EmployeeRepository
+    public class EmployeeRepository : IEmployeeRepository
     {
         private SqlConnection _connection; // SQL connection object
         private string _connectionString; // Connection string for the database
@@ -100,6 +100,48 @@ namespace backend.Infraestructure
                 }
 
                 _connection.Close();
+            }
+
+            return employees;
+        }
+
+        public async Task<List<EmployeeModel>> GetSummaryByCompanyIdAsync(Guid companyId)
+        {
+            var employees = new List<EmployeeModel>();
+            var query = @"
+                SELECT 
+                    Id,
+                    WorkerId,
+                    CompanyId,
+                    EmployeeStartDate,
+                    ContractType,
+                    GrossSalary,
+                    HasToReportHours
+                FROM Employees
+                WHERE CompanyId = @CompanyId";
+
+            using (var connection = new SqlConnection(_connectionString))
+            using (var command = new SqlCommand(query, connection))
+            {
+                command.Parameters.AddWithValue("@CompanyId", companyId);
+
+                await connection.OpenAsync();
+                using (var reader = await command.ExecuteReaderAsync())
+                {
+                    while (await reader.ReadAsync())
+                    {
+                        employees.Add(new EmployeeModel
+                        {
+                            Id = reader.GetGuid(reader.GetOrdinal("Id")),
+                            WorkerId = reader["WorkerId"].ToString(),
+                            CompanyId = reader.GetGuid(reader.GetOrdinal("CompanyId")),
+                            EmployeeStartDate = reader.GetDateTime(reader.GetOrdinal("EmployeeStartDate")),
+                            ContractType = reader["ContractType"].ToString(),
+                            GrossSalary = reader.GetDecimal(reader.GetOrdinal("GrossSalary")),
+                            HasToReportHours = reader.GetBoolean(reader.GetOrdinal("HasToReportHours"))
+                        });
+                    }
+                }
             }
 
             return employees;
