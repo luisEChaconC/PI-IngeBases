@@ -6,7 +6,8 @@
   >
     <div class="modal-dialog">
       <div class="modal-content p-5">
-        <h5 class="text-center">Seleccione el periodo de la planilla</h5>
+        <h2 class="text-center modal-title-custom">Seleccione el periodo de la planilla</h2>
+        <h5 class="text-center text-muted modal-subtitle-custom">Esta empresa paga de manera {{ paymentTypeSpanish }}</h5>
         <div class="my-4">
           <DatePicker
             :enable-time-picker="false"
@@ -29,6 +30,8 @@
 </template>
 
 <script>
+import axios from "axios";
+import currentUserService from "@/services/currentUserService";
 import DatePicker from '@vuepic/vue-datepicker';
 import '@vuepic/vue-datepicker/dist/main.css';
 
@@ -74,18 +77,42 @@ export default {
       startDate: null,
       endDate: null,
       highlightedDates: [],
+      paymentType: 'weekly', // default, will be updated
     }
   },
   computed: {
     formattedStartDate() { return formatDateDisplay(this.startDate); },
-    formattedEndDate() { return formatDateDisplay(this.endDate); }
+    formattedEndDate() { return formatDateDisplay(this.endDate); },
+    paymentTypeSpanish() {
+      switch (this.paymentType) {
+        case 'weekly': return 'semanal';
+        case 'biweekly': return 'quincenal';
+        case 'monthly': return 'mensual';
+        default: return this.paymentType;
+      }
+    }
+  },
+  async created() {
+    // Fetch payment type when component is created
+    try {
+      const currentUserInformation = currentUserService.getCurrentUserInformationFromLocalStorage();
+      const companyId = currentUserInformation.companyId;
+      const response = await axios.get(`https://localhost:5000/api/Company/GetCompanyById/${companyId}`);
+      this.paymentType = response.data && response.data.paymentType
+        ? response.data.paymentType.toLowerCase()
+        : 'weekly'
+    } catch (e) {
+      alert(e)
+      this.paymentType = 'weekly';
+    }
   },
   methods: {
     handleGenerate() {
       this.$emit('generate', { startDate: this.startDate, endDate: this.endDate });
     },
-    handleDayChange(date) {
-      const type = 'weekly'; // Change as needed
+    async handleDayChange(date) {
+      // Use the fetched paymentType
+      const type = this.paymentType;
       const days = type === 'biweekly' ? 15 : type === 'monthly' ? 30 : 7;
 
       if (!date) {
@@ -133,5 +160,15 @@ export default {
   min-width: 500px;
   max-width: 90vw;
   box-shadow: 0 2px 16px rgba(0,0,0,0.2);
+}
+.modal-title-custom {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+}
+.modal-subtitle-custom {
+  font-size: 1.15rem;
+  font-weight: 400;
+  margin-bottom: 1.5rem;
 }
 </style>
