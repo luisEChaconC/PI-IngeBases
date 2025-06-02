@@ -11,22 +11,22 @@ using System.Linq;
 [Route("api/[controller]")]
 public class DeductionsController : ControllerBase
 {
-    private DeductionService _deductionService;
+    private DeductionOrchestrator _deductionOrchestrator;
 
     public DeductionsController(
-        DeductionService deductionService)
+        DeductionOrchestrator deductionService)
     {
-        _deductionService = deductionService;
+        _deductionOrchestrator = deductionService;
     }
 
     [HttpPost("")]
     public IActionResult CalculateDeductions([FromBody] CalculateDeductionDto dto)
     {
-        var result = _deductionService.CalculateDeductions(dto);
+        var result = _deductionOrchestrator.CalculateDeductions(dto);
 
         var deductionsList = (List<DeductionDetailModel>)result.deductions;
         decimal totalDeductions = deductionsList.Sum(d => d.AmountDeduced);
 
-        return Ok(new{result.gross, result.deductions, totalDeductions});
+        return Ok(new{result.deductions, totalDeductions});
     }
 }

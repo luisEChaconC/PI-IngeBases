@@ -50,7 +50,7 @@ builder.Services.AddScoped<IGetPayrollsByCompanyIdQuery, GetPayrollsByCompanyIdQ
 builder.Services.AddScoped<IGetPayrollsSummaryByCompanyIdQuery, GetPayrollsSummaryByCompanyIdQuery>();
 builder.Services.AddScoped<ITimesheetRepository, TimesheetRepository>();
 builder.Services.AddScoped<BenefitService>();
-builder.Services.AddScoped<DeductionService>();
+builder.Services.AddScoped<DeductionOrchestrator>();
 
 
 // Register Payment Calculation Strategies
