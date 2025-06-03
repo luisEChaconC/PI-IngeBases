@@ -172,7 +172,8 @@ namespace backend.Services
                     LinkAPI = row["LinkAPI"].ToString(),
                     FixedPercentage = row["FixedPercentage"] != DBNull.Value ? Convert.ToInt32(row["FixedPercentage"]) : null,
                     FixedAmount = row["FixedAmount"] != DBNull.Value ? Convert.ToInt32(row["FixedAmount"]) : null,
-                    RequiredMonthsWorked = Convert.ToInt32(row["RequiredMonthsWorked"])
+                    RequiredMonthsWorked = Convert.ToInt32(row["RequiredMonthsWorked"]),
+                    EligibleEmployeeTypes = GetEmployeeTypesForBenefit(id)
                 });
             }
 
