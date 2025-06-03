@@ -109,9 +109,9 @@ export default {
 
     const regex = {
       email: /^[\w.-]+@([\w-]+\.)+[\w-]{2,4}$/,
-      phoneNumber: /^$|^\d{8}$/,
+      phoneNumber: /^$|^\d{4}-\d{4}$/,
       grossSalary: /^\d+(\.\d{1,2})?$/,
-      legalId: /^(\d{9,12}|\d{1,2}-\d{4}-\d{4}|\d-\d{3}-\d{6})$/,
+      legalId: /^((?!0)\d{9,12}|(?!0)\d{1,2}-\d{4}-\d{4}|(?!0)\d-\d{3}-\d{6})$/,
       workerId: /^[A-Z0-9#-]{3,20}$/,
       contractType: /^.+$/,
       firstName: /^[A-Za-zÁÉÍÓÚñáéíóú\s]{2,40}$/,
