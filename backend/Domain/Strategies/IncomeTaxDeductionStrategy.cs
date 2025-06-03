@@ -3,7 +3,7 @@ namespace backend.Domain.Strategies
 {
     public class IncomeTaxDeductionStrategy : IDeductionCalculationStrategy
     {
-        public decimal CalculateDeduction(decimal grossSalary, string contractType, Benefit? benefit = null)
+        public decimal CalculateDeduction(decimal grossSalary, string contractType, string gender, Benefit? benefit = null)
         {
             if (contractType == "Professional Services")
                 return 0;

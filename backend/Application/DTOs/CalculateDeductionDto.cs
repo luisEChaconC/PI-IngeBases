@@ -7,4 +7,5 @@ public class CalculateDeductionDto
     public Decimal GrossSalary { get; set; }
     public Guid PaymentDetailsId { get; set; }
     public string ContractType { get; set; }
+    public string Gender { get; set; }
 }

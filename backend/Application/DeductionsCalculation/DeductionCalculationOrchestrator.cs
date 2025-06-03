@@ -22,13 +22,13 @@ namespace backend.Application.DeductionCalculation
             _benefitStrategy = benefitStrategy;
         }
 
-        public List<DeductionDetailModel> CalculateTotalDeductions(decimal grossSalary, string contractType, List<Benefit>? benefits, Guid paymentDetailsId)
+        public List<DeductionDetailModel> CalculateTotalDeductions(decimal grossSalary, string contractType, string gender, List<Benefit>? benefits, Guid paymentDetailsId)
         {
             var details = new List<DeductionDetailModel>();
 
             foreach (var strategy in _strategies)
             {
-                var amount = strategy.CalculateDeduction(grossSalary, contractType);
+                var amount = strategy.CalculateDeduction(grossSalary, contractType, gender);
                 if (amount > 0)
                 {
                     details.Add(new DeductionDetailModel
@@ -46,7 +46,7 @@ namespace backend.Application.DeductionCalculation
             {
             foreach (var benefit in benefits)
             {
-                    var amount = _benefitStrategy.CalculateDeduction(grossSalary,contractType, benefit);
+                    var amount = _benefitStrategy.CalculateDeduction(grossSalary,contractType,gender, benefit);
                     if (amount > 0)
                     {
                         details.Add(new DeductionDetailModel

@@ -2,7 +2,7 @@ namespace backend.Domain.Strategies
 {
     public class BenefitDeductionStrategy : IDeductionCalculationStrategy
     {
-        public decimal CalculateDeduction(decimal grossSalary, string contractType, Benefit? benefit = null)
+        public decimal CalculateDeduction(decimal grossSalary, string contractType, string gender, Benefit? benefit = null)
         {
             if (benefit == null) return 0;
 
