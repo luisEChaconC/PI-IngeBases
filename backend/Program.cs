@@ -10,6 +10,7 @@ using backend.Application.GrossPaymentCalculation;
 using backend.Application.DeductionCalculation;
 using System.Text.Json.Serialization;
 using backend.Application.Queries.Payroll;
+using backend.Repositories;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -65,6 +66,8 @@ builder.Services.AddScoped<BenefitDeductionStrategy>();
 
 // Register Calculation Orchestrator
 builder.Services.AddScoped<DeductionCalculationOrchestrator>();
+builder.Services.AddScoped<APIRepository>();
+builder.Services.AddHttpClient<BenefitDeductionStrategy>();
 
 builder.Services.AddScoped<IDeductionDetailRepository, DeductionDetailRepository>();
 builder.Services.AddScoped<IInsertDeductionDetailsCommand, InsertDeductionDetailsCommand>();

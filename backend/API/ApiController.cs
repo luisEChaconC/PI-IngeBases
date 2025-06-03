@@ -12,8 +12,7 @@ namespace backend.API
 
         public APIController(IConfiguration configuration)
         {
-            var connectionString = configuration.GetConnectionString("DefaultConnection");
-            _repo = new APIRepository(connectionString);
+            _repo = new APIRepository();
         }
         [HttpGet]
         public ActionResult<List<ApiModel>> GetAPIs()

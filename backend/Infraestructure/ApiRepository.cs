@@ -7,10 +7,13 @@ namespace backend.Repositories
     public class APIRepository : IAPIRepository
     {
         private readonly string _connectionString;
-
-        public APIRepository(string connectionString)
+        protected SqlConnection _connection;
+        
+        public APIRepository()
         {
-            _connectionString = connectionString;
+            var builder = WebApplication.CreateBuilder();
+            _connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+            _connection = new SqlConnection(_connectionString);
         }
 
         public List<ApiModel> GetAPIs()
