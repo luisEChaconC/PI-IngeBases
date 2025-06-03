@@ -10,6 +10,8 @@ using backend.Application.GrossPaymentCalculation;
 using backend.Application.DeductionCalculation;
 using System.Text.Json.Serialization;
 using backend.Application.Queries.Payroll;
+using backend.Application.Benefits.Commands;
+using backend.Application.Benefits.Queries;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -54,6 +56,14 @@ builder.Services.AddScoped<IGetPayrollsSummaryByCompanyIdQuery, GetPayrollsSumma
 builder.Services.AddScoped<ITimesheetRepository, TimesheetRepository>();
 builder.Services.AddScoped<BenefitService>();
 builder.Services.AddScoped<DeductionOrchestrator>();
+
+builder.Services.AddScoped<GetBenefitsQuery>();
+builder.Services.AddScoped<GetBenefitByIdQuery>();
+builder.Services.AddScoped<CreateBenefitCommand>();
+builder.Services.AddScoped<AssignBenefitsToEmployeeCommand>();
+builder.Services.AddScoped<GetAssignedBenefitsQuery>();
+builder.Services.AddScoped<UpdateBenefitCommand>();
+builder.Services.AddScoped<IsBenefitAssignedQuery>();
 
 
 // Register Payment Calculation Strategies

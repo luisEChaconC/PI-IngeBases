@@ -232,30 +232,22 @@ namespace backend.Infraestructure
 
         public bool IsBenefitAssignedToAnyEmployee(Guid benefitId)
         {
-            const string query = @"
-        SELECT COUNT(*) 
-        FROM EmployeeXBenefit 
-        WHERE BenefitId = @BenefitId";
+            const string query = "SELECT dbo.IsBenefitAssigned(@BenefitId)";
 
             using var connection = new SqlConnection(_connectionString);
             using var command = new SqlCommand(query, connection);
             command.Parameters.AddWithValue("@BenefitId", benefitId);
 
             connection.Open();
-            int count = (int)command.ExecuteScalar();
+            var result = command.ExecuteScalar();
             connection.Close();
 
-            return count > 0;
+            return result != null && Convert.ToBoolean(result);
         }
-
         public bool UpdateBenefit(Benefit benefit)
         {
-            if (IsBenefitAssignedToAnyEmployee(Guid.Parse(benefit.Id)))
-            {
-                return false; // o lanza una excepción si prefieres
-            }
 
-            const string query = @"
+            const string updateQuery = @"
         UPDATE Benefits
         SET Name = @Name,
             Description = @Description,
@@ -268,23 +260,49 @@ namespace backend.Infraestructure
         WHERE Id = @Id";
 
             using var connection = new SqlConnection(_connectionString);
-            using var command = new SqlCommand(query, connection);
-
-            command.Parameters.AddWithValue("@Id", Guid.Parse(benefit.Id));
-            command.Parameters.AddWithValue("@Name", benefit.Name);
-            command.Parameters.AddWithValue("@Description", benefit.Description ?? "");
-            command.Parameters.AddWithValue("@IsActive", benefit.IsActive);
-            command.Parameters.AddWithValue("@Type", benefit.Type);
-            command.Parameters.AddWithValue("@LinkAPI", (object?)benefit.LinkAPI ?? DBNull.Value);
-            command.Parameters.AddWithValue("@FixedPercentage", (object?)benefit.FixedPercentage ?? DBNull.Value);
-            command.Parameters.AddWithValue("@FixedAmount", (object?)benefit.FixedAmount ?? DBNull.Value);
-            command.Parameters.AddWithValue("@RequiredMonthsWorked", benefit.RequiredMonthsWorked);
-
             connection.Open();
-            int rows = command.ExecuteNonQuery();
-            connection.Close();
 
-            return rows > 0;
+            using (var command = new SqlCommand(updateQuery, connection))
+            {
+                command.Parameters.AddWithValue("@Id", Guid.Parse(benefit.Id));
+                command.Parameters.AddWithValue("@Name", benefit.Name);
+                command.Parameters.AddWithValue("@Description", benefit.Description ?? "");
+                command.Parameters.AddWithValue("@IsActive", benefit.IsActive);
+                command.Parameters.AddWithValue("@Type", benefit.Type);
+                command.Parameters.AddWithValue("@LinkAPI", (object?)benefit.LinkAPI ?? DBNull.Value);
+                command.Parameters.AddWithValue("@FixedPercentage", (object?)benefit.FixedPercentage ?? DBNull.Value);
+                command.Parameters.AddWithValue("@FixedAmount", (object?)benefit.FixedAmount ?? DBNull.Value);
+                command.Parameters.AddWithValue("@RequiredMonthsWorked", benefit.RequiredMonthsWorked);
+
+                command.ExecuteNonQuery();
+            }
+
+            const string deleteQuery = @"
+        DELETE FROM EmployeeTypesXBenefits WHERE BenefitId = @BenefitId";
+
+            using (var deleteCmd = new SqlCommand(deleteQuery, connection))
+            {
+                deleteCmd.Parameters.AddWithValue("@BenefitId", Guid.Parse(benefit.Id));
+                deleteCmd.ExecuteNonQuery();
+            }
+
+            foreach (var empType in benefit.EligibleEmployeeTypes)
+            {
+                var empTypeId = GetEmployeeTypeIdByName(empType, connection);
+                if (empTypeId != null)
+                {
+                    const string insertRelQuery = @"
+                INSERT INTO EmployeeTypesXBenefits (EmployeeTypeId, BenefitId)
+                VALUES (@EmpTypeId, @BenefitId)";
+
+                    using var relCmd = new SqlCommand(insertRelQuery, connection);
+                    relCmd.Parameters.AddWithValue("@EmpTypeId", empTypeId);
+                    relCmd.Parameters.AddWithValue("@BenefitId", Guid.Parse(benefit.Id));
+                    relCmd.ExecuteNonQuery();
+                }
+            }
+
+            return true;
         }
 
         public Benefit? GetBenefitById(Guid id)

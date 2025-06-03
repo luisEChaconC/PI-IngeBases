@@ -16,6 +16,7 @@ namespace backend.API
         private readonly AssignBenefitsToEmployeeCommand _assignBenefitsCommand;
         private readonly GetAssignedBenefitsQuery _getAssignedBenefitsQuery;
         private readonly UpdateBenefitCommand _updateBenefitCommand;
+        private readonly IsBenefitAssignedQuery _isBenefitAssignedQuery;
 
         public BenefitController(
             GetBenefitsQuery getBenefitsQuery,
@@ -23,7 +24,8 @@ namespace backend.API
             CreateBenefitCommand createBenefitCommand,
             AssignBenefitsToEmployeeCommand assignBenefitsCommand,
             GetAssignedBenefitsQuery getAssignedBenefitsQuery,
-            UpdateBenefitCommand updateBenefitCommand)
+            UpdateBenefitCommand updateBenefitCommand,
+            IsBenefitAssignedQuery isBenefitAssignedQuery)
         {
             _getBenefitsQuery = getBenefitsQuery;
             _getBenefitByIdQuery = getBenefitByIdQuery;
@@ -31,6 +33,7 @@ namespace backend.API
             _assignBenefitsCommand = assignBenefitsCommand;
             _getAssignedBenefitsQuery = getAssignedBenefitsQuery;
             _updateBenefitCommand = updateBenefitCommand;
+            _isBenefitAssignedQuery = isBenefitAssignedQuery;
         }
 
         [HttpGet("{id}")]
@@ -114,7 +117,7 @@ namespace backend.API
 
                 var success = _updateBenefitCommand.Execute(benefit);
                 if (!success)
-                    return Conflict("No se puede editar el beneficio porque ya fue asignado a empleados.");
+                    return Conflict("No se pudo actualizar el beneficio.");
 
                 return Ok(true);
             }
@@ -122,6 +125,21 @@ namespace backend.API
             {
                 return StatusCode(StatusCodes.Status500InternalServerError,
                     $"Error actualizando beneficio: {ex.Message}");
+            }
+        }
+
+        [HttpGet("benefits/{benefitId}/is-assigned")]
+        public ActionResult<bool> IsBenefitAssigned(Guid benefitId)
+        {
+            try
+            {
+                var isAssigned = _isBenefitAssignedQuery.Execute(benefitId);
+                return Ok(isAssigned);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    $"Error checking if benefit is assigned: {ex.Message}");
             }
         }
     }
