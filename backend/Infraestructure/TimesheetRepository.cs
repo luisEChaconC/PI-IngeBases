@@ -125,5 +125,35 @@ namespace backend.Infraestructure
 
             return totalWorkHours;
         }
+
+        public bool UpdatePayrollIdInTimesheets(List<TimesheetModel> timesheets)
+        {
+            var query = @"UPDATE Timesheets 
+                          SET PayrollId = @PayrollId 
+                          WHERE Id = @Id";
+            
+            try
+            {
+                _connection.Open();
+                foreach (var timesheet in timesheets)
+                {
+                    using (var command = new SqlCommand(query, _connection))
+                    {
+                        command.Parameters.AddWithValue("@PayrollId", (object?)timesheet.PayrollId ?? DBNull.Value);
+                        command.Parameters.AddWithValue("@Id", timesheet.Id);
+                        command.ExecuteNonQuery();
+                    }
+                }
+                return true;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error updating payrollId in timesheets: {ex.Message}");
+            }
+            finally
+            {
+                _connection.Close();
+            }
+        }
     }
 }
