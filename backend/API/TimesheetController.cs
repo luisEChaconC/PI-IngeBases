@@ -2,8 +2,10 @@ using backend.Application;
 using backend.Application.DTOs;
 using backend.Domain;
 using backend.Application.Queries;
+using backend.Application.Commands;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
+using System.Globalization;
 
 namespace backend.API
 {
@@ -13,11 +15,15 @@ namespace backend.API
     {
         private readonly IGetDaysByTimesheetIdQuery _getDaysByTimesheetIdQuery;
         private readonly IGetEmployeeHoursInPeriodQuery _getEmployeeHoursInPeriodQuery;
+        private readonly IGetEmployeeTimesheetByDateQuery _getEmployeeTimesheetByDateQuery;
+        private readonly IUpdateDayCommand _updateDayCommand;
 
-        public TimesheetController(IGetDaysByTimesheetIdQuery getDaysByTimesheetIdQuery, IGetEmployeeHoursInPeriodQuery getEmployeeHoursInPeriodQuery)
+        public TimesheetController(IGetDaysByTimesheetIdQuery getDaysByTimesheetIdQuery, IGetEmployeeHoursInPeriodQuery getEmployeeHoursInPeriodQuery, IGetEmployeeTimesheetByDateQuery getEmployeeTimesheetByDateQuery, IUpdateDayCommand updateDayCommand)
         {
             _getDaysByTimesheetIdQuery = getDaysByTimesheetIdQuery;
             _getEmployeeHoursInPeriodQuery = getEmployeeHoursInPeriodQuery;
+            _getEmployeeTimesheetByDateQuery = getEmployeeTimesheetByDateQuery;
+            _updateDayCommand = updateDayCommand;
         }
 
         [HttpGet("{timesheetId}/days")]
@@ -75,6 +81,74 @@ namespace backend.API
                     error = ex.Message
                 });
             }
+        }
+
+        [HttpGet("employee/{employeeId}/timesheet-by-date")]
+        public IActionResult GetEmployeeTimesheetByDate(Guid employeeId, [FromQuery] DateTime date)
+        {
+            try
+            {
+                if (employeeId == Guid.Empty)
+                {
+                    return BadRequest("EmployeeId is required.");
+                }
+
+                if (date == default || date == DateTime.MinValue)
+                {
+                    return BadRequest("Date is required and must be a valid date.");
+                }
+
+                var timesheet = _getEmployeeTimesheetByDateQuery.Execute(employeeId, date);
+
+                if (timesheet == null)
+                {
+                    return NotFound("No timesheet found for the specified employee and date.");
+                }
+
+                return Ok(timesheet);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new
+                {
+                    message = "An error occurred while retrieving the employee timesheet.",
+                    error = ex.Message
+                });
+            }
+        }
+
+        [HttpPut("/day/{dayId}")]
+        public IActionResult UpdateDay(Guid dayId, DayCommandDto dayCommandDto)
+        {
+            try
+            {
+                if (dayCommandDto == null)
+                {
+                    return BadRequest("Day command is required");
+                }
+
+                if (dayId == Guid.Empty)
+                {
+                    return BadRequest("DayId is required");
+                }
+
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
+
+                var day = _updateDayCommand.Execute(dayId, dayCommandDto);
+
+                return Ok(day);
+            } catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new
+                {
+                    message = "An error occurred while updating the day",
+                    error = ex.Message
+                });
+            }
+                
         }
     }
 }
