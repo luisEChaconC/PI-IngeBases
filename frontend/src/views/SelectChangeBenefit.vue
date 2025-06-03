@@ -57,7 +57,7 @@
                   {{ benefit.name }}
                 </label>
                   <div
-                    v-if="benefit && benefit.type === 'API' && apiParametersByBenefitId && apiParametersByBenefitId[benefit.id]"
+                    v-if="benefit && benefit.type === 'API' && tempSelection.includes(benefit) && apiParametersByBenefitId[benefit.id]"
                     class="ms-4 mt-2"
                   >
                   <div
@@ -68,12 +68,15 @@
                     <label class="form-label" :for="paramName">
                       {{ traducirParametro(paramName) }}
                     </label>
-                    <input
-                      class="form-control"
-                      :type="obtenerTipoInput(paramObj.type)"
-                      v-model="apiParametersByBenefitId[benefit.id][paramName].value"
-                      :id="paramName"
-                    />
+                      <input
+                        class="form-control"
+                        :type="obtenerTipoInput(paramObj.type)"
+                        v-model="apiParametersByBenefitId[benefit.id][paramName].value"
+                        :id="paramName"
+                        :required="true"
+                        :min="paramObj.type.toLowerCase() === 'int' ? 0 : null"
+                        :step="paramObj.type.toLowerCase() === 'int' ? 1 : null"
+                      />
                   </div>
                   </div>
               </div>
@@ -126,6 +129,11 @@ export default {
       }
     };
 
+    const tipoParametroPorNombre = {
+      "Association Name": "string",
+      "Date of birth": "date",
+      "Dependents": "int"
+    };
 
     const traducirParametro = (param) => {
       const traducciones = {
@@ -139,7 +147,6 @@ export default {
     const onBenefitToggle = async (benefit) => {
       if (benefit.type !== 'API') return;
 
-      // Evitar recargar si ya se cargaron los parámetros
       if (apiParametersByBenefitId.value[benefit.id]) return;
 
       const matchedApi = allApis.value.find(api => api.name === benefit.name);
@@ -156,8 +163,9 @@ export default {
         apiParametersByBenefitId.value[benefit.id] = {};
         userDefinedParams.forEach(param => {
           apiParametersByBenefitId.value[benefit.id][param.name] = {
+            id: param.id,
             value: '',
-            type: param.valueType
+            type: tipoParametroPorNombre[param.name] || 'string' 
           };
         });
 
@@ -232,9 +240,10 @@ export default {
           const copy = { ...b };
 
           if (copy.type === 'API' && apiParametersByBenefitId.value[copy.id]) {
+            const parameters = apiParametersByBenefitId.value[copy.id];
             copy.parameterValues = {};
-            Object.entries(apiParametersByBenefitId.value[copy.id]).forEach(([name, obj]) => {
-              copy.parameterValues[name] = obj.value;
+            Object.entries(parameters).forEach(([paramName, paramObj]) => {
+              copy.parameterValues[paramName] = paramObj.value;
             });
           }
 
@@ -281,7 +290,7 @@ export default {
         const response = await axios.post('https://localhost:5000/api/benefit/assign', payload);
 
         if (response.status === 200) {
-          await saveParameterValues(employeeId);
+          await saveParameterValues();
           alert('Beneficios asignados exitosamente.');
         }
       } catch (error) {
@@ -308,42 +317,84 @@ export default {
       }
     };
 
-    const saveParameterValues = async (employeeId) => {
+    const saveParameterValues = async () => {
       for (const benefit of selectedBenefits.value) {
-        if (benefit.type !== 'API' || !benefit.parameterValues) continue;
+        if (benefit.type !== 'API') {
+          continue;
+        }
 
-        const api = allApis.value.find(api => api.id === benefit.apiId);
-        if (!api) continue;
+        const employeeId = getCurrentUserInformationFromLocalStorage()?.idNaturalPerson;
+        if (!employeeId) {
+          return;
+        }
 
-        const parameters = api.parameters;
+        if (!benefit.apiId) {
+          continue;
+        }
 
-        for (const [paramName, inputValue] of Object.entries(benefit.parameterValues)) {
+        let parameters = [];
+        try {
+          const response = await axios.get(`https://localhost:5000/api/API/${benefit.apiId}/parameters`);
+          parameters = response.data;
+        } catch (error) {
+          continue;
+        }
+
+        for (const [paramName, inputValue] of Object.entries(benefit.parameterValues || {})) {
+          console.log('Procesando parámetro:', paramName, 'con valor:', inputValue);
+
           const param = parameters.find(p => p.name === paramName);
-          if (!param) continue;
 
-          const valueType = param.valueType; // 'String', 'Date', 'Int'
+          if (!param) {
+            continue;
+          }
+
+          if (param.type === 'systemDefined') {
+            continue;
+          }
+
+          let type;
+          switch (param.name) {
+            case 'Date of birth':
+              type = 'date';
+              break;
+            case 'Dependents':
+              type = 'int';
+              break;
+            case 'Association Name':
+              type = 'string';
+              break;
+            default:
+              continue;
+          }
+
           const payload = {
+            id: crypto.randomUUID(),
             parameterId: param.id,
             employeeId,
-            valueType,
-            stringValue: valueType === 'String' ? inputValue : null,
-            intValue: valueType === 'Int' ? parseInt(inputValue) || null : null,
-            dateValue: valueType === 'Date' ? inputValue : null,
+            valueType: type,
+            stringValue: type === 'string' ? inputValue : null,
+            intValue: type === 'int' ? parseInt(inputValue) : null,
+            dateValue: type === 'date' ? new Date(inputValue).toISOString() : null
           };
 
+          console.log('Payload preparado:', payload);
+
           try {
-            await axios.post('https://localhost:5000/api/API/parameters/values', payload);
+            await axios.post('https://localhost:5000/api/api/parameters/values', payload);
+            console.log("✔ Parámetro guardado correctamente");
           } catch (error) {
-            console.error('Error guardando valor de parámetro:', error, payload);
+            console.error('❌ Error guardando valor de parámetro:', error, payload);
           }
         }
       }
     };
 
+
     const obtenerTipoInput = (type) => {
-      console.log('Tipo recibido:', type);
       if (!type || typeof type !== 'string') return 'text';
       switch (type.toLowerCase()) {
+        case 'int':
         case 'number':
           return 'number';
         case 'date':
