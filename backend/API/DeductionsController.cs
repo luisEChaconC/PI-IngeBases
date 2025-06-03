@@ -3,7 +3,6 @@ using backend.Application.DeductionCalculation;
 using backend.Application.GrossPaymentCalculation;
 using backend.Domain;
 using backend.Infraestructure;
-using backend.Services;
 using Microsoft.AspNetCore.Mvc;
 using System.Linq;
 

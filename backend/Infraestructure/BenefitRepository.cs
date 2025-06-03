@@ -2,9 +2,9 @@ using backend.Domain;
 using System.Data;
 using System.Data.SqlClient;
 
-namespace backend.Services
+namespace backend.Infraestructure
 {
-    public class BenefitService
+    public class BenefitService : IBenefitRepository
     {
         private readonly SqlConnection _connection;
         private readonly string _connectionString;
@@ -229,5 +229,98 @@ namespace backend.Services
                 }
             }
         }
+
+        public bool IsBenefitAssignedToAnyEmployee(Guid benefitId)
+        {
+            const string query = @"
+        SELECT COUNT(*) 
+        FROM EmployeeXBenefit 
+        WHERE BenefitId = @BenefitId";
+
+            using var connection = new SqlConnection(_connectionString);
+            using var command = new SqlCommand(query, connection);
+            command.Parameters.AddWithValue("@BenefitId", benefitId);
+
+            connection.Open();
+            int count = (int)command.ExecuteScalar();
+            connection.Close();
+
+            return count > 0;
+        }
+
+        public bool UpdateBenefit(Benefit benefit)
+        {
+            if (IsBenefitAssignedToAnyEmployee(Guid.Parse(benefit.Id)))
+            {
+                return false; // o lanza una excepción si prefieres
+            }
+
+            const string query = @"
+        UPDATE Benefits
+        SET Name = @Name,
+            Description = @Description,
+            IsActive = @IsActive,
+            Type = @Type,
+            LinkAPI = @LinkAPI,
+            FixedPercentage = @FixedPercentage,
+            FixedAmount = @FixedAmount,
+            RequiredMonthsWorked = @RequiredMonthsWorked
+        WHERE Id = @Id";
+
+            using var connection = new SqlConnection(_connectionString);
+            using var command = new SqlCommand(query, connection);
+
+            command.Parameters.AddWithValue("@Id", Guid.Parse(benefit.Id));
+            command.Parameters.AddWithValue("@Name", benefit.Name);
+            command.Parameters.AddWithValue("@Description", benefit.Description ?? "");
+            command.Parameters.AddWithValue("@IsActive", benefit.IsActive);
+            command.Parameters.AddWithValue("@Type", benefit.Type);
+            command.Parameters.AddWithValue("@LinkAPI", (object?)benefit.LinkAPI ?? DBNull.Value);
+            command.Parameters.AddWithValue("@FixedPercentage", (object?)benefit.FixedPercentage ?? DBNull.Value);
+            command.Parameters.AddWithValue("@FixedAmount", (object?)benefit.FixedAmount ?? DBNull.Value);
+            command.Parameters.AddWithValue("@RequiredMonthsWorked", benefit.RequiredMonthsWorked);
+
+            connection.Open();
+            int rows = command.ExecuteNonQuery();
+            connection.Close();
+
+            return rows > 0;
+        }
+
+        public Benefit? GetBenefitById(Guid id)
+        {
+            const string query = "SELECT * FROM Benefits WHERE Id = @Id";
+
+            using var command = new SqlCommand(query, _connection);
+            command.Parameters.AddWithValue("@Id", id);
+
+            _connection.Open();
+            using var reader = command.ExecuteReader();
+
+            if (!reader.Read())
+            {
+                _connection.Close();
+                return null;
+            }
+
+            var benefit = new Benefit
+            {
+                Id = reader["Id"].ToString(),
+                CompanyId = reader["CompanyId"].ToString(),
+                Name = reader["Name"].ToString(),
+                Description = reader["Description"].ToString(),
+                IsActive = Convert.ToBoolean(reader["IsActive"]),
+                Type = reader["Type"].ToString(),
+                LinkAPI = reader["LinkAPI"].ToString(),
+                FixedPercentage = reader["FixedPercentage"] != DBNull.Value ? Convert.ToInt32(reader["FixedPercentage"]) : null,
+                FixedAmount = reader["FixedAmount"] != DBNull.Value ? Convert.ToInt32(reader["FixedAmount"]) : null,
+                RequiredMonthsWorked = Convert.ToInt32(reader["RequiredMonthsWorked"]),
+                EligibleEmployeeTypes = GetEmployeeTypesForBenefit(id)
+            };
+
+            _connection.Close();
+            return benefit;
+        }
+
     }
 }

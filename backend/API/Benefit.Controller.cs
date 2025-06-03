@@ -1,5 +1,6 @@
+using backend.Application.Benefits.Commands;
 using backend.Domain;
-using backend.Services;
+using backend.Application.Benefits.Queries;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,19 +10,33 @@ namespace backend.API
     [ApiController]
     public class BenefitController : ControllerBase
     {
-        private readonly BenefitService _benefitService;
+        private readonly GetBenefitsQuery _getBenefitsQuery;
+        private readonly GetBenefitByIdQuery _getBenefitByIdQuery;
+        private readonly CreateBenefitCommand _createBenefitCommand;
+        private readonly AssignBenefitsToEmployeeCommand _assignBenefitsCommand;
+        private readonly GetAssignedBenefitsQuery _getAssignedBenefitsQuery;
+        private readonly UpdateBenefitCommand _updateBenefitCommand;
 
-        public BenefitController()
+        public BenefitController(
+            GetBenefitsQuery getBenefitsQuery,
+            GetBenefitByIdQuery getBenefitByIdQuery,
+            CreateBenefitCommand createBenefitCommand,
+            AssignBenefitsToEmployeeCommand assignBenefitsCommand,
+            GetAssignedBenefitsQuery getAssignedBenefitsQuery,
+            UpdateBenefitCommand updateBenefitCommand)
         {
-            _benefitService = new BenefitService();
+            _getBenefitsQuery = getBenefitsQuery;
+            _getBenefitByIdQuery = getBenefitByIdQuery;
+            _createBenefitCommand = createBenefitCommand;
+            _assignBenefitsCommand = assignBenefitsCommand;
+            _getAssignedBenefitsQuery = getAssignedBenefitsQuery;
+            _updateBenefitCommand = updateBenefitCommand;
         }
 
         [HttpGet("{id}")]
         public ActionResult<Benefit> GetById(Guid id, [FromQuery] string companyId)
         {
-            var benefits = _benefitService.GetBenefits(companyId);
-            var benefit = benefits.FirstOrDefault(b => b.Id == id.ToString());
-
+            var benefit = _getBenefitByIdQuery.Execute(id, companyId);
             if (benefit == null)
                 return NotFound();
 
@@ -36,7 +51,7 @@ namespace backend.API
                 if (benefit == null)
                     return BadRequest("Benefit is null");
 
-                var result = _benefitService.CreateBenefit(benefit); 
+                var result = _createBenefitCommand.Execute(benefit);
                 return Ok(result);
             }
             catch (Exception ex)
@@ -52,7 +67,7 @@ namespace backend.API
             if (string.IsNullOrEmpty(companyId))
                 return BadRequest("Se requiere el ID de la empresa.");
 
-            var benefits = _benefitService.GetBenefits(companyId);
+            var benefits = _getBenefitsQuery.Execute(companyId);
             return Ok(benefits);
         }
 
@@ -64,7 +79,7 @@ namespace backend.API
                 if (selection == null || selection.BenefitIds == null || !selection.BenefitIds.Any())
                     return BadRequest("Datos inválidos.");
 
-                var result = _benefitService.AssignBenefitsToEmployee(selection.EmployeeId, selection.BenefitIds);
+                var result = _assignBenefitsCommand.Execute(selection.EmployeeId, selection.BenefitIds);
                 return Ok(result);
             }
             catch (Exception ex)
@@ -79,7 +94,7 @@ namespace backend.API
         {
             try
             {
-                var benefits = _benefitService.GetAssignedBenefitsForEmployee(employeeId);
+                var benefits = _getAssignedBenefitsQuery.Execute(employeeId);
                 return Ok(benefits);
             }
             catch (Exception ex)
@@ -89,5 +104,26 @@ namespace backend.API
             }
         }
 
+        [HttpPut("{id}")]
+        public ActionResult<bool> UpdateBenefit(Guid id, [FromBody] Benefit benefit)
+        {
+            try
+            {
+                if (benefit == null || id.ToString() != benefit.Id)
+                    return BadRequest("ID no válido.");
+
+                var success = _updateBenefitCommand.Execute(benefit);
+                if (!success)
+                    return Conflict("No se puede editar el beneficio porque ya fue asignado a empleados.");
+
+                return Ok(true);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    $"Error actualizando beneficio: {ex.Message}");
+            }
+        }
     }
 }
+
