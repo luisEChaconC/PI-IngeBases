@@ -2,6 +2,7 @@ using backend.Application;
 using backend.Application.DTOs;
 using backend.Domain;
 using backend.Application.Queries;
+using backend.Application.Commands;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 
@@ -13,11 +14,13 @@ namespace backend.API
     {
         private readonly IGetDaysByTimesheetIdQuery _getDaysByTimesheetIdQuery;
         private readonly IGetEmployeeHoursInPeriodQuery _getEmployeeHoursInPeriodQuery;
+        private readonly IUpdatePayrollIdInTimesheetsCommand _updatePayrollIdInTimesheetsCommand;
 
-        public TimesheetController(IGetDaysByTimesheetIdQuery getDaysByTimesheetIdQuery, IGetEmployeeHoursInPeriodQuery getEmployeeHoursInPeriodQuery)
+        public TimesheetController(IGetDaysByTimesheetIdQuery getDaysByTimesheetIdQuery, IGetEmployeeHoursInPeriodQuery getEmployeeHoursInPeriodQuery, IUpdatePayrollIdInTimesheetsCommand updatePayrollIdInTimesheetsCommand)
         {
             _getDaysByTimesheetIdQuery = getDaysByTimesheetIdQuery;
             _getEmployeeHoursInPeriodQuery = getEmployeeHoursInPeriodQuery;
+            _updatePayrollIdInTimesheetsCommand = updatePayrollIdInTimesheetsCommand;
         }
 
         [HttpGet("{timesheetId}/days")]
@@ -72,6 +75,50 @@ namespace backend.API
                 return StatusCode(StatusCodes.Status500InternalServerError, new
                 {
                     message = "An error occurred while retrieving employee hours",
+                    error = ex.Message
+                });
+            }
+        }
+
+        [HttpPut("employee/{employeeId}/payroll-id")]
+        public IActionResult UpdatePayrollIdInTimesheets(Guid employeeId, [FromQuery] DateTime startDate, [FromQuery] DateTime endDate, [FromQuery] Guid newPayrollId)
+        {
+            try
+            {
+                if (employeeId == Guid.Empty)
+                {
+                    return BadRequest("EmployeeId is required");
+                }
+
+                if (startDate == default)
+                {
+                    return BadRequest("StartDate is required");
+                }
+
+                if (endDate == default)
+                {
+                    return BadRequest("EndDate is required");
+                }
+
+                if (newPayrollId == Guid.Empty)
+                {
+                    return BadRequest("NewPayrollId is required");
+                }
+
+                if (endDate <= startDate)
+                {
+                    return BadRequest("EndDate must be after StartDate");
+                }
+
+                var result = _updatePayrollIdInTimesheetsCommand.Execute(newPayrollId, employeeId, startDate, endDate);
+
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new
+                {
+                    message = "An error occurred while updating payrollId in timesheets",
                     error = ex.Message
                 });
             }
