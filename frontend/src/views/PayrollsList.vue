@@ -21,6 +21,7 @@
         <GeneratePayrollModal
           :visible="showModal"
           @close="showModal = false"
+          @payroll-generated="refreshPayrolls"
         />
         <div class="table-responsive" style="max-height: 600px; overflow-y: auto">
           <table class="table table-striped table-bordered">
@@ -69,20 +70,23 @@ export default {
     }
   },
   async mounted() {
-    try {
-      const currentUserInformation = currentUserService.getCurrentUserInformationFromLocalStorage();
-      const companyId = currentUserInformation?.companyId;
-      if (!companyId) {
-        this.payrolls = [];
-        return;
-      }
-      const response = await axios.get(`https://localhost:5000/api/payroll/company/${companyId}/summary`);
-      this.payrolls = response.data;
-    } catch (error) {
-      this.payrolls = [];
-    }
+    await this.refreshPayrolls();
   },
   methods: {
+    async refreshPayrolls() {
+      try {
+        const currentUserInformation = currentUserService.getCurrentUserInformationFromLocalStorage();
+        const companyId = currentUserInformation?.companyId;
+        if (!companyId) {
+          this.payrolls = [];
+          return;
+        }
+        const response = await axios.get(`https://localhost:5000/api/payroll/company/${companyId}/summary`);
+        this.payrolls = response.data;
+      } catch (error) {
+        this.payrolls = [];
+      }
+    },
     formatDate(dateStr) {
       if (!dateStr) return '';
       const date = new Date(dateStr);

@@ -8,6 +8,9 @@
       <div class="modal-content p-5">
         <h2 class="text-center modal-title-custom">Seleccione el periodo de la planilla</h2>
         <h5 class="text-center text-muted modal-subtitle-custom">Esta empresa paga de manera {{ paymentTypeSpanish }}</h5>
+        <div v-if="errorMessage" class="alert alert-danger text-center my-1">
+          {{ errorMessage }}
+        </div>
         <div class="my-4">
           <DatePicker
             :enable-time-picker="false"
@@ -78,6 +81,7 @@ export default {
       endDate: null,
       highlightedDates: [],
       paymentType: 'weekly', // default, will be updated
+      errorMessage: ''
     }
   },
   computed: {
@@ -93,7 +97,6 @@ export default {
     }
   },
   async created() {
-    // Fetch payment type when component is created
     try {
       const currentUserInformation = currentUserService.getCurrentUserInformationFromLocalStorage();
       const companyId = currentUserInformation.companyId;
@@ -102,20 +105,39 @@ export default {
         ? response.data.paymentType.toLowerCase()
         : 'weekly'
     } catch (e) {
-      alert(e)
+      this.errorMessage = 'Error al obtener el tipo de pago de la empresa';
       this.paymentType = 'weekly';
     }
   },
   methods: {
-    handleGenerate() {
+    async handleGenerate() {
+      this.errorMessage = '';
+      if (!this.startDate || !this.endDate) {
+        this.errorMessage = 'Debe seleccionar un periodo válido para la planilla.';
+        return;
+      }
+
       const currentUserInformation = currentUserService.getCurrentUserInformationFromLocalStorage();
       const companyId = currentUserInformation.companyId;
-      const payrollManagerId = currentUserInformation.PersonId;
-      const response = await axios.get(`https://localhost:5000/api/Company/GetCompanyById/${companyId}`);
+      const payrollManagerId = currentUserInformation.idPerson;
 
+      // Prepare the payload
+      const payload = {
+        startDate: this.startDate,
+        endDate: this.endDate,
+        companyId: companyId,
+        payrollManagerId: payrollManagerId
+      };
+
+      try {
+        await axios.post('https://localhost:5000/api/Payroll', payload);
+        this.$emit('payroll-generated'); // Emit event for parent to refresh
+        this.$emit('close');
+      } catch (error) {
+        this.errorMessage = 'Error al generar la planilla';
+      }
     },
     async handleDayChange(date) {
-      // Use the fetched paymentType
       const type = this.paymentType;
       const days = type === 'biweekly' ? 15 : type === 'monthly' ? 30 : 7;
 
