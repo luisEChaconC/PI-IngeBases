@@ -361,7 +361,7 @@ export default {
             case 'Dependents':
               type = 'int';
               break;
-            case 'Association Name':
+            case 'Association name':
               type = 'string';
               break;
             default:
