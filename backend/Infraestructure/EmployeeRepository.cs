@@ -119,6 +119,7 @@ namespace backend.Infraestructure
                     FirstName = ISNULL(NULLIF(@FirstName, ''), FirstName),
                     FirstSurname = ISNULL(NULLIF(@FirstSurname, ''), FirstSurname),
                     SecondSurname = ISNULL(NULLIF(@SecondSurname, ''), SecondSurname)
+                    Gender = ISNULL(NULLIF(@Gender, ''), Gender)
                 WHERE Id = @Id;
 
                 UPDATE Persons
@@ -180,6 +181,8 @@ using (var checkCmd = new SqlCommand(checkWorkerIdQuery, connection))
                         command.Parameters.AddWithValue("@FirstName", (object?)updated.FirstName ?? DBNull.Value);
                         command.Parameters.AddWithValue("@FirstSurname", (object?)updated.FirstSurname ?? DBNull.Value);
                         command.Parameters.AddWithValue("@SecondSurname", (object?)updated.SecondSurname ?? DBNull.Value);
+                        command.Parameters.AddWithValue("@Gender", (object?)updated.Gender ?? DBNull.Value);
+
 
                         command.Parameters.AddWithValue("@LegalId", (object?)updated.LegalId ?? DBNull.Value);
                         command.Parameters.AddWithValue("@Email", (object?)updated.Email ?? DBNull.Value);

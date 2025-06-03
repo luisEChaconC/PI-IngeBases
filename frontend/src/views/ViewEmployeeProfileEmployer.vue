@@ -28,7 +28,6 @@
                 :id="field.key"
                 v-model="employee[field.key]"
                 :disabled="!editMode || (hasPayments && ['firstName', 'firstSurname', 'secondSurname', 'legalId'].includes(field.key))"
-
                 :class="{ 'is-invalid': editMode && !validations[field.key] }"
                 @input="onInputChange(field.key)"
               />
@@ -46,7 +45,6 @@
                 :id="field.key"
                 v-model="employee[field.key]"
                 :disabled="!editMode || (hasPayments && ['firstName', 'firstSurname', 'secondSurname', 'legalId'].includes(field.key))"
-
                 :class="{ 'is-invalid': editMode && !validations[field.key] }"
                 @input="onInputChange(field.key)"
               />
@@ -57,6 +55,27 @@
           </div>
         </div>
 
+        <!-- Campo de Género -->
+        <div class="mb-3">
+          <label for="gender" class="form-label">Género</label>
+          <select
+            id="gender"
+            class="form-select"
+            v-model="employee.gender"
+            :disabled="!editMode"
+            :class="{ 'is-invalid': editMode && !validations.gender }"
+            @change="validateField('gender')"
+          >
+            <option value="">Seleccione</option>
+            <option value="M">M</option>
+            <option value="F">F</option>
+          </select>
+          <div v-if="editMode && !validations.gender" class="invalid-feedback">
+            El género debe ser 'M' o 'F'.
+          </div>
+        </div>
+
+        <!-- Botones -->
         <div class="d-flex justify-content-start mt-3 gap-2">
           <button type="button" class="btn btn-dark" @click="toggleEdit">
             {{ editMode ? 'Cancelar' : 'Editar' }}
@@ -69,6 +88,7 @@
       </div>
     </div>
 
+    <!-- Modal de eliminación -->
     <div class="modal fade" id="deleteModal" tabindex="-1" ref="deleteModal">
       <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
@@ -86,6 +106,7 @@
     </div>
   </div>
 </template>
+
 
 <script>
 import axios from 'axios';
@@ -177,6 +198,7 @@ export default {
           firstName: response.data.firstName,
           firstSurname: response.data.firstSurname,
           secondSurname: response.data.secondSurname,
+          gender: response.data.gender,
           legalId: response.data.cedula,
           workerId: response.data.workerId,
           role: response.data.isAdmin ? 'Admin' : 'Employee',
@@ -212,6 +234,7 @@ export default {
           FirstName: employee.value.firstName,
           FirstSurname: employee.value.firstSurname,
           SecondSurname: employee.value.secondSurname,
+          Gender: employee.value.gender,
           LegalId: employee.value.legalId,
           WorkerId: employee.value.workerId,
           ContractType: employee.value.contractType,

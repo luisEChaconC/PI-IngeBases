@@ -11,6 +11,8 @@ namespace backend.Domain
         public string? FirstName { get; set; }
         public string? FirstSurname { get; set; }
         public string? SecondSurname { get; set; }
+        public string Gender { get; set; }
+
 
         // Persons
         public string? LegalId { get; set; }
