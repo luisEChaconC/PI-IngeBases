@@ -30,28 +30,21 @@ namespace backend.Infraestructure
         /// <param name="naturalPerson">The natural person model containing the data to insert.</param>
         public void CreateNaturalPerson(NaturalPersonModel naturalPerson)
         {
-            // SQL query to insert a new natural person
             var query = @"
-                INSERT INTO NaturalPersons (Id, FirstName, FirstSurname, SecondSurname, UserId)
-                VALUES (@Id, @FirstName, @FirstSurname, @SecondSurname, @UserId)";
+        INSERT INTO NaturalPersons (Id, FirstName, FirstSurname, SecondSurname, UserId, Gender)
+        VALUES (@Id, @FirstName, @FirstSurname, @SecondSurname, @UserId, @Gender)";
 
-            // Create a SQL command with the query and connection
             using (var command = new SqlCommand(query, _connection))
             {
-                // Add parameters to the query to prevent SQL injection
                 command.Parameters.AddWithValue("@Id", naturalPerson.Id);
                 command.Parameters.AddWithValue("@FirstName", naturalPerson.FirstName);
                 command.Parameters.AddWithValue("@FirstSurname", naturalPerson.FirstSurname);
                 command.Parameters.AddWithValue("@SecondSurname", naturalPerson.SecondSurname);
                 command.Parameters.AddWithValue("@UserId", naturalPerson.UserId != null ? naturalPerson.UserId : DBNull.Value);
+                command.Parameters.AddWithValue("@Gender", naturalPerson.Gender);
 
-                // Open the database connection
                 _connection.Open();
-
-                // Execute the query
                 command.ExecuteNonQuery();
-
-                // Close the database connection
                 _connection.Close();
             }
         }

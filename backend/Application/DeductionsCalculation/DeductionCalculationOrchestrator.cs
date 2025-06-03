@@ -22,21 +22,46 @@ namespace backend.Application.DeductionCalculation
             _benefitStrategy = benefitStrategy;
         }
 
-        public decimal CalculateTotalDeductions(decimal grossSalary, List<Benefit> benefits)
+        public List<DeductionDetailModel> CalculateTotalDeductions(decimal grossSalary, List<Benefit>? benefits, Guid paymentDetailsId)
         {
-            decimal total = 0;
+            var details = new List<DeductionDetailModel>();
 
             foreach (var strategy in _strategies)
             {
-                total += strategy.CalculateDeduction(grossSalary);
+                var amount = strategy.CalculateDeduction(grossSalary);
+                if (amount > 0)
+                {
+                    details.Add(new DeductionDetailModel
+                    {
+                        Id = Guid.NewGuid(),
+                        Name = strategy.GetType().Name.Replace("DeductionStrategy", ""),
+                        AmountDeduced = amount,
+                        PaymentDetailsId = paymentDetailsId,
+                        DeductionType = "mandatory"
+                    });
+            }
             }
 
+            if (benefits != null)
+            {
             foreach (var benefit in benefits)
             {
-                total += _benefitStrategy.CalculateDeduction(grossSalary, benefit);
+                    var amount = _benefitStrategy.CalculateDeduction(grossSalary, benefit);
+                    if (amount > 0)
+                    {
+                        details.Add(new DeductionDetailModel
+                        {
+                            Id = Guid.NewGuid(),
+                            Name = benefit.Name,
+                            AmountDeduced = amount,
+                            PaymentDetailsId = paymentDetailsId,
+                            DeductionType = "voluntary"
+                        });
+                    }
+                }
             }
 
-            return total;
+            return details;
         }
     }
 }
