@@ -31,7 +31,7 @@ namespace backend.Infraestructure
                     u.Email,
                     u.IsAdmin,
                     c.PhoneNumber,
-                    np.Gender -- ← agregado aquí
+                    np.Gender
                 FROM 
                     Employers em
                 JOIN NaturalPersons np ON em.Id = np.Id
