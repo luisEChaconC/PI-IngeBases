@@ -1,6 +1,7 @@
 -- ================================================
--- Script to insert dummy Timesheets
--- All timesheets are 7-day periods within existing payrolls
+-- Script to insert dummy Timesheets using the InsertTimesheetsForPeriod procedure
+-- This procedure automatically creates timesheets with proper weekly boundaries
+-- and triggers the automatic creation of Days records
 -- ================================================
 
 -- Variables for Company and Employee IDs
@@ -22,6 +23,8 @@ DECLARE @Employee2_Company2 UNIQUEIDENTIFIER
 -- Employee IDs for Company3
 DECLARE @Employee1_Company3 UNIQUEIDENTIFIER
 DECLARE @Employee2_Company3 UNIQUEIDENTIFIER
+
+PRINT 'Starting dummy timesheet creation using InsertTimesheetsForPeriod procedure...'
 
 -- Get Company IDs
 SELECT @CompanyId1 = Id FROM Companies WHERE Name = 'TecnoSoluciones CR'
@@ -78,118 +81,202 @@ WHERE e.CompanyId = @CompanyId3
   AND np.FirstName = 'Sofía'
   AND np.FirstSurname = 'Araya'
 
+-- Verify all required data exists
+IF @CompanyId1 IS NULL OR @CompanyId2 IS NULL OR @CompanyId3 IS NULL
+BEGIN
+    PRINT 'ERROR: One or more companies not found!'
+    RETURN
+END
+
+IF @PayrollId1 IS NULL OR @PayrollId2 IS NULL OR @PayrollId3 IS NULL
+BEGIN
+    PRINT 'ERROR: One or more payrolls not found!'
+    RETURN
+END
+
+IF @Employee1_Company1 IS NULL OR @Employee2_Company1 IS NULL OR 
+   @Employee1_Company2 IS NULL OR @Employee2_Company2 IS NULL OR
+   @Employee1_Company3 IS NULL OR @Employee2_Company3 IS NULL
+BEGIN
+    PRINT 'ERROR: One or more employees not found!'
+    RETURN
+END
+
+PRINT 'All required entities found. Creating timesheets...'
+
+-- ================================================
+-- PROCESSED PAYROLL TIMESHEETS
+-- These timesheets have already been processed and paid
+-- ================================================
+
+PRINT 'Creating processed payroll timesheets...'
+
 -- ================================================
 -- Company1 - Monthly Payroll (30 days: 2024-01-01 to 2024-01-30)
--- Breaking into 7-day timesheets + final 2-day timesheet
+-- The procedure will automatically create weekly timesheets
 -- ================================================
 
 -- Employee1 - Company1 Timesheets
-INSERT INTO Timesheets (StartDate, EndDate, EmployeeId, PayrollId)
-VALUES 
-    ('2024-01-01', '2024-01-07', @Employee1_Company1, @PayrollId1),
-    ('2024-01-08', '2024-01-14', @Employee1_Company1, @PayrollId1),
-    ('2024-01-15', '2024-01-21', @Employee1_Company1, @PayrollId1),
-    ('2024-01-22', '2024-01-28', @Employee1_Company1, @PayrollId1),
-    ('2024-01-29', '2024-01-30', @Employee1_Company1, @PayrollId1)
+EXEC dbo.InsertTimesheetsForPeriod 
+    @PeriodStartDate = '2024-01-01',
+    @PeriodEndDate = '2024-01-30',
+    @EmployeeId = @Employee1_Company1,
+    @PayrollId = @PayrollId1
+
+PRINT 'Created timesheets for Miguel Soto (TecnoSoluciones) - Monthly period'
 
 -- Employee2 - Company1 Timesheets
-INSERT INTO Timesheets (StartDate, EndDate, EmployeeId, PayrollId)
-VALUES 
-    ('2024-01-01', '2024-01-07', @Employee2_Company1, @PayrollId1),
-    ('2024-01-08', '2024-01-14', @Employee2_Company1, @PayrollId1),
-    ('2024-01-15', '2024-01-21', @Employee2_Company1, @PayrollId1),
-    ('2024-01-22', '2024-01-28', @Employee2_Company1, @PayrollId1),
-    ('2024-01-29', '2024-01-30', @Employee2_Company1, @PayrollId1)
+EXEC dbo.InsertTimesheetsForPeriod 
+    @PeriodStartDate = '2024-01-01',
+    @PeriodEndDate = '2024-01-30',
+    @EmployeeId = @Employee2_Company1,
+    @PayrollId = @PayrollId1
+
+PRINT 'Created timesheets for Gabriela Rodríguez (TecnoSoluciones) - Monthly period'
 
 -- ================================================
 -- Company2 - Biweekly Payroll (15 days: 2024-01-01 to 2024-01-15)
--- Breaking into 7-day timesheets + final 1-day timesheet
+-- The procedure will create weekly timesheets + partial week
 -- ================================================
 
 -- Employee1 - Company2 Timesheets
-INSERT INTO Timesheets (StartDate, EndDate, EmployeeId, PayrollId)
-VALUES 
-    ('2024-01-01', '2024-01-07', @Employee1_Company2, @PayrollId2),
-    ('2024-01-08', '2024-01-14', @Employee1_Company2, @PayrollId2),
-    ('2024-01-15', '2024-01-15', @Employee1_Company2, @PayrollId2)
+EXEC dbo.InsertTimesheetsForPeriod 
+    @PeriodStartDate = '2024-01-01',
+    @PeriodEndDate = '2024-01-15',
+    @EmployeeId = @Employee1_Company2,
+    @PayrollId = @PayrollId2
+
+PRINT 'Created timesheets for Ricardo Blanco (Café Dorado) - Biweekly period'
 
 -- Employee2 - Company2 Timesheets
-INSERT INTO Timesheets (StartDate, EndDate, EmployeeId, PayrollId)
-VALUES 
-    ('2024-01-01', '2024-01-07', @Employee2_Company2, @PayrollId2),
-    ('2024-01-08', '2024-01-14', @Employee2_Company2, @PayrollId2),
-    ('2024-01-15', '2024-01-15', @Employee2_Company2, @PayrollId2)
+EXEC dbo.InsertTimesheetsForPeriod 
+    @PeriodStartDate = '2024-01-01',
+    @PeriodEndDate = '2024-01-15',
+    @EmployeeId = @Employee2_Company2,
+    @PayrollId = @PayrollId2
+
+PRINT 'Created timesheets for Laura Fallas (Café Dorado) - Biweekly period'
 
 -- ================================================
 -- Company3 - Weekly Payroll (7 days: 2024-01-01 to 2024-01-07)
--- Exact match with payroll period
+-- The procedure will create exactly one weekly timesheet
 -- ================================================
 
 -- Employee1 - Company3 Timesheet
-INSERT INTO Timesheets (StartDate, EndDate, EmployeeId, PayrollId)
-VALUES 
-    ('2024-01-01', '2024-01-07', @Employee1_Company3, @PayrollId3)
+EXEC dbo.InsertTimesheetsForPeriod 
+    @PeriodStartDate = '2024-01-01',
+    @PeriodEndDate = '2024-01-07',
+    @EmployeeId = @Employee1_Company3,
+    @PayrollId = @PayrollId3
+
+PRINT 'Created timesheets for Alejandro Rojas (EcoTurismo) - Weekly period'
 
 -- Employee2 - Company3 Timesheet
-INSERT INTO Timesheets (StartDate, EndDate, EmployeeId, PayrollId)
-VALUES 
-    ('2024-01-01', '2024-01-07', @Employee2_Company3, @PayrollId3)
+EXEC dbo.InsertTimesheetsForPeriod 
+    @PeriodStartDate = '2024-01-01',
+    @PeriodEndDate = '2024-01-07',
+    @EmployeeId = @Employee2_Company3,
+    @PayrollId = @PayrollId3
+
+PRINT 'Created timesheets for Sofía Araya (EcoTurismo) - Weekly period'
 
 -- ================================================
--- Future Timesheets (PayrollId = NULL)
+-- FUTURE TIMESHEETS (PayrollId = NULL)
 -- These represent work done but not yet processed in payroll
+-- They demonstrate the approval workflow for pending periods
 -- ================================================
+
+PRINT 'Creating future timesheets (not yet processed)...'
 
 -- ================================================
 -- Company1 - Next Monthly Period (30 days: 2024-02-01 to 2024-03-01)
+-- Monthly payroll periods must be exactly 30 days
 -- ================================================
 
 -- Employee1 - Company1 Future Timesheets
-INSERT INTO Timesheets (StartDate, EndDate, EmployeeId, PayrollId)
-VALUES 
-    ('2024-02-01', '2024-02-07', @Employee1_Company1, NULL),
-    ('2024-02-08', '2024-02-14', @Employee1_Company1, NULL),
-    ('2024-02-15', '2024-02-21', @Employee1_Company1, NULL),
-    ('2024-02-22', '2024-02-28', @Employee1_Company1, NULL),
-    ('2024-02-29', '2024-03-01', @Employee1_Company1, NULL)
+EXEC dbo.InsertTimesheetsForPeriod 
+    @PeriodStartDate = '2024-02-01',
+    @PeriodEndDate = '2024-03-01',
+    @EmployeeId = @Employee1_Company1,
+    @PayrollId = NULL
+
+PRINT 'Created future timesheets for Miguel Soto (TecnoSoluciones) - February period (30 days)'
 
 -- Employee2 - Company1 Future Timesheets
-INSERT INTO Timesheets (StartDate, EndDate, EmployeeId, PayrollId)
-VALUES 
-    ('2024-02-01', '2024-02-07', @Employee2_Company1, NULL),
-    ('2024-02-08', '2024-02-14', @Employee2_Company1, NULL),
-    ('2024-02-15', '2024-02-21', @Employee2_Company1, NULL),
-    ('2024-02-22', '2024-02-28', @Employee2_Company1, NULL),
-    ('2024-02-29', '2024-03-01', @Employee2_Company1, NULL)
+EXEC dbo.InsertTimesheetsForPeriod 
+    @PeriodStartDate = '2024-02-01',
+    @PeriodEndDate = '2024-03-01',
+    @EmployeeId = @Employee2_Company1,
+    @PayrollId = NULL
+
+PRINT 'Created future timesheets for Gabriela Rodríguez (TecnoSoluciones) - February period (30 days)'
 
 -- ================================================
 -- Company2 - Next Biweekly Period (15 days: 2024-01-16 to 2024-01-30)
 -- ================================================
 
 -- Employee1 - Company2 Future Timesheets
-INSERT INTO Timesheets (StartDate, EndDate, EmployeeId, PayrollId)
-VALUES 
-    ('2024-01-16', '2024-01-22', @Employee1_Company2, NULL),
-    ('2024-01-23', '2024-01-29', @Employee1_Company2, NULL),
-    ('2024-01-30', '2024-01-30', @Employee1_Company2, NULL)
+EXEC dbo.InsertTimesheetsForPeriod 
+    @PeriodStartDate = '2024-01-16',
+    @PeriodEndDate = '2024-01-30',
+    @EmployeeId = @Employee1_Company2,
+    @PayrollId = NULL
+
+PRINT 'Created future timesheets for Ricardo Blanco (Café Dorado) - Next biweekly period'
 
 -- Employee2 - Company2 Future Timesheets
-INSERT INTO Timesheets (StartDate, EndDate, EmployeeId, PayrollId)
-VALUES 
-    ('2024-01-16', '2024-01-22', @Employee2_Company2, NULL),
-    ('2024-01-23', '2024-01-29', @Employee2_Company2, NULL),
-    ('2024-01-30', '2024-01-30', @Employee2_Company2, NULL)
+EXEC dbo.InsertTimesheetsForPeriod 
+    @PeriodStartDate = '2024-01-16',
+    @PeriodEndDate = '2024-01-30',
+    @EmployeeId = @Employee2_Company2,
+    @PayrollId = NULL
+
+PRINT 'Created future timesheets for Laura Fallas (Café Dorado) - Next biweekly period'
 
 -- ================================================
 -- Company3 - Next Weekly Period (7 days: 2024-01-08 to 2024-01-14)
 -- ================================================
 
 -- Employee1 - Company3 Future Timesheet
-INSERT INTO Timesheets (StartDate, EndDate, EmployeeId, PayrollId)
-VALUES 
-    ('2024-01-08', '2024-01-14', @Employee1_Company3, NULL)
+EXEC dbo.InsertTimesheetsForPeriod 
+    @PeriodStartDate = '2024-01-08',
+    @PeriodEndDate = '2024-01-14',
+    @EmployeeId = @Employee1_Company3,
+    @PayrollId = NULL
+
+PRINT 'Created future timesheets for Alejandro Rojas (EcoTurismo) - Next weekly period'
 
 -- Employee2 - Company3 Future Timesheet
-INSERT INTO Timesheets (StartDate, EndDate, EmployeeId, PayrollId)
-VALUES 
-    ('2024-01-08', '2024-01-14', @Employee2_Company3, NULL)
+EXEC dbo.InsertTimesheetsForPeriod 
+    @PeriodStartDate = '2024-01-08',
+    @PeriodEndDate = '2024-01-14',
+    @EmployeeId = @Employee2_Company3,
+    @PayrollId = NULL
+
+PRINT 'Created future timesheets for Sofía Araya (EcoTurismo) - Next weekly period'
+
+-- ================================================
+-- SUMMARY
+-- ================================================
+
+PRINT '================================================'
+PRINT 'TIMESHEET CREATION COMPLETE'
+PRINT '================================================'
+
+-- Show summary of created timesheets
+SELECT 
+    c.Name AS Company,
+    COUNT(*) AS TotalTimesheets,
+    SUM(CASE WHEN t.PayrollId IS NOT NULL THEN 1 ELSE 0 END) AS ProcessedTimesheets,
+    SUM(CASE WHEN t.PayrollId IS NULL THEN 1 ELSE 0 END) AS FutureTimesheets,
+    MIN(t.StartDate) AS EarliestDate,
+    MAX(t.EndDate) AS LatestDate
+FROM Timesheets t
+INNER JOIN Employees e ON t.EmployeeId = e.Id
+INNER JOIN Companies c ON e.CompanyId = c.Id
+GROUP BY c.Name
+ORDER BY c.Name
+
+PRINT 'All timesheets have been created using the InsertTimesheetsForPeriod procedure.'
+PRINT 'The trigger has automatically created corresponding Days records.'
+PRINT 'Next step: Run the dummy Days update script to populate work hours and descriptions.'
