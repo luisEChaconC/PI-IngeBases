@@ -9,6 +9,7 @@ using backend.Application.Queries.Company;
 using backend.Domain.Enums;
 using backend.Application.Commands.PaymentDetails;
 using backend.Application.Orchestrators.Deduction;
+using backend.Application.Commands;
 
 namespace backend.Application.Orchestrators.Payroll
 {
@@ -26,7 +27,9 @@ namespace backend.Application.Orchestrators.Payroll
         private readonly ICalculateGrossPaymentQuery _calculateGrossPaymentQuery;
         private readonly IGetCompanyPaymentTypeByCompanyIdQuery _getCompanyPaymentTypeByCompanyIdQuery;
         private readonly ICreatePaymentDetailCommand _createPaymentDetailCommand;
+        private readonly IUpdatePayrollIdInTimesheetsCommand _updatePayrollIdInTimesheetsCommand;
         private readonly IDeductionOrchestrator _deductionOrchestrator;
+        
         public PayrollOrchestrator(
             ICheckPayrollExistsQuery checkPayrollExistsQuery,
             IGetEmployeesByCompanyIdQuery getEmployeesByCompanyIdQuery,
@@ -35,6 +38,7 @@ namespace backend.Application.Orchestrators.Payroll
             ICalculateGrossPaymentQuery calculateGrossPaymentQuery,
             IGetCompanyPaymentTypeByCompanyIdQuery getCompanyPaymentTypeByCompanyIdQuery,
             ICreatePaymentDetailCommand createPaymentDetailCommand,
+            IUpdatePayrollIdInTimesheetsCommand updatePayrollIdInTimesheetsCommand,
             IDeductionOrchestrator deductionOrchestrator)
         {
             _checkPayrollExistsQuery = checkPayrollExistsQuery;
@@ -44,6 +48,7 @@ namespace backend.Application.Orchestrators.Payroll
             _calculateGrossPaymentQuery = calculateGrossPaymentQuery;
             _getCompanyPaymentTypeByCompanyIdQuery = getCompanyPaymentTypeByCompanyIdQuery;
             _createPaymentDetailCommand = createPaymentDetailCommand;
+            _updatePayrollIdInTimesheetsCommand = updatePayrollIdInTimesheetsCommand;
             _deductionOrchestrator = deductionOrchestrator;
         }
 
@@ -65,6 +70,8 @@ namespace backend.Application.Orchestrators.Payroll
             {
                 // This is required cause an employee can start working after the payroll start date
                 var startDate = employee.EmployeeStartDate > model.StartDate ? employee.EmployeeStartDate : model.StartDate;
+
+                _updatePayrollIdInTimesheetsCommand.Execute(payrollId, employee.Id, startDate, model.EndDate);
 
                 var employeeHoursWorked = _getEmployeeHoursInPeriodQuery.Execute(employee.Id, startDate, model.EndDate);
 
