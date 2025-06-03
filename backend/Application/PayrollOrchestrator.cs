@@ -103,6 +103,7 @@ namespace backend.Application.Orchestrators.Payroll
                     EmployeeId = employee.Id,
                     GrossSalary = grossPayment,
                     PaymentDetailsId = paymentDetailId
+                    
                 };
 
                 _deductionOrchestrator.CalculateDeductions(deductionsDto);

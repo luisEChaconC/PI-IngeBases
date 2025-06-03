@@ -1,4 +1,5 @@
 ﻿using backend.Domain;
+using backend.Application.DTOs;
 using Microsoft.Data.SqlClient;
 
 namespace backend.Infraestructure
@@ -105,20 +106,26 @@ namespace backend.Infraestructure
             return employees;
         }
 
-        public async Task<List<EmployeeModel>> GetSummaryByCompanyIdAsync(Guid companyId)
+        public async Task<List<EmployeeSummaryDto>> GetSummaryByCompanyIdAsync(Guid companyId)
         {
-            var employees = new List<EmployeeModel>();
+            var employees = new List<EmployeeSummaryDto>();
             var query = @"
                 SELECT 
-                    Id,
-                    WorkerId,
-                    CompanyId,
-                    EmployeeStartDate,
-                    ContractType,
-                    GrossSalary,
-                    HasToReportHours
-                FROM Employees
-                WHERE CompanyId = @CompanyId";
+                    e.Id,
+                    e.WorkerId,
+                    e.CompanyId,
+                    e.EmployeeStartDate,
+                    e.ContractType,
+                    e.GrossSalary,
+                    e.HasToReportHours,
+                    np.FirstName,
+                    np.FirstSurname,
+                    np.SecondSurname,
+                    np.UserId,
+                    np.Gender
+                FROM Employees e
+                INNER JOIN NaturalPersons np ON e.Id = np.Id
+                WHERE e.CompanyId = @CompanyId";
 
             using (var connection = new SqlConnection(_connectionString))
             using (var command = new SqlCommand(query, connection))
@@ -130,7 +137,7 @@ namespace backend.Infraestructure
                 {
                     while (await reader.ReadAsync())
                     {
-                        employees.Add(new EmployeeModel
+                        employees.Add(new EmployeeSummaryDto
                         {
                             Id = reader.GetGuid(reader.GetOrdinal("Id")),
                             WorkerId = reader["WorkerId"].ToString(),
@@ -138,7 +145,12 @@ namespace backend.Infraestructure
                             EmployeeStartDate = reader.GetDateTime(reader.GetOrdinal("EmployeeStartDate")),
                             ContractType = reader["ContractType"].ToString(),
                             GrossSalary = reader.GetDecimal(reader.GetOrdinal("GrossSalary")),
-                            HasToReportHours = reader.GetBoolean(reader.GetOrdinal("HasToReportHours"))
+                            HasToReportHours = reader.GetBoolean(reader.GetOrdinal("HasToReportHours")),
+                            FirstName = reader["FirstName"].ToString(),
+                            FirstSurname = reader["FirstSurname"].ToString(),
+                            SecondSurname = reader["SecondSurname"].ToString(),
+                            UserId = reader["UserId"] == DBNull.Value ? null : reader["UserId"].ToString(),
+                            Gender = reader["Gender"].ToString()
                         });
                     }
                 }

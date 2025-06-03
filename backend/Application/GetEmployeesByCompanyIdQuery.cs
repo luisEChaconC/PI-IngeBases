@@ -1,11 +1,11 @@
-using backend.Domain;
+using backend.Application.DTOs;
 using backend.Infraestructure;
 
 namespace backend.Application.Queries.Employees
 {
     public interface IGetEmployeesByCompanyIdQuery
     {
-        Task<List<EmployeeModel>> ExecuteAsync(Guid companyId);
+        Task<List<EmployeeSummaryDto>> ExecuteAsync(Guid companyId);
     }
 
     public class GetEmployeesByCompanyIdQuery : IGetEmployeesByCompanyIdQuery
@@ -17,7 +17,7 @@ namespace backend.Application.Queries.Employees
             _repository = repository;
         }
 
-        public async Task<List<EmployeeModel>> ExecuteAsync(Guid companyId)
+        public async Task<List<EmployeeSummaryDto>> ExecuteAsync(Guid companyId)
         {
             return await _repository.GetSummaryByCompanyIdAsync(companyId);
         }

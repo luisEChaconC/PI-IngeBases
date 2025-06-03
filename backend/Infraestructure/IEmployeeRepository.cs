@@ -1,4 +1,5 @@
 using backend.Domain;
+using backend.Application.DTOs;
 
 namespace backend.Infraestructure
 {
@@ -6,6 +7,6 @@ namespace backend.Infraestructure
     {
         void CreateEmployee(EmployeeModel employee);
         List<dynamic> GetEmployeesByCompanyId(string companyId);
-        Task<List<EmployeeModel>> GetSummaryByCompanyIdAsync(Guid companyId);
+        Task<List<EmployeeSummaryDto>> GetSummaryByCompanyIdAsync(Guid companyId);
     }
 }
