@@ -1,6 +1,7 @@
 using backend.Application.Commands.PaymentDetails;
 using backend.Application.Queries.PaymentDetails;
 using backend.Application.Queries;
+using backend.Application.Commands;
 using backend.Application.GrossPaymentCalculation;
 using backend.Domain.Strategies;
 using backend.Services;
@@ -45,6 +46,7 @@ builder.Services.AddScoped<IGetPaymentDetailsByEmployeeIdQuery, GetPaymentDetail
 builder.Services.AddScoped<IGetPaymentDetailsByCompanyIdQuery, GetPaymentDetailsByCompanyIdQuery>();
 builder.Services.AddScoped<IGetDaysByTimesheetIdQuery, GetDaysByTimesheetIdQuery>();
 builder.Services.AddScoped<IGetEmployeeHoursInPeriodQuery, GetEmployeeHoursInPeriodQuery>();
+builder.Services.AddScoped<IUpdatePayrollIdInTimesheetsCommand, UpdatePayrollIdInTimesheetsCommand>();
 
 builder.Services.AddScoped<IPayrollRepository, PayrollRepository>();
 builder.Services.AddScoped<IGetPayrollsByCompanyIdQuery, GetPayrollsByCompanyIdQuery>();

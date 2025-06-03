@@ -17,6 +17,7 @@ namespace backend.Domain.Strategies
         }
 
         public decimal CalculateDeduction(decimal grossSalary, Benefit? benefit = null)
+        public decimal CalculateDeduction(decimal grossSalary, string contractType, string gender, Benefit? benefit = null)
         {
             if (benefit == null) return 0;
 
@@ -40,10 +41,10 @@ namespace backend.Domain.Strategies
            
         }
        
-       // SI O S√ç NECESITO EL ID DE EMPLEADO
+       // SI O SÕ NECESITO EL ID DE EMPLEADO
        private async Task<decimal> CallBenefitApi(Benefit benefit)
         {
-            // Obtener la API seg√∫n el nombre 
+            // Obtener la API seg˙n el nombre 
             var apiName = benefit.Name == "Joya"
                 ? "Life Insurance"
                 : benefit.LinkAPI;
