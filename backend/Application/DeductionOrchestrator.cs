@@ -27,7 +27,7 @@ namespace backend.Application.Orchestrators.Deduction
         public (object gross, object deductions) CalculateDeductions(CalculateDeductionDto dto)
         {
             var benefits = _benefitService.GetAssignedBenefitsForEmployee(dto.EmployeeId);
-            var deductions = _deductionOrchestrator.CalculateTotalDeductions(dto.GrossSalary, benefits, dto.PaymentDetailsId);
+            var deductions = _deductionOrchestrator.CalculateTotalDeductions(dto.GrossSalary, dto.ContractType, dto.Gender, benefits, dto.PaymentDetailsId);
             _insertDeductionDetailsCommand.Execute(deductions);
             return (dto.GrossSalary, deductions);
         }
