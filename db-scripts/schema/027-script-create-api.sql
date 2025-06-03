@@ -1,0 +1,12 @@
+USE PayrollSystem;
+
+CREATE TABLE APIs (
+	Id UNIQUEIDENTIFIER NOT NULL PRIMARY KEY DEFAULT NEWID(),
+	Name VARCHAR(35) NOT NULL,
+	URL VARCHAR(200),
+	Token VARCHAR(300),
+	SecurityKeyName VARCHAR(35) NOT NULL,
+    EndpointMethod VARCHAR(5) 
+       NOT NULL 
+       CHECK (EndpointMethod IN ('GET', 'POST'))
+);

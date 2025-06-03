@@ -14,6 +14,7 @@ import ViewEmployeeProfileEmployer from '../views/ViewEmployeeProfileEmployer.vu
 import ViewCompanyInfo from '@/views/ViewCompanyInfo.vue'
 import ViewCompaniesList from '../views/ViewCompaniesList.vue'
 import HomeView from '../views/HomeView.vue'
+import PayrollsList from '@/views/PayrollsList.vue'
 import EmployeeTimesheet from '@/views/EmployeeTimesheet.vue'
 
 const routes = [
@@ -40,6 +41,7 @@ const routes = [
             { path: '/select-change-benefit', name: 'SelectChangeBenefit', component: SelectChangeBenefit },
             { path: '/view-employee-profile', name: 'ViewEmployeeProfile', component: ViewEmployeeProfile },
             { path: '/view-company-info', name: 'ViewCompanyInfo', component: ViewCompanyInfo },
+            { path: '/payrolls-list', name: 'PayrollsList', component: PayrollsList },
             { path: '/employee-timesheet', name: 'EmployeeTimesheet', component: EmployeeTimesheet}
         ],
     },
