@@ -9,26 +9,31 @@ namespace backend.Domain.Strategies
 
         private const decimal MinBaseSem = 341227m;
         private const decimal MinBaseIvm = 319384m;
-        public decimal CalculateDeduction(decimal grossSalary, Benefit? benefit = null)
-        {
-             // Aplicar base mínima
-            var semBase = Math.Max(grossSalary, MinBaseSem);
-            var ivmBase = Math.Max(grossSalary, MinBaseIvm);
+       public decimal CalculateDeduction(decimal grossSalary, string contractType, Benefit? benefit = null)
+{
+    // Exclude "Professional Services" employees from deductions
+    if (contractType == "Professional Services")
+        return 0;
 
-            // Cálculo trabajador
-            decimal semWorker = Math.Round(semBase * WorkerSemRate, 2);
-            decimal ivmWorker = Math.Round(ivmBase * WorkerIvmRate, 2);
+    // Apply minimum salary base
+    var semBase = Math.Max(grossSalary, MinBaseSem);
+    var ivmBase = Math.Max(grossSalary, MinBaseIvm);
 
-            // Cálculo patrono (también aplica sobre bases mínimas)
-            decimal semEmployer = Math.Round(semBase * EmployerSemRate, 2);
-            decimal ivmEmployer = Math.Round(ivmBase * EmployerIvmRate, 2);
+    // Worker deduction
+    decimal semWorker = Math.Round(semBase * WorkerSemRate, 2);
+    decimal ivmWorker = Math.Round(ivmBase * WorkerIvmRate, 2);
+    decimal totalWorker = semWorker + ivmWorker;
 
-            decimal totalWorker = semWorker + ivmWorker;
-            decimal totalEmployer = semEmployer + ivmEmployer;
+    // Employer deduction (calculated, but unused for now)
+    decimal semEmployer = Math.Round(semBase * EmployerSemRate, 2);
+    decimal ivmEmployer = Math.Round(ivmBase * EmployerIvmRate, 2);
+    decimal totalEmployer = semEmployer + ivmEmployer;
 
-            // TODO: almacenar employerDeduction (totalEmployer) en DeductionDetails o donde corresponda
+    // TODO: Store totalEmployer if needed later
 
-            return totalWorker; 
+    // Ensure result is non-negative
+    return Math.Max(totalWorker, 0);
         }
+
     }
 }
