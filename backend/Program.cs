@@ -47,6 +47,7 @@ builder.Services.AddScoped<IGetDaysByTimesheetIdQuery, GetDaysByTimesheetIdQuery
 builder.Services.AddScoped<IGetEmployeeHoursInPeriodQuery, GetEmployeeHoursInPeriodQuery>();
 builder.Services.AddScoped<IGetEmployeeTimesheetByDateQuery, GetEmployeeTimesheetByDateQuery>();
 builder.Services.AddScoped<IUpdateDayCommand, UpdateDayCommand>();
+builder.Services.AddScoped<IUpdatePayrollIdInTimesheetsCommand, UpdatePayrollIdInTimesheetsCommand>();
 
 builder.Services.AddScoped<IPayrollRepository, PayrollRepository>();
 builder.Services.AddScoped<IGetPayrollsByCompanyIdQuery, GetPayrollsByCompanyIdQuery>();
