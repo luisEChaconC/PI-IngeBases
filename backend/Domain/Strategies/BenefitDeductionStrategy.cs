@@ -16,10 +16,10 @@ namespace backend.Domain.Strategies
             _httpClient = httpClient;
         }
 
-        public decimal CalculateDeduction(decimal grossSalary, Benefit? benefit = null)
-        public decimal CalculateDeduction(decimal grossSalary, string contractType, string gender, Benefit? benefit = null)
+        public decimal CalculateDeduction(decimal grossSalary, string contractType, string gender, Benefit? benefit = null, Guid? employeeId = null)
         {
             if (benefit == null) return 0;
+
 
             if(benefit.Name != "Joya")
             {
@@ -30,21 +30,21 @@ namespace backend.Domain.Strategies
                     case "FixedPercentage":
                         return Math.Round(grossSalary * ((benefit.FixedPercentage ?? 0) / 100m), 2);
                     case "API":
-                        return CallBenefitApi(benefit).GetAwaiter().GetResult();
+                        return CallBenefitApi(gender, benefit, employeeId).GetAwaiter().GetResult();
                     default:
                         return 0;
                 }
             } else
             {
-                return CallBenefitApi(benefit).GetAwaiter().GetResult();
+                return CallBenefitApi(gender, benefit, employeeId).GetAwaiter().GetResult();
             }
            
         }
        
-       // SI O SÍ NECESITO EL ID DE EMPLEADO
-       private async Task<decimal> CallBenefitApi(Benefit benefit)
+       // SI O Sï¿½ NECESITO EL ID DE EMPLEADO
+       private async Task<decimal> CallBenefitApi(string gender, Benefit benefit, Guid? employeeId = null)
         {
-            // Obtener la API según el nombre 
+            // Obtener la API segï¿½n el nombre 
             var apiName = benefit.Name == "Joya"
                 ? "Life Insurance"
                 : benefit.LinkAPI;
@@ -55,7 +55,6 @@ namespace backend.Domain.Strategies
             var api = _apiRepository.GetAPIs().FirstOrDefault(a => a.Name == apiName);
             if (api == null) return 0;
             Console.WriteLine($"Token usado: {api.Token}");
-
             var parameters = _apiRepository.GetParametersByAPI(api.Id);
 
             var paramValues = new Dictionary<string, string>();
@@ -63,7 +62,7 @@ namespace backend.Domain.Strategies
             foreach (var param in parameters)
             {
                 var values = _apiRepository.GetParameterValues(param.Id)
-                    .Where(v => v.EmployeeId == Guid.Parse("21311152-4752-4DD0-8565-895718FE0485")) // Cambiar luego
+                    .Where(v => v.EmployeeId == employeeId) 
                     .FirstOrDefault();
 
                 string value = values?.ValueType switch
