@@ -51,10 +51,31 @@
                   :value="benefit"
                   v-model="tempSelection"
                   :id="'benefit-' + index"
+                  @change="onBenefitToggle(benefit)"
                 />
                 <label class="form-check-label" :for="'benefit-' + index">
                   {{ benefit.name }}
                 </label>
+                  <div
+                    v-if="benefit && benefit.type === 'API' && apiParametersByBenefitId && apiParametersByBenefitId[benefit.id]"
+                    class="ms-4 mt-2"
+                  >
+                  <div
+                    v-for="(paramObj, paramName) in apiParametersByBenefitId[benefit.id]"
+                    :key="benefit.id + '-' + paramName"
+                    class="mb-2"
+                  >
+                    <label class="form-label" :for="paramName">
+                      {{ traducirParametro(paramName) }}
+                    </label>
+                    <input
+                      class="form-control"
+                      :type="obtenerTipoInput(paramObj.type)"
+                      v-model="apiParametersByBenefitId[benefit.id][paramName].value"
+                      :id="paramName"
+                    />
+                  </div>
+                  </div>
               </div>
 
               <div v-if="exceedsLimit" class="alert alert-warning mt-3" role="alert">
@@ -88,11 +109,67 @@ export default {
     const maxBenefits = ref(3);
     const modalInstance = ref(null);
     const benefitsModal = ref(null);
+    const allApis = ref([]);
+    const apiParametersByBenefitId = ref({});
     const availableBenefits = computed(() =>
       allBenefits.value.filter(
         (b) => !selectedBenefits.value.some((sb) => sb.id === b.id)
       )
     );
+
+    const getAllApis = async () => {
+      try {
+        const response = await axios.get("https://localhost:5000/api/API");
+        allApis.value = response.data;
+      } catch (error) {
+        console.error("Error obteniendo APIs:", error);
+      }
+    };
+
+
+    const traducirParametro = (param) => {
+      const traducciones = {
+        "Association Name": 'Nombre de la asociación',
+        "Date of birth": 'Fecha de Nacimiento',
+        "Dependents": 'Número de dependientes',
+      };
+      return traducciones[param] || param;
+    };
+
+    const onBenefitToggle = async (benefit) => {
+      if (benefit.type !== 'API') return;
+
+      // Evitar recargar si ya se cargaron los parámetros
+      if (apiParametersByBenefitId.value[benefit.id]) return;
+
+      const matchedApi = allApis.value.find(api => api.name === benefit.name);
+
+      if (!matchedApi) {
+        console.warn(`No se encontró una API con nombre ${benefit.name}`);
+        return;
+      }
+
+      try {
+        const response = await axios.get(`https://localhost:5000/api/API/${matchedApi.id}/parameters`);
+        const userDefinedParams = response.data.filter(p => p.type === 'UserDefined');
+        console.log(userDefinedParams);
+        apiParametersByBenefitId.value[benefit.id] = {};
+        userDefinedParams.forEach(param => {
+          apiParametersByBenefitId.value[benefit.id][param.name] = {
+            value: '',
+            type: param.valueType
+          };
+        });
+
+        console.log(apiParametersByBenefitId)
+
+        benefit.apiId = matchedApi.id;
+
+        apiParametersByBenefitId.value = { ...apiParametersByBenefitId.value };
+      } catch (error) {
+        console.error(`Error cargando parámetros para API ID ${matchedApi.id}:`, error);
+      }
+    };
 
     const getCurrentUserInformationFromLocalStorage = () => {
       const userInformation = localStorage.getItem('currentUserInformation'); 
@@ -122,8 +199,7 @@ export default {
         const response = await axios.get("https://localhost:5000/api/benefit", {
           params: { companyId }
         });
-        console.log('Beneficios sin filtro:', response.data);
-        // Filter benefits where EligibleEmployeeTypes includes the user's contractType
+
         allBenefits.value = response.data.filter(benefit =>
           benefit.eligibleEmployeeTypes &&
           benefit.eligibleEmployeeTypes.some(type =>
@@ -152,7 +228,19 @@ export default {
 
     const addSelectedBenefits = () => {
       if (!exceedsLimit.value) {
-        selectedBenefits.value.push(...tempSelection.value);
+        tempSelection.value.forEach(b => {
+          const copy = { ...b };
+
+          if (copy.type === 'API' && apiParametersByBenefitId.value[copy.id]) {
+            copy.parameterValues = {};
+            Object.entries(apiParametersByBenefitId.value[copy.id]).forEach(([name, obj]) => {
+              copy.parameterValues[name] = obj.value;
+            });
+          }
+
+          selectedBenefits.value.push(copy);
+        });
+
         modalInstance.value.hide();
       }
     };
@@ -190,11 +278,10 @@ export default {
           benefitIds
         };
 
-        console.log("Asignando con:", payload);
-
         const response = await axios.post('https://localhost:5000/api/benefit/assign', payload);
 
         if (response.status === 200) {
+          await saveParameterValues(employeeId);
           alert('Beneficios asignados exitosamente.');
         }
       } catch (error) {
@@ -221,6 +308,54 @@ export default {
       }
     };
 
+    const saveParameterValues = async (employeeId) => {
+      for (const benefit of selectedBenefits.value) {
+        if (benefit.type !== 'API' || !benefit.parameterValues) continue;
+
+        const api = allApis.value.find(api => api.id === benefit.apiId);
+        if (!api) continue;
+
+        const parameters = api.parameters;
+
+        for (const [paramName, inputValue] of Object.entries(benefit.parameterValues)) {
+          const param = parameters.find(p => p.name === paramName);
+          if (!param) continue;
+
+          const valueType = param.valueType; // 'String', 'Date', 'Int'
+          const payload = {
+            parameterId: param.id,
+            employeeId,
+            valueType,
+            stringValue: valueType === 'String' ? inputValue : null,
+            intValue: valueType === 'Int' ? parseInt(inputValue) || null : null,
+            dateValue: valueType === 'Date' ? inputValue : null,
+          };
+
+          try {
+            await axios.post('https://localhost:5000/api/API/parameters/values', payload);
+          } catch (error) {
+            console.error('Error guardando valor de parámetro:', error, payload);
+          }
+        }
+      }
+    };
+
+    const obtenerTipoInput = (type) => {
+      console.log('Tipo recibido:', type);
+      if (!type || typeof type !== 'string') return 'text';
+      switch (type.toLowerCase()) {
+        case 'number':
+          return 'number';
+        case 'date':
+          return 'date';
+        case 'email':
+          return 'email';
+        case 'boolean':
+          return 'checkbox';
+        default:
+          return 'text';
+      }
+    };
 
     const removeBenefit = (index) => {
       selectedBenefits.value.splice(index, 1);
@@ -230,6 +365,7 @@ export default {
       getBenefits();
       getAssignedBenefits();
       getCompanyMaxBenefits();
+      getAllApis();
     });
 
     return {
@@ -239,13 +375,21 @@ export default {
       maxBenefits,
       modalInstance,
       benefitsModal,
+      allApis,
+      apiParametersByBenefitId, 
       availableBenefits,
+      traducirParametro,
+      onBenefitToggle,
       exceedsLimit,
-      getBenefits,
       openModal,
       addSelectedBenefits,
-      removeBenefit,
       assignBenefits,
+      getCompanyMaxBenefits,
+      getBenefits,
+      getAssignedBenefits,
+      saveParameterValues,
+      obtenerTipoInput,
+      removeBenefit
     };
   },
 };

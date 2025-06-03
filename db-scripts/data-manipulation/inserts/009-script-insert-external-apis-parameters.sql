@@ -2,29 +2,28 @@ USE PayrollSystem
 
 -- Life Insurance Parameters
 INSERT INTO APIParameters(Name, Type, APIId)
-VALUES('Date of birth', 'UserDefined', '36ACD88B-024E-4A82-8885-5ADED125563F')
+VALUES('Date of birth', 'UserDefined', '578B7C9B-6D7F-43AC-9955-006D6A0D110F')
 
 INSERT INTO APIParameters(Name, Type, APIId)
-VALUES('Gender', 'SystemDefined', '36ACD88B-024E-4A82-8885-5ADED125563F')
+VALUES('Gender', 'SystemDefined', '578B7C9B-6D7F-43AC-9955-006D6A0D110F')
 
 
 -- Association Parameters
 INSERT INTO APIParameters(Name, Type, APIId)
-VALUES('Association name', 'UserDefined', '6E734A4B-DCBC-4761-BE0D-A18C07307DFF')
+VALUES('Association name', 'UserDefined', '41978094-1A94-4F6B-9CE2-43582555DE60')
 
 INSERT INTO APIParameters(Name, Type, APIId)
-VALUES('Salary', 'SystemDefined', '6E734A4B-DCBC-4761-BE0D-A18C07307DFF')
+VALUES('Salary', 'SystemDefined', '41978094-1A94-4F6B-9CE2-43582555DE60')
 
 
 -- Medicare Parameters
 INSERT INTO APIParameters(Name, Type, APIId)
-VALUES('Date of birth', 'UserDefined', 'B88DB333-0269-4981-AB11-00D0C6EDA18D')
+VALUES('Date of birth', 'UserDefined', '131C6C5E-DB1A-4DAE-8293-84D3C0DB652B')
 
 INSERT INTO APIParameters(Name, Type, APIId)
-VALUES('Gender', 'SystemDefined', 'B88DB333-0269-4981-AB11-00D0C6EDA18D')
+VALUES('Gender', 'SystemDefined', '131C6C5E-DB1A-4DAE-8293-84D3C0DB652B')
 
 INSERT INTO APIParameters(Name, Type, APIId)
-VALUES('Dependents', 'UserDefined', 'B88DB333-0269-4981-AB11-00D0C6EDA18D')
-
+VALUES('Dependents', 'UserDefined', '131C6C5E-DB1A-4DAE-8293-84D3C0DB652B')
 
 
