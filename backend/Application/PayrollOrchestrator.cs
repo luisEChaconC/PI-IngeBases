@@ -102,8 +102,9 @@ namespace backend.Application.Orchestrators.Payroll
                 {
                     EmployeeId = employee.Id,
                     GrossSalary = grossPayment,
-                    PaymentDetailsId = paymentDetailId
-                    
+                    PaymentDetailsId = paymentDetailId,
+                    ContractType = employee.ContractType,
+                    Gender = employee.Gender,
                 };
 
                 _deductionOrchestrator.CalculateDeductions(deductionsDto);
