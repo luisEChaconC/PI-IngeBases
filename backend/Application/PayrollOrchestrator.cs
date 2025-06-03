@@ -10,6 +10,7 @@ using backend.Domain.Enums;
 using backend.Application.Commands.PaymentDetails;
 using backend.Application.Orchestrators.Deduction;
 using backend.Application.Commands;
+using backend.Application.Exceptions;
 
 namespace backend.Application.Orchestrators.Payroll
 {
@@ -29,7 +30,7 @@ namespace backend.Application.Orchestrators.Payroll
         private readonly ICreatePaymentDetailCommand _createPaymentDetailCommand;
         private readonly IUpdatePayrollIdInTimesheetsCommand _updatePayrollIdInTimesheetsCommand;
         private readonly IDeductionOrchestrator _deductionOrchestrator;
-        
+
         public PayrollOrchestrator(
             ICheckPayrollExistsQuery checkPayrollExistsQuery,
             IGetEmployeesByCompanyIdQuery getEmployeesByCompanyIdQuery,
@@ -55,16 +56,17 @@ namespace backend.Application.Orchestrators.Payroll
         public async Task<Guid> GeneratePayroll(PayrollModel model)
         {
             bool payrollExistsForPeriod = await _checkPayrollExistsQuery.ExecuteAsync(model.StartDate, model.EndDate, model.CompanyId);
-            if (payrollExistsForPeriod) throw new InvalidOperationException("A payroll already exists for the given period.");
+            if (payrollExistsForPeriod) throw new PayrollException("AlreadyExists", "A payroll already exists for the given period.");
+
 
             var employees = await _getEmployeesByCompanyIdQuery.ExecuteAsync(model.CompanyId);
-            if (employees.Count == 0) throw new InvalidOperationException("No employees found for the given company.");
+            if (employees.Count == 0) throw new PayrollException("NoEmployees", "No employees found for the given company.");
 
             var payrollId = await _createPayrollCommand.ExecuteAsync(model);
 
             var companyPaymentType = await _getCompanyPaymentTypeByCompanyIdQuery.ExecuteAsync(model.CompanyId);
             if (!Enum.TryParse<EmployeeTypePayment>(companyPaymentType, true, out var companyPaymentTypeEnum))
-                throw new InvalidOperationException("Invalid payment type from company.");
+                throw new PayrollException("InvalidPaymentType", "Invalid payment type from company.");
 
             foreach (var employee in employees)
             {

@@ -2,6 +2,7 @@ using backend.Application.Orchestrators.Payroll;
 using backend.Application.Queries.Payroll;
 using backend.Domain;
 using Microsoft.AspNetCore.Mvc;
+using backend.Application.Exceptions;
 
 namespace backend.API
 {
@@ -43,12 +44,22 @@ namespace backend.API
                 var id = await _payrollOrchestrator.GeneratePayroll(model);
                 return Ok(new { Id = id });
             }
+            catch (PayrollException ex)
+            {
+                return BadRequest(new
+                {
+                    message = "An error occurred while creating the payroll",
+                    error = ex.Message,
+                    errorType = ex.ErrorType
+                });
+            }
             catch (Exception ex)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, new
                 {
                     message = "An error occurred while creating the payroll",
-                    error = ex.Message
+                    error = ex.Message,
+                    errorType = "ServerError"
                 });
             }
         }
@@ -65,7 +76,8 @@ namespace backend.API
 
                 var details = await _getByCompanyIdQuery.ExecuteAsync(companyId);
                 return Ok(details);
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, new
                 {
@@ -86,7 +98,8 @@ namespace backend.API
                 }
                 var details = await _getSummaryByCompanyIdQuery.ExecuteAsync(companyId);
                 return Ok(details);
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, new
                 {

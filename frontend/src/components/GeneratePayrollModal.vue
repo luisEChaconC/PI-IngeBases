@@ -39,34 +39,26 @@ import DatePicker from '@vuepic/vue-datepicker';
 import '@vuepic/vue-datepicker/dist/main.css';
 
 // --- Utility functions ---
-function pad(n) {
-  return n.toString().padStart(2, '0');
-}
-
-function toCRDate(date) {
-  // Returns a Date object in Costa Rica time
-  return new Date(date.toLocaleString('en-US', { timeZone: 'America/Costa_Rica' }));
-}
-
-function toCRDateString(date) {
-  // Returns YYYY-MM-DD in Costa Rica time
-  const d = toCRDate(date);
-  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
-}
-
 function formatDateDisplay(dateStr) {
   if (!dateStr) return '';
   const [year, month, day] = dateStr.split('-');
   return `${day}/${month}/${year}`;
 }
 
-function getRangeDates(baseDate, days, formatter) {
-  // Returns an array of formatted dates for the range
+function getRangeDates(baseDate, days) {
+  // Returns an array of Date objects for the range
   return Array.from({ length: days }, (_, i) => {
     const d = new Date(baseDate.getTime());
     d.setDate(baseDate.getDate() + i);
-    return formatter(d);
+    return d;
   });
+}
+
+function formatDateToString(dateObj) {
+  const yyyy = dateObj.getFullYear();
+  const mm = String(dateObj.getMonth() + 1).padStart(2, '0');
+  const dd = String(dateObj.getDate()).padStart(2, '0');
+  return `${yyyy}-${mm}-${dd}`;
 }
 
 // --- Vue component ---
@@ -79,7 +71,7 @@ export default {
       period: null,
       startDate: null,
       endDate: null,
-      highlightedDates: [],
+      highlightedDates: [], // Array of Date objects
       paymentType: 'weekly', // default, will be updated
       errorMessage: ''
     }
@@ -134,7 +126,20 @@ export default {
         this.$emit('payroll-generated'); // Emit event for parent to refresh
         this.$emit('close');
       } catch (error) {
-        this.errorMessage = 'Error al generar la planilla';
+        // Default message
+        let message = 'Error al generar la planilla';
+
+        // If backend sends errorType, show a specific message
+        const errorType = error.response?.data?.errorType;
+        if (errorType === 'AlreadyExists') {
+          message = 'Ya existe una planilla para el periodo seleccionado.';
+        } else if (errorType === 'NoEmployees') {
+          message = 'No hay empleados registrados en la empresa.';
+        } else if (errorType === 'InvalidPaymentType') {
+          message = 'El tipo de pago definido no coincide con el pago de la empresa.';
+        }
+
+        this.errorMessage = message;
       }
     },
     async handleDayChange(date) {
@@ -147,16 +152,25 @@ export default {
         return;
       }
 
-      const baseDateCR = toCRDate(date);
+      // Always use local midnight to avoid timezone shift
+      let baseDateLocal;
+      if (typeof date === 'string') {
+        const d = new Date(date);
+        baseDateLocal = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+      } else if (date instanceof Date) {
+        baseDateLocal = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+      } else if (date.year && date.month && date.day) {
+        baseDateLocal = new Date(date.year, date.month - 1, date.day);
+      } else {
+        baseDateLocal = new Date();
+      }
 
-      // Highlight uses ISO (picker expects this format)
-      this.highlightedDates = getRangeDates(baseDateCR, days, d => d.toISOString().split('T')[0]);
+      // Highlight expects array of Date objects
+      this.highlightedDates = getRangeDates(baseDateLocal, days);
 
-      // Start/end use Costa Rica time string
-      this.startDate = toCRDateString(baseDateCR);
-      const endDateCR = new Date(baseDateCR.getTime());
-      endDateCR.setDate(baseDateCR.getDate() + days - 1);
-      this.endDate = toCRDateString(endDateCR);
+      // For backend, format as yyyy-mm-dd
+      this.startDate = formatDateToString(this.highlightedDates[0]);
+      this.endDate = formatDateToString(this.highlightedDates[this.highlightedDates.length - 1]);
     },
     formatPicker() {
       if (this.startDate && this.endDate) {
