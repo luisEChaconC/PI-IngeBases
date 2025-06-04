@@ -1,5 +1,4 @@
 using backend.Application.DeductionCalculation;
-using backend.Application.GrossPaymentCalculation;
 using backend.Infraestructure;
 
 namespace backend.Application.Orchestrators.Deduction
@@ -11,9 +10,9 @@ namespace backend.Application.Orchestrators.Deduction
 
     public class DeductionOrchestrator : IDeductionOrchestrator
     {
-        private readonly IBenefitRepository _benefitRepository;
         private readonly DeductionCalculationOrchestrator _deductionOrchestrator;
         private readonly IInsertDeductionDetailsCommand _insertDeductionDetailsCommand;
+        private readonly IBenefitRepository _benefitRepository;
 
         public DeductionOrchestrator(
             IBenefitRepository benefitRepository,
@@ -28,7 +27,7 @@ namespace backend.Application.Orchestrators.Deduction
         public (object gross, object deductions) CalculateDeductions(CalculateDeductionDto dto)
         {
             var benefits = _benefitRepository.GetAssignedBenefitsForEmployee(dto.EmployeeId);
-            var deductions = _deductionOrchestrator.CalculateTotalDeductions(dto.GrossSalary, dto.ContractType, dto.Gender, benefits, dto.PaymentDetailsId);
+            var deductions = _deductionOrchestrator.CalculateTotalDeductions(dto.GrossSalary, dto.ContractType, dto.Gender, benefits, dto.PaymentDetailsId, dto.EmployeeId);
             _insertDeductionDetailsCommand.Execute(deductions);
             return (dto.GrossSalary, deductions);
         }
