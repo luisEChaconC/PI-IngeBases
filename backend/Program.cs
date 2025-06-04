@@ -17,6 +17,8 @@ using backend.Application.Benefits.Commands;
 using backend.Application.Benefits.Queries;
 using backend.Application.Orchestrators.Deduction;
 using backend.Application.Orchestrators.Payroll;
+using backend.Application.Queries.Payroll;
+using backend.Repositories;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -91,9 +93,14 @@ builder.Services.AddScoped<BenefitDeductionStrategy>();
 
 // Register Calculation Orchestrator
 builder.Services.AddScoped<DeductionCalculationOrchestrator>();
+builder.Services.AddScoped<APIRepository>();
+builder.Services.AddHttpClient<BenefitDeductionStrategy>();
 
 builder.Services.AddScoped<IDeductionDetailRepository, DeductionDetailRepository>();
 builder.Services.AddScoped<IInsertDeductionDetailsCommand, InsertDeductionDetailsCommand>();
+
+
+
 
 
 // Register Strategy Orchestrator
