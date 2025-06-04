@@ -87,6 +87,9 @@ builder.Services.AddScoped<IDeductionDetailRepository, DeductionDetailRepository
 builder.Services.AddScoped<IInsertDeductionDetailsCommand, InsertDeductionDetailsCommand>();
 
 
+
+
+
 // Register Strategy Orchestrator
 builder.Services.AddScoped<GrossPaymentCalculationOrchestrator>();
 

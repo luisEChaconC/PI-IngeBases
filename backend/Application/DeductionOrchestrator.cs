@@ -24,11 +24,12 @@ namespace backend.Application.Orchestrators.Deduction
             _insertDeductionDetailsCommand = insertDeductionDetailsCommand;
         }
 
-    public (object gross, object deductions) CalculateDeductions(CalculateDeductionDto dto)
-    {
-        var benefits = _benefitService.GetAssignedBenefitsForEmployee(dto.EmployeeId);
-        var deductions = _deductionOrchestrator.CalculateTotalDeductions(dto.GrossSalary, dto.ContractType, dto.Gender, benefits, dto.PaymentDetailsId, dto.EmployeeId);
-        _insertDeductionDetailsCommand.Execute(deductions);
-        return (dto.GrossSalary, deductions);
+        public (object gross, object deductions) CalculateDeductions(CalculateDeductionDto dto)
+        {
+            var benefits = _benefitService.GetAssignedBenefitsForEmployee(dto.EmployeeId);
+            var deductions = _deductionOrchestrator.CalculateTotalDeductions(dto.GrossSalary, dto.ContractType, dto.Gender, benefits, dto.PaymentDetailsId, dto.EmployeeId);
+            _insertDeductionDetailsCommand.Execute(deductions);
+            return (dto.GrossSalary, deductions);
+        }
     }
 }
