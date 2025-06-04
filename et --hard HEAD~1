@@ -1,0 +1,70 @@
+[33m5524147[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mfeature-33/edit-employee-info[m[33m, [m[1;31morigin/feature-33/edit-employee-info[m[33m)[m HEAD@{0}: checkout: moving from feature-33/edit-employee-info to feature-33/edit-employee-info
+[33m5524147[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mfeature-33/edit-employee-info[m[33m, [m[1;31morigin/feature-33/edit-employee-info[m[33m)[m HEAD@{1}: commit: feat(edit-employee-info): add gender field in .vue and backend
+[33m3b82335[m HEAD@{2}: checkout: moving from develop to feature-33/edit-employee-info
+[33m3ca45c6[m[33m ([m[1;31morigin/develop[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mdevelop[m[33m)[m HEAD@{3}: pull --progress --no-edit --no-stat --recurse-submodules=no origin: Fast-forward
+[33m5db1d34[m HEAD@{4}: checkout: moving from feature-33/edit-employee-info to develop
+[33m3b82335[m HEAD@{5}: checkout: moving from feature-85/CCSS-Deduction to feature-33/edit-employee-info
+[33mb6d75ea[m[33m ([m[1;32mfeature-85/CCSS-Deduction[m[33m)[m HEAD@{6}: merge develop: Merge made by the 'ort' strategy.
+[33m2805d08[m HEAD@{7}: checkout: moving from develop to feature-85/CCSS-Deduction
+[33m5db1d34[m HEAD@{8}: checkout: moving from feature-85/CCSS-Deduction to develop
+[33m2805d08[m HEAD@{9}: commit: feat-fix(CCSS-Deduction): add gender on Interface and .dto to do Apis logic
+[33m8a28a46[m HEAD@{10}: checkout: moving from develop to feature-85/CCSS-Deduction
+[33m5db1d34[m HEAD@{11}: checkout: moving from feature-85/CCSS-Deduction to develop
+[33m8a28a46[m HEAD@{12}: checkout: moving from develop to feature-85/CCSS-Deduction
+[33m5db1d34[m HEAD@{13}: pull --progress --no-edit --no-stat --recurse-submodules=no origin: Fast-forward
+[33m30df913[m HEAD@{14}: checkout: moving from feature-85/CCSS-Deduction to develop
+[33m8a28a46[m HEAD@{15}: commit: feat-fix(CCSS-Deduction): add contract type at interface and deduction orchestrator to compare employee contract type in deductions
+[33m07a90e8[m HEAD@{16}: merge develop: Merge made by the 'ort' strategy.
+[33m1a4705e[m HEAD@{17}: checkout: moving from feature-33/edit-employee-info to feature-85/CCSS-Deduction
+[33m3b82335[m HEAD@{18}: checkout: moving from feature-33/edit-employee-info to feature-33/edit-employee-info
+[33m3b82335[m HEAD@{19}: checkout: moving from develop to feature-33/edit-employee-info
+[33m30df913[m HEAD@{20}: checkout: moving from feature-33/edit-employee-info to develop
+[33m3b82335[m HEAD@{21}: checkout: moving from develop to feature-33/edit-employee-info
+[33m30df913[m HEAD@{22}: checkout: moving from feature-33/edit-employee-info to develop
+[33m3b82335[m HEAD@{23}: checkout: moving from develop to feature-33/edit-employee-info
+[33m30df913[m HEAD@{24}: checkout: moving from feature-33/edit-employee-info to develop
+[33m3b82335[m HEAD@{25}: checkout: moving from develop to feature-33/edit-employee-info
+[33m30df913[m HEAD@{26}: pull --progress --no-edit --no-stat --recurse-submodules=no origin: Fast-forward
+[33m3bcc593[m HEAD@{27}: checkout: moving from feature-33/edit-employee-info to develop
+[33m3b82335[m HEAD@{28}: commit: feat(edit-employee-info): regex modifications in phone number
+[33m8ef2e8d[m HEAD@{29}: commit: feat(edit-employee-info): Added function call in EmployeeRepository to verifies users in PaymentDetails.
+[33mdc22596[m HEAD@{30}: checkout: moving from feature-85/CCSS-Deduction to feature-33/edit-employee-info
+[33m1a4705e[m HEAD@{31}: commit: feat(CCSS-Deduction): Added logic to calculate the CCSS deduction for employee, with ifs and startegy
+[33m3bcc593[m HEAD@{32}: checkout: moving from develop to feature-85/CCSS-Deduction
+[33m3bcc593[m HEAD@{33}: pull --progress --no-edit --no-stat --recurse-submodules=no origin: Fast-forward
+[33m4225121[m HEAD@{34}: checkout: moving from feature-84/Income-Tax-Deduction to develop
+[33m76f8685[m[33m ([m[1;31morigin/feature-84/Income-Tax-Deduction[m[33m, [m[1;32mfeature-84/Income-Tax-Deduction[m[33m)[m HEAD@{35}: commit: feat(Income-Tax-Deduction): Implements startegy, and add logic to calculate income tax deduction, returns the total deduction
+[33m4225121[m HEAD@{36}: checkout: moving from develop to feature-84/Income-Tax-Deduction
+[33m4225121[m HEAD@{37}: checkout: moving from feature-84/Income-Tax-Deduction to develop
+[33m05a4d71[m HEAD@{38}: commit: feat(Income-Tax-Deduction): Delete model
+[33mec18c1e[m HEAD@{39}: commit (merge): merge: update feat 84 with develop last changes
+[33m4a682cd[m HEAD@{40}: commit: feat(Income-Tax-Deduction): Added logic of calculate Income Tax and returns the deduction amount
+[33m6bf8123[m HEAD@{41}: checkout: moving from develop to feature-84/Income-Tax-Deduction
+[33m4225121[m HEAD@{42}: pull --progress --no-edit --no-stat --recurse-submodules=no origin: Fast-forward
+[33mc174ba9[m HEAD@{43}: checkout: moving from feature-84/IncomeTaxDeduction to develop
+[33m87f49dd[m[33m ([m[1;31morigin/feature-84/IncomeTaxDeduction[m[33m)[m HEAD@{44}: checkout: moving from feature-85/ccss-deduction to feature-84/IncomeTaxDeduction
+[33m2f8926b[m HEAD@{45}: checkout: moving from develop to feature-85/ccss-deduction
+[33mc174ba9[m HEAD@{46}: pull --progress --no-edit --no-stat --recurse-submodules=no origin (finish): returning to refs/heads/develop
+[33mc174ba9[m HEAD@{47}: pull --progress --no-edit --no-stat --recurse-submodules=no origin (start): checkout c174ba9668e47d2160f5076e98162ee6154a613a
+[33mc4697da[m[33m ([m[1;31morigin/backend/createDeductionDetails[m[33m, [m[1;32mbackend/createDeductionDetails[m[33m)[m HEAD@{48}: checkout: moving from feature-85/ccss-deduction to develop
+[33m2f8926b[m HEAD@{49}: checkout: moving from feature-84/IncomeTaxDeduction to feature-85/ccss-deduction
+[33m87f49dd[m[33m ([m[1;31morigin/feature-84/IncomeTaxDeduction[m[33m)[m HEAD@{50}: commit: feat(income-tax-deduction): added logic of IncomeTax in IncomeTaxDeductionStrategy and calculates TotalTax
+[33m2f8926b[m HEAD@{51}: checkout: moving from feature-85/ccss-deduction to feature-84/IncomeTaxDeduction
+[33m2f8926b[m HEAD@{52}: commit: feat(ccss-deduction): add calculate deduction ccss logic in ccss strategy and delete employeeId
+[33mc5383f3[m HEAD@{53}: checkout: moving from develop to feature-85/ccss-deduction
+[33mc4697da[m[33m ([m[1;31morigin/backend/createDeductionDetails[m[33m, [m[1;32mbackend/createDeductionDetails[m[33m)[m HEAD@{54}: merge backend/createDeductionDetails: Fast-forward
+[33mcb12d20[m HEAD@{55}: checkout: moving from backend/createDeductionDetails to develop
+[33mc4697da[m[33m ([m[1;31morigin/backend/createDeductionDetails[m[33m, [m[1;32mbackend/createDeductionDetails[m[33m)[m HEAD@{56}: commit: backend script: create DeductionDetails Table in sql
+[33mcb12d20[m HEAD@{57}: checkout: moving from develop to backend/createDeductionDetails
+[33mcb12d20[m HEAD@{58}: pull --progress --no-edit --no-stat --recurse-submodules=no origin: Fast-forward
+[33m07e5c1c[m HEAD@{59}: checkout: moving from feature-33/edit-employee-info to develop
+[33mdc22596[m HEAD@{60}: commit: feat(edit-employee-info): added some alerts to regex, regex validations, and fields modificacion with edible fields
+[33meea5cbe[m HEAD@{61}: commit: feat(edit-employee-info): added BD querys with updates, also some small validations
+[33m4912efd[m HEAD@{62}: commit: feat(edit-employee-info): added a new model to get all employee field to edit
+[33mf2c73f5[m HEAD@{63}: commit: feat(edit-employee-info): added endpoint Patch to edit employee info and endopint get haspayment to validate employee payments
+[33m07e5c1c[m HEAD@{64}: merge develop: Fast-forward
+[33m20224a3[m HEAD@{65}: checkout: moving from develop to feature-33/edit-employee-info
+[33m07e5c1c[m HEAD@{66}: pull --progress --no-edit --no-stat --recurse-submodules=no origin: Fast-forward
+[33mb4287d0[m HEAD@{67}: checkout: moving from feature-33/edit-employee-info to develop
+[33m20224a3[m HEAD@{68}: checkout: moving from develop to feature-33/edit-employee-info
+[33mb4287d0[m HEAD@{69}: pull --progress --no-edit --no-stat --recurse-submodules=no origin
