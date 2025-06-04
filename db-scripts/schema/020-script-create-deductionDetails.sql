@@ -7,5 +7,5 @@ CREATE TABLE DeductionDetails (
     PaymentDetailsId UNIQUEIDENTIFIER NOT NULL,
     DeductionType VARCHAR(10) NOT NULL CHECK (DeductionType IN ('mandatory', 'voluntary')),
     CONSTRAINT FK_DeductionDetails_PaymentDetails FOREIGN KEY (PaymentDetailsId)
-        REFERENCES PaymentDetails(Id)
+        REFERENCES PaymentDetails(Id) ON DELETE CASCADE
 );
