@@ -1,4 +1,5 @@
 ﻿using backend.Domain;
+using backend.Application.DTOs;
 using Microsoft.Data.SqlClient;
 
 namespace backend.Infraestructure
@@ -6,7 +7,7 @@ namespace backend.Infraestructure
     /// <summary>
     /// Repository for managing operations related to the Employees table.
     /// </summary>
-    public class EmployeeRepository
+    public class EmployeeRepository : IEmployeeRepository
     {
         private SqlConnection _connection; // SQL connection object
         private string _connectionString; // Connection string for the database
@@ -100,6 +101,59 @@ namespace backend.Infraestructure
                 }
 
                 _connection.Close();
+            }
+
+            return employees;
+        }
+
+        public async Task<List<EmployeeSummaryDto>> GetSummaryByCompanyIdAsync(Guid companyId)
+        {
+            var employees = new List<EmployeeSummaryDto>();
+            var query = @"
+                SELECT 
+                    e.Id,
+                    e.WorkerId,
+                    e.CompanyId,
+                    e.EmployeeStartDate,
+                    e.ContractType,
+                    e.GrossSalary,
+                    e.HasToReportHours,
+                    np.FirstName,
+                    np.FirstSurname,
+                    np.SecondSurname,
+                    np.UserId,
+                    np.Gender
+                FROM Employees e
+                INNER JOIN NaturalPersons np ON e.Id = np.Id
+                WHERE e.CompanyId = @CompanyId";
+
+            using (var connection = new SqlConnection(_connectionString))
+            using (var command = new SqlCommand(query, connection))
+            {
+                command.Parameters.AddWithValue("@CompanyId", companyId);
+
+                await connection.OpenAsync();
+                using (var reader = await command.ExecuteReaderAsync())
+                {
+                    while (await reader.ReadAsync())
+                    {
+                        employees.Add(new EmployeeSummaryDto
+                        {
+                            Id = reader.GetGuid(reader.GetOrdinal("Id")),
+                            WorkerId = reader["WorkerId"].ToString(),
+                            CompanyId = reader.GetGuid(reader.GetOrdinal("CompanyId")),
+                            EmployeeStartDate = reader.GetDateTime(reader.GetOrdinal("EmployeeStartDate")),
+                            ContractType = reader["ContractType"].ToString(),
+                            GrossSalary = reader.GetDecimal(reader.GetOrdinal("GrossSalary")),
+                            HasToReportHours = reader.GetBoolean(reader.GetOrdinal("HasToReportHours")),
+                            FirstName = reader["FirstName"].ToString(),
+                            FirstSurname = reader["FirstSurname"].ToString(),
+                            SecondSurname = reader["SecondSurname"].ToString(),
+                            UserId = reader["UserId"] == DBNull.Value ? null : reader["UserId"].ToString(),
+                            Gender = reader["Gender"].ToString()
+                        });
+                    }
+                }
             }
 
             return employees;

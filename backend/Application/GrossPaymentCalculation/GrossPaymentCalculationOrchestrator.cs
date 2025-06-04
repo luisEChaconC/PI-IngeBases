@@ -27,7 +27,7 @@ namespace backend.Application.GrossPaymentCalculation
                 throw new ArgumentException($"No strategy found for employee type: {type}");
             }
 
-            return strategy.CalculateGrossPayment(startDate, endDate,baseSalary, workedHours);
+            return strategy.CalculateGrossPayment(startDate, endDate, baseSalary, workedHours);
         }
     }
 }
