@@ -19,9 +19,6 @@
           <li v-if="showOption('viewWorkedHours')" class="nav-item">
             <a class="nav-link" href="#">Horas Laboradas</a>
           </li>
-          <li v-if="showOption('viewGeneratePayroll')" class="nav-item">
-            <a class="nav-link" href="#">Generar Planillas</a>
-          </li>
           <li v-if="showOption('viewHours')" class="nav-item">
             <a class="nav-link" href="#">Horas</a>
           </li>
@@ -118,7 +115,6 @@ export default {
           "viewRequestHourCorrection",
         ],
         SoftwareManager: [
-          "viewProfile",
           "viewCompanyManagement",
           "viewReports",
         ],
@@ -126,8 +122,8 @@ export default {
           "viewProfile",
           "viewPayments",
           "viewWorkedHours",
+          "viewEmployees",
           "viewBenefits",
-          "viewGeneratePayroll",
           "viewPayrolls",
         ],
       };
