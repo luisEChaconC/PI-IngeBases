@@ -31,6 +31,14 @@
           <li v-if="showOption('viewEmployees')" class="nav-item">
             <router-link to="/employees-list" class="nav-link">Empleados</router-link>
           </li>
+          <li v-if="showOption('viewBenefitsPayrollM')" class="nav-item">
+            <router-link
+              to="/benefits"
+              class="nav-link"
+            >
+              Editar Beneficios
+            </router-link>
+          </li>
           <li v-if="showOption('viewBenefits')" class="nav-item">
             <router-link
               v-if="employeeType === 'Employer'"
@@ -96,7 +104,7 @@ export default {
           "viewProfile", 
           "viewPayments", 
           "viewWorkedHours", 
-          "viewBenefits"
+          "viewBenefits",
         ],
         Employer: [
           "viewProfile",
@@ -125,6 +133,7 @@ export default {
           "viewEmployees",
           "viewBenefits",
           "viewPayrolls",
+          "viewBenefitsPayrollM"
         ],
       };
       return permissions[this.employeeType]?.includes(option);
