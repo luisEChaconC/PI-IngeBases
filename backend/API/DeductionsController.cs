@@ -4,7 +4,6 @@ using backend.Application.GrossPaymentCalculation;
 using backend.Application.Orchestrators.Deduction;
 using backend.Domain;
 using backend.Infraestructure;
-using backend.Services;
 using Microsoft.AspNetCore.Mvc;
 using System.Linq;
 
@@ -12,12 +11,11 @@ using System.Linq;
 [Route("api/[controller]")]
 public class DeductionsController : ControllerBase
 {
-    private DeductionOrchestrator _deductionOrchestrator;
+    private readonly IDeductionOrchestrator _deductionOrchestrator;
 
-    public DeductionsController(
-        DeductionOrchestrator deductionService)
+    public DeductionsController(IDeductionOrchestrator deductionOrchestrator)
     {
-        _deductionOrchestrator = deductionService;
+        _deductionOrchestrator = deductionOrchestrator;
     }
 
     [HttpPost("")]
@@ -28,6 +26,6 @@ public class DeductionsController : ControllerBase
         var deductionsList = (List<DeductionDetailModel>)result.deductions;
         decimal totalDeductions = deductionsList.Sum(d => d.AmountDeduced);
 
-        return Ok(new{result.deductions, totalDeductions});
+        return Ok(new { result.deductions, totalDeductions });
     }
 }

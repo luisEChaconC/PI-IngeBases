@@ -8,13 +8,17 @@ using backend.Application.Commands.Payroll;
 using backend.Application.Queries.Employees;
 using backend.Application.Queries.Company;
 using backend.Domain.Strategies;
-using backend.Services;
 using backend.Application;
 using backend.Infraestructure;
 using backend.Application.DeductionCalculation;
 using System.Text.Json.Serialization;
+using backend.Application.Queries.Payroll;
+using backend.Application.Benefits.Commands;
+using backend.Application.Benefits.Queries;
 using backend.Application.Orchestrators.Deduction;
 using backend.Application.Orchestrators.Payroll;
+using backend.Application.Queries.Payroll;
+using backend.Repositories;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -54,6 +58,8 @@ builder.Services.AddScoped<IUpdateDayCommand, UpdateDayCommand>();
 builder.Services.AddScoped<IUpdatePayrollIdInTimesheetsCommand, UpdatePayrollIdInTimesheetsCommand>();
 builder.Services.AddScoped<IInsertTimesheetsForPeriodCommand, InsertTimesheetsForPeriodCommand>();
 
+builder.Services.AddScoped<IBenefitRepository, BenefitService>();
+
 builder.Services.AddScoped<IPayrollRepository, PayrollRepository>();
 builder.Services.AddScoped<IGetPayrollsByCompanyIdQuery, GetPayrollsByCompanyIdQuery>();
 builder.Services.AddScoped<IGetPayrollsSummaryByCompanyIdQuery, GetPayrollsSummaryByCompanyIdQuery>();
@@ -66,7 +72,14 @@ builder.Services.AddScoped<IPayrollOrchestrator, PayrollOrchestrator>();
 builder.Services.AddScoped<ICompanyRepository, CompanyRepository>();
 builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
 
-builder.Services.AddScoped<BenefitService>();
+builder.Services.AddScoped<GetBenefitsQuery>();
+builder.Services.AddScoped<GetBenefitByIdQuery>();
+builder.Services.AddScoped<CreateBenefitCommand>();
+builder.Services.AddScoped<AssignBenefitsToEmployeeCommand>();
+builder.Services.AddScoped<GetAssignedBenefitsQuery>();
+builder.Services.AddScoped<UpdateBenefitCommand>();
+builder.Services.AddScoped<IsBenefitAssignedQuery>();
+
 builder.Services.AddScoped<IDeductionOrchestrator, DeductionOrchestrator>();
 
 // Register Payment Calculation Strategies
@@ -81,9 +94,14 @@ builder.Services.AddScoped<BenefitDeductionStrategy>();
 
 // Register Calculation Orchestrator
 builder.Services.AddScoped<DeductionCalculationOrchestrator>();
+builder.Services.AddScoped<APIRepository>();
+builder.Services.AddHttpClient<BenefitDeductionStrategy>();
 
 builder.Services.AddScoped<IDeductionDetailRepository, DeductionDetailRepository>();
 builder.Services.AddScoped<IInsertDeductionDetailsCommand, InsertDeductionDetailsCommand>();
+
+
+
 
 
 // Register Strategy Orchestrator
