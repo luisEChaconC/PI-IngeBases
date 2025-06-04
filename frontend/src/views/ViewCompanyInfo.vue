@@ -23,11 +23,11 @@
                     
                   </div>
 
-                  <!-- Cédula Jurídica -->
-                  <div class="col-md-6 mb-3 position-relative">
-                    <label for="legalId" class="form-label">Cédula Jurídica</label>
-                    <input type="text" class="form-control pe-5" id="legalId" v-model="company.person.legalId" :disabled="!isEditing || hasPayroll" placeholder="X-XXX-XXXXXX"/>
-                  </div>
+                 <!-- Cédula Jurídica -->
+                <div class="col-md-6 mb-3 position-relative">
+                  <label for="legalId" class="form-label">Cédula Jurídica</label>
+                  <input type="text" class="form-control pe-5" id="legalId" v-model="company.person.legalId" @input="isEditingLegalId = true" :disabled="!isEditing || hasPayroll" placeholder="X-XXX-XXXXXX"/>
+                </div>
 
                   <!-- Dirección -->
                   <div class="col-12 mb-3 position-relative">
@@ -85,18 +85,16 @@
                   </div>
 
                   <!-- Correo -->
-                  <div class="col-md-6 mb-3 position-relative">
-                    <label for="email" class="form-label">Correo</label>
-                    <input type="email" class="form-control pe-5" id="email" v-model="company.contact.email" :disabled="!isEditing" placeholder="nombre@ejemplo.com"/>
-                    
-                  </div>
+                <div class="col-md-6 mb-3 position-relative">
+                  <label for="email" class="form-label">Correo</label>
+                  <input type="email" class="form-control pe-5" id="email" v-model="company.contact.email" @input="isEditingEmail = true" :disabled="!isEditing" placeholder="nombre@ejemplo.com"/>
+                </div>
 
-                  <!-- Teléfono -->
-                  <div class="col-md-6 mb-3 position-relative">
-                    <label for="phoneNumber" class="form-label">Teléfono</label>
-                    <input type="tel" class="form-control pe-5" id="phoneNumber" v-model="company.contact.phoneNumber" :disabled="!isEditing" placeholder="8888-8888"/>
-                    
-                  </div>
+                <!-- Teléfono -->
+                <div class="col-md-6 mb-3 position-relative">
+                  <label for="phoneNumber" class="form-label">Teléfono</label>
+                  <input type="tel" class="form-control pe-5" id="phoneNumber" v-model="company.contact.phoneNumber" @input="isEditingPhone = true" :disabled="!isEditing" placeholder="8888-8888"/>
+                </div>
 
                   <!-- Cantidad máxima beneficios -->
                   <div class="col-md-6 mb-3 position-relative">
@@ -135,6 +133,9 @@ export default {
     return {
       isEditing: false,
       hasPayroll: false,
+      isEditingEmail: false,
+      isEditingPhone: false,
+      isEditingLegalId: false,
       company: {
         name: "",
         employeesCount: 0,
@@ -198,17 +199,19 @@ export default {
     }, 
 
    updateCompany() {
-      if (!this.emailHasValidFormat()) {
+ 
+      if (this.isEditingEmail && !this.emailHasValidFormat()) {
         alert("El correo no tiene un formato válido.");
         return;
       }
 
-      if (!this.phoneNumberHasValidFormat()) {
+   
+      if (this.isEditingPhone && !this.phoneNumberHasValidFormat()) {
         alert("El teléfono debe tener el formato ####-####.");
         return;
       }
 
-      if (!this.legalEntityIdHasAValidFormat() && !this.hasPayroll) {
+      if (this.isEditingLegalId && !this.legalEntityIdHasAValidFormat() && !this.hasPayroll) {
         alert("La cédula jurídica debe tener el formato #-###-######.");
         return;
       }
@@ -252,6 +255,9 @@ export default {
       cancelEdit() {
         this.company = JSON.parse(JSON.stringify(this.originalCompany));
         this.isEditing = false;
+        this.isEditingEmail = false;
+        this.isEditingPhone = false;
+        this.isEditingLegalId = false;
       },
       phoneNumberHasValidFormat() {
         const validFormat = /^[0-9]{4}-[0-9]{4}$/;
