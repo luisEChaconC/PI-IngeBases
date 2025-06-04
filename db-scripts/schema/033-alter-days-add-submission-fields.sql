@@ -1,0 +1,5 @@
+ALTER TABLE Days 
+ADD IsSubmitted BIT NOT NULL DEFAULT 0
+
+ALTER TABLE Days 
+ADD LastSubmitTimestamp DATETIME2
