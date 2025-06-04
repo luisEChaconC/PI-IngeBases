@@ -137,7 +137,7 @@ export default {
           "viewBenefits",
           "viewGeneratePayroll",
           "viewPayrolls",
-          "viewBenefitsPayrollM"
+          "viewBenefitsPayrollM",
           "viewEmployees"
         ],
       };
