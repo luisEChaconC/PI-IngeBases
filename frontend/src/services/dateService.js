@@ -1,6 +1,6 @@
 class DateService {
     constructor() {
-        this.testDate = '2024-01-30';
+        this.testDate = null;
     }
 
     async getCurrentDate() {
@@ -57,6 +57,61 @@ class DateService {
             date1.getMonth() === date2.getMonth() &&
             date1.getDate() === date2.getDate();
     }
+
+    formatDate(dateString) {
+        const date = new Date(dateString);
+        return date.toLocaleDateString('es-ES', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric'
+        });
+    }
+
+    formatDateTime(dateString) {
+        if (!dateString) return 'N/A';
+        const date = new Date(dateString);
+
+        console.log('Date object toString():', date.toString());
+        console.log('Date object getTimezoneOffset():', date.getTimezoneOffset());
+
+        return date.toLocaleString('es-ES', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+    }
+
+    getDayName(dateString) {
+        const date = new Date(dateString);
+        const dayNames = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+        return dayNames[date.getDay()];
+    }
+
+    getTimeAgo(dateString) {
+        if (!dateString) return 'N/A';
+
+        const now = new Date();
+        const date = new Date(dateString); // Ensure this is interpreted as UTC if the string format supports it
+        const diffMs = now.getTime() - date.getTime(); // Compare timestamps in milliseconds (independent of timezone for the diff)
+        const diffMins = Math.floor(diffMs / 60000);
+        const diffHours = Math.floor(diffMins / 60);
+        const diffDays = Math.floor(diffHours / 24);
+
+        if (diffMins < 1) return 'Hace menos de un minuto';
+        if (diffMins < 60) return `Hace ${diffMins} minuto${diffMins !== 1 ? 's' : ''}`;
+        if (diffHours < 24) return `Hace ${diffHours} hora${diffHours !== 1 ? 's' : ''}`;
+        if (diffDays < 7) return `Hace ${diffDays} día${diffDays !== 1 ? 's' : ''}`;
+
+        // For dates older than 7 days, show just the date.
+        return date.toLocaleDateString('es-ES', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric'
+        });
+    }
+
 }
 
 const dateService = new DateService();
