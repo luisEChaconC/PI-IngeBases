@@ -42,6 +42,17 @@ class CurrentUserService {
     removeCurrentUserInformationFromLocalStorage() {
         localStorage.removeItem('currentUserInformation');
     }
+
+    getCurrentEmployeeId() {
+        const userInfo = this.getCurrentUserInformationFromLocalStorage();
+
+        console.log("User info recibido:", userInfo);
+        if (userInfo && userInfo.idNaturalPerson) {
+            return userInfo.idNaturalPerson;
+        } else {
+            throw new Error('Employee ID not found in user information.');
+        }
+    }
 }
 
 // Export a pre-instantiated object of the service
