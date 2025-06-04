@@ -14,7 +14,7 @@
 
       <div class="mb-3">
         <label class="form-label">Nombre</label>
-        <input v-model="benefit.name" type="text" class="form-control" :disabled="!fieldEditability.name" />
+        <input v-model="benefit.name" type="text" class="form-control" :disabled="!fieldEditability.type" />
       </div>
 
       <div class="mb-3">
@@ -24,7 +24,24 @@
 
       <div class="mb-3">
         <label class="form-label">Tipo</label>
-        <input :value="translatedType" type="text" class="form-control" disabled />
+
+        <select
+          v-if="fieldEditability.type"
+          v-model="benefit.type"
+          class="form-select"
+        >
+          <option value="API">API</option>
+          <option value="FixedAmount">Monto Fijo</option>
+          <option value="FixedPercentage">Porcentaje Fijo</option>
+        </select>
+        
+        <input
+          v-else
+          :value="translatedType"
+          type="text"
+          class="form-control"
+          disabled
+        />
       </div>
 
       <div v-if="benefit.type === 'API'" class="mb-3">
@@ -152,6 +169,7 @@
       return {
         name: false,
         description: false,
+        type: false,
         linkAPI: false,
         fixedPercentage: false,
         fixedAmount: false,
@@ -164,6 +182,7 @@
       return {
         name: false,
         description: true,
+        type: false,
         linkAPI: false,
         fixedPercentage: false,
         fixedAmount: false,
@@ -176,6 +195,7 @@
     return {
       name: true,
       description: true,
+      type: true,
       linkAPI: true,
       fixedPercentage: true,
       fixedAmount: true,
