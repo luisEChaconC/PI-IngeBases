@@ -4,6 +4,6 @@ CREATE TABLE Payrolls (
     EndDate DATE NOT NULL,
     CompanyId UNIQUEIDENTIFIER NOT NULL,
     PayrollManagerId UNIQUEIDENTIFIER NOT NULL,
-    FOREIGN KEY (CompanyId) REFERENCES Companies(Id),
-    FOREIGN KEY (PayrollManagerId) REFERENCES PayrollManagers(Id) ON DELETE CASCADE
+    FOREIGN KEY (CompanyId) REFERENCES Companies(Id) ON DELETE CASCADE,
+    FOREIGN KEY (PayrollManagerId) REFERENCES PayrollManagers(Id)
 );
