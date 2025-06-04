@@ -3,14 +3,18 @@ using backend.Application.Queries.PaymentDetails;
 using backend.Application.Queries;
 using backend.Application.Commands;
 using backend.Application.GrossPaymentCalculation;
+using backend.Application.Queries.Payroll;
+using backend.Application.Commands.Payroll;
+using backend.Application.Queries.Employees;
+using backend.Application.Queries.Company;
 using backend.Domain.Strategies;
 using backend.Services;
 using backend.Application;
 using backend.Infraestructure;
-using backend.Application.GrossPaymentCalculation;
 using backend.Application.DeductionCalculation;
 using System.Text.Json.Serialization;
-using backend.Application.Queries.Payroll;
+using backend.Application.Orchestrators.Deduction;
+using backend.Application.Orchestrators.Payroll;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -51,9 +55,16 @@ builder.Services.AddScoped<IPayrollRepository, PayrollRepository>();
 builder.Services.AddScoped<IGetPayrollsByCompanyIdQuery, GetPayrollsByCompanyIdQuery>();
 builder.Services.AddScoped<IGetPayrollsSummaryByCompanyIdQuery, GetPayrollsSummaryByCompanyIdQuery>();
 builder.Services.AddScoped<ITimesheetRepository, TimesheetRepository>();
-builder.Services.AddScoped<BenefitService>();
-builder.Services.AddScoped<DeductionOrchestrator>();
+builder.Services.AddScoped<ICheckPayrollExistsQuery, CheckPayrollExistsQuery>();
+builder.Services.AddScoped<IGetEmployeesByCompanyIdQuery, GetEmployeesByCompanyIdQuery>();
+builder.Services.AddScoped<ICreatePayrollCommand, CreatePayrollCommand>();
+builder.Services.AddScoped<IGetCompanyPaymentTypeByCompanyIdQuery, GetCompanyPaymentTypeByCompanyIdQuery>();
+builder.Services.AddScoped<IPayrollOrchestrator, PayrollOrchestrator>();
+builder.Services.AddScoped<ICompanyRepository, CompanyRepository>();
+builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
 
+builder.Services.AddScoped<BenefitService>();
+builder.Services.AddScoped<IDeductionOrchestrator, DeductionOrchestrator>();
 
 // Register Payment Calculation Strategies
 builder.Services.AddScoped<MonthlyPaymentStrategy>();
