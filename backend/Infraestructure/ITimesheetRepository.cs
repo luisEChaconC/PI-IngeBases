@@ -11,5 +11,6 @@ namespace backend.Infraestructure
         DayModel? GetDayById(Guid dayId);
         bool UpdateDayWorkDetails(Guid dayId, int hoursWorked, string? description);
         bool UpdatePayrollIdInTimesheets(List<TimesheetModel> timesheets);
+        void InsertTimesheetsForPeriod(DateTime periodStartDate, DateTime periodEndDate, Guid employeeId, Guid? payrollId = null);
     }
 }
