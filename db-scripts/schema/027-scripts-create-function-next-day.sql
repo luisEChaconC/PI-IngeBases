@@ -1,0 +1,10 @@
+CREATE FUNCTION dbo.NextDay
+(
+    @Date DATE
+)
+RETURNS DATE
+AS
+BEGIN
+    DECLARE @NextDay DATE = DATEADD(DAY, 1, @Date)
+    RETURN @NextDay
+END
