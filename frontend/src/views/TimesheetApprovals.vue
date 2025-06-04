@@ -271,18 +271,12 @@ export default {
         const fetchedDays = await approvalService.getPendingDaysByEmployee(employeeId);
         this.selectedEmployeeDays = fetchedDays;
 
-        console.log('Días pendientes fetched:', fetchedDays);
         if (fetchedDays && fetchedDays.length > 0) {
             const firstDay = fetchedDays[0];
-            console.log('Timestamp crudo del primer día:', firstDay.lastSubmitTimestamp);
             const dateObj = new Date(firstDay.lastSubmitTimestamp);
-            console.log('Objeto Date del primer día:', dateObj);
-            console.log('Timestamp en ISO string (siempre UTC):', dateObj.toISOString());
-            console.log('Timestamp en string local:', dateObj.toString());
         }
 
       } catch (error) {
-        console.error('Error loading employee days:', error);
         this.modalError = error.message || 'Error al cargar los días pendientes del empleado.';
       } finally {
         this.loadingDays = false;
