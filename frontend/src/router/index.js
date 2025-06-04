@@ -44,10 +44,6 @@ const routes = [
             { path: '/view-employee-profile', name: 'ViewEmployeeProfile', component: ViewEmployeeProfile, meta: {allowedPositions: ['Employer', 'Collaborator', 'Payroll Manager', 'Supervisor', 'SoftwareManager']} },
             { path: '/view-company-info', name: 'ViewCompanyInfo', component: ViewCompanyInfo, meta: {allowedPositions: ['Employer', 'SoftwareManager']} },
             { path: '/payrolls-list', name: 'PayrollsList', component: PayrollsList, meta: {allowedPositions: ['Payroll Manager']} },
-            { path: '/select-change-benefit', name: 'SelectChangeBenefit', component: SelectChangeBenefit, meta: {allowedPositions: ['Employer', 'Collaborator']} },
-            { path: '/view-employee-profile', name: 'ViewEmployeeProfile', component: ViewEmployeeProfile, meta: {allowedPositions: ['Employer', 'Collaborator', "Payroll Manager","Supervisor", "SoftwareManager"]}},
-            { path: '/view-company-info', name: 'ViewCompanyInfo', component: ViewCompanyInfo, meta: {allowedPositions: ['Employer, SoftwareManager']} },
-            { path: '/payrolls-list', name: 'PayrollsList', component: PayrollsList },
             { path: '/employee-timesheet', name: 'EmployeeTimesheet', component: EmployeeTimesheet}
         ],
     },
