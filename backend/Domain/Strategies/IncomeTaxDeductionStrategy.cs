@@ -3,8 +3,11 @@ namespace backend.Domain.Strategies
 {
     public class IncomeTaxDeductionStrategy : IDeductionCalculationStrategy
     {
-        public decimal CalculateDeduction(decimal grossSalary, Benefit? benefit = null)
+        public decimal CalculateDeduction(decimal grossSalary, string contractType, string gender, Benefit? benefit = null, Guid? employeeId = null)
         {
+            if (contractType == "Professional Services")
+                return 0;
+                
             decimal totalTax = 0;
 
             if (grossSalary > 4_745_000m)

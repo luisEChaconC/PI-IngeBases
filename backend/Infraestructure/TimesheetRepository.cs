@@ -485,5 +485,32 @@ namespace backend.Infraestructure
                 _connection.Close();
             }
         }
+
+        public void InsertTimesheetsForPeriod(DateTime periodStartDate, DateTime periodEndDate, Guid employeeId, Guid? payrollId = null)
+        {
+            try
+            {
+                _connection.Open();
+                using (var command = new SqlCommand("dbo.InsertTimesheetsForPeriod", _connection))
+                {
+                    command.CommandType = CommandType.StoredProcedure;
+                    
+                    command.Parameters.AddWithValue("@PeriodStartDate", periodStartDate.Date);
+                    command.Parameters.AddWithValue("@PeriodEndDate", periodEndDate.Date);
+                    command.Parameters.AddWithValue("@EmployeeId", employeeId);
+                    command.Parameters.AddWithValue("@PayrollId", (object?)payrollId ?? DBNull.Value);
+                    
+                    command.ExecuteNonQuery();
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error inserting timesheets for period: {ex.Message}");
+            }
+            finally
+            {
+                _connection.Close();
+            }
+        }
     }
 }

@@ -1,6 +1,7 @@
 using backend.Domain;
 using backend.Domain.Requests;
 using backend.Infraestructure;
+using backend.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -169,5 +170,27 @@ namespace backend.API
                     new { message = "An error occurred while retrieving the company.", error = ex.Message });
             }
         }
+
+        [HttpPut("{id}")]
+        public IActionResult UpdateCompany(string id, [FromBody] UpdateCompanyModel company)
+        {
+            try
+            {
+                if (id != company.Id)
+                    return BadRequest("El ID de la compañía no coincide con el ID proporcionado en el URL");
+
+                _companyRepository.UpdateCompany(company);
+                return Ok("La compañía ha sido actualizada correctamente");
+            }
+            catch (Exception ex)
+            {
+                // Check for known validation errors
+                if (ex.Message.Contains("ya existe"))
+                    return Conflict(new { message = ex.Message }); 
+
+                return StatusCode(500, $"An update error occurred: {ex.Message}");
+            }
+        }
+
     }
 }

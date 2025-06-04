@@ -1,28 +1,36 @@
 using backend.Application.DeductionCalculation;
 using backend.Application.GrossPaymentCalculation;
-using backend.Services;
+using backend.Infraestructure;
 
-public class DeductionOrchestrator
+namespace backend.Application.Orchestrators.Deduction
 {
-    private readonly BenefitService _benefitService;
-    private readonly DeductionCalculationOrchestrator _deductionOrchestrator;
-    private readonly IInsertDeductionDetailsCommand _insertDeductionDetailsCommand;
-
-    public DeductionOrchestrator(
-        BenefitService benefitService,
-        DeductionCalculationOrchestrator deductionOrchestrator,
-        IInsertDeductionDetailsCommand insertDeductionDetailsCommand)
+    public interface IDeductionOrchestrator
     {
-        _benefitService = benefitService;
-        _deductionOrchestrator = deductionOrchestrator;
-        _insertDeductionDetailsCommand = insertDeductionDetailsCommand;
+        (object gross, object deductions) CalculateDeductions(CalculateDeductionDto dto);
     }
 
-    public (object gross, object deductions) CalculateDeductions(CalculateDeductionDto dto)
+    public class DeductionOrchestrator : IDeductionOrchestrator
     {
-        var benefits = _benefitService.GetAssignedBenefitsForEmployee(dto.EmployeeId);
-        var deductions = _deductionOrchestrator.CalculateTotalDeductions(dto.GrossSalary, benefits, dto.PaymentDetailsId);
-        _insertDeductionDetailsCommand.Execute(deductions);
-        return (dto.GrossSalary, deductions);
+        private readonly IBenefitRepository _benefitRepository;
+        private readonly DeductionCalculationOrchestrator _deductionOrchestrator;
+        private readonly IInsertDeductionDetailsCommand _insertDeductionDetailsCommand;
+
+        public DeductionOrchestrator(
+            IBenefitRepository benefitRepository,
+            DeductionCalculationOrchestrator deductionOrchestrator,
+            IInsertDeductionDetailsCommand insertDeductionDetailsCommand)
+        {
+            _benefitRepository = benefitRepository;
+            _deductionOrchestrator = deductionOrchestrator;
+            _insertDeductionDetailsCommand = insertDeductionDetailsCommand;
+        }
+
+        public (object gross, object deductions) CalculateDeductions(CalculateDeductionDto dto)
+        {
+            var benefits = _benefitRepository.GetAssignedBenefitsForEmployee(dto.EmployeeId);
+            var deductions = _deductionOrchestrator.CalculateTotalDeductions(dto.GrossSalary, dto.ContractType, dto.Gender, benefits, dto.PaymentDetailsId, dto.EmployeeId);
+            _insertDeductionDetailsCommand.Execute(deductions);
+            return (dto.GrossSalary, deductions);
+        }
     }
 }

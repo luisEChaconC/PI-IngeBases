@@ -26,6 +26,7 @@ namespace backend.Infraestructure
                     np.FirstName,
                     np.FirstSurname,
                     np.SecondSurname,
+                    np.Gender,
                     p.LegalId AS Cedula,
                     e.WorkerId,
                     e.ContractType,
@@ -35,7 +36,7 @@ namespace backend.Infraestructure
                     u.Email,
                     u.IsAdmin,
                     c.PhoneNumber,
-                    np.Gender  -- ← agregado aquí
+                    np.Gender  
                 FROM 
                     Employees e
                 JOIN NaturalPersons np ON e.Id = np.Id
@@ -70,11 +71,12 @@ namespace backend.Infraestructure
                                 FirstName = reader["FirstName"]?.ToString(),
                                 FirstSurname = reader["FirstSurname"]?.ToString(),
                                 SecondSurname = reader["SecondSurname"]?.ToString(),
+                                Gender = reader["Gender"]?.ToString(),
                                 Cedula = reader["Cedula"]?.ToString(),
                                 Email = reader["Email"]?.ToString(),
                                 IsAdmin = reader["IsAdmin"] != DBNull.Value ? Convert.ToBoolean(reader["IsAdmin"]) : (bool?)null,
                                 PhoneNumber = reader["PhoneNumber"]?.ToString(),
-                                Gender = reader["Gender"]?.ToString()
+                               
                             };
                         }
                     }

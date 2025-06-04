@@ -15,5 +15,6 @@ namespace backend.Infraestructure
         List<PendingApprovalWithEmployeeInfo> GetPendingApprovalsWithEmployeeInfo(Guid companyId);
         List<DayModel> GetPendingDaysByEmployee(Guid employeeId);
         bool ApproveDayById(Guid dayId, Guid supervisorId);
+        void InsertTimesheetsForPeriod(DateTime periodStartDate, DateTime periodEndDate, Guid employeeId, Guid? payrollId = null);
     }
 }

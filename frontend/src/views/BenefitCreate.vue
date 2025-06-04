@@ -11,6 +11,7 @@
     <div class="card shadow-sm p-4 rounded-4" style="width: 500px;">
       <h3 class="fw-bold mb-4">Nuevo Beneficio</h3>
 
+      <!-- Nombre (solo editable si no es tipo API) -->
       <div class="mb-3">
         <label class="form-label">Nombre</label>
         <input
@@ -19,6 +20,7 @@
           class="form-control"
           maxlength="35"
           @input="validateBenefit"
+          :disabled="benefit.type === 'API'"
         />
         <div v-if="errors.name" class="text-danger small mt-1">{{ errors.name }}</div>
       </div>
@@ -35,6 +37,7 @@
         <div v-if="errors.description" class="text-danger small mt-1">{{ errors.description }}</div>
       </div>
 
+      <!-- Tipo -->
       <div class="mb-3">
         <label class="form-label">Tipo</label>
         <select
@@ -48,18 +51,22 @@
         </select>
       </div>
 
+      <!-- Dropdown de APIs -->
       <div v-if="benefit.type === 'API'" class="mb-3">
-        <label class="form-label">Enlace API</label>
-        <input
-          v-model="benefit.linkAPI"
-          type="text"
-          class="form-control"
-          maxlength="100"
-          @input="validateBenefit"
-        />
+        <label class="form-label">Seleccionar API</label>
+        <select v-model="selectedApiId" class="form-select">
+          <option disabled value="">Seleccione una API</option>
+          <option v-for="api in apis" :key="api.id" :value="api.id">
+            {{ api.name }}
+          </option>
+        </select>
         <div v-if="errors.linkAPI" class="text-danger small mt-1">{{ errors.linkAPI }}</div>
       </div>
 
+      <!-- Campo oculto o readonly del linkAPI (opcional) -->
+      <input type="hidden" v-model="benefit.linkAPI" />
+
+      <!-- Porcentaje fijo -->
       <div v-if="benefit.type === 'FixedPercentage'" class="mb-3">
         <label class="form-label">Porcentaje fijo (%)</label>
         <div class="input-group">
@@ -76,6 +83,7 @@
         <div v-if="errors.fixedPercentage" class="text-danger small mt-1">{{ errors.fixedPercentage }}</div>
       </div>
 
+      <!-- Monto fijo -->
       <div v-if="benefit.type === 'FixedAmount'" class="mb-3">
         <label class="form-label">Monto fijo</label>
         <div class="input-group">
@@ -122,6 +130,7 @@
         </div>
       </div>
 
+      <!-- Botón Guardar -->
       <div class="text-center mt-4">
         <button
           class="btn btn-success"
@@ -136,11 +145,14 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import axios from 'axios'
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
+
+const apis = ref([])
+const selectedApiId = ref(null)
 
 const benefit = ref({
   name: '',
@@ -163,6 +175,7 @@ const employeeTypeOptions = [
   { value: 'Hourly', label: 'Por Horas' }
 ]
 
+// Validación
 const validateBenefit = () => {
   errors.value = {}
   const b = benefit.value
@@ -181,9 +194,7 @@ const validateBenefit = () => {
 
   if (b.type === 'API') {
     if (!b.linkAPI) {
-      errors.value.linkAPI = 'El enlace API es requerido.'
-    } else if (b.linkAPI.length > 100) {
-      errors.value.linkAPI = 'Máximo 100 caracteres.'
+      errors.value.linkAPI = 'Debe seleccionar una API.'
     }
   }
 
@@ -208,14 +219,12 @@ const validateBenefit = () => {
   }
 }
 
+// Guardar beneficio
 const saveBenefit = async () => {
   validateBenefit()
-  if (Object.keys(errors.value).length > 0) {
-    return
-  }
-  
+  if (Object.keys(errors.value).length > 0) return
+
   const userInfo = localStorage.getItem('currentUserInformation')
-  console.log(localStorage.getItem('currentUserInformation'))
   const companyId = userInfo ? JSON.parse(userInfo).companyId : null
 
   if (!companyId) {
@@ -226,6 +235,7 @@ const saveBenefit = async () => {
   benefit.value.companyId = companyId
 
   try {
+    console.log('Datos enviados al backend:', benefit.value)
     await axios.post('https://localhost:5000/api/benefit', benefit.value)
     alert('Beneficio guardado exitosamente')
     router.push('/benefits')
@@ -234,4 +244,38 @@ const saveBenefit = async () => {
     alert('Error al guardar el beneficio')
   }
 }
+
+// Cargar APIs
+const fetchAPIs = async () => {
+  try {
+    const response = await axios.get('https://localhost:5000/api/API')
+    apis.value = response.data
+  } catch (err) {
+    console.error('Error cargando APIs:', err.response?.data || err.message)
+  }
+}
+
+// Rellenar automáticamente nombre y linkAPI al seleccionar API
+watch(selectedApiId, (newApiId) => {
+  if (newApiId) {
+    const selectedApi = apis.value.find(api => api.id === newApiId)
+    benefit.value.linkAPI = 'https://dummy.api.com/endpoint'
+    benefit.value.name = selectedApi?.name || ''
+  } else {
+    benefit.value.name = ''
+    benefit.value.linkAPI = ''
+  }
+})
+
+// Limpiar campos si cambia tipo
+watch(() => benefit.value.type, (newType) => {
+  if (newType !== 'API') {
+    selectedApiId.value = null
+    benefit.value.linkAPI = ''
+  }
+})
+
+fetchAPIs()
 </script>
+
+

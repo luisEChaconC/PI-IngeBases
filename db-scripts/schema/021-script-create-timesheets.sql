@@ -5,5 +5,5 @@ CREATE TABLE Timesheets (
     EmployeeId UNIQUEIDENTIFIER NOT NULL,
     PayrollId UNIQUEIDENTIFIER,
     FOREIGN KEY (EmployeeId) REFERENCES Employees(Id),
-    FOREIGN KEY (PayrollId) REFERENCES Payrolls(Id)
+    FOREIGN KEY (PayrollId) REFERENCES Payrolls(Id) ON DELETE SET NULL
 )
