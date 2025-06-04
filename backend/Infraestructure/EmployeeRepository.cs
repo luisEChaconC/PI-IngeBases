@@ -66,7 +66,7 @@ namespace backend.Infraestructure
                     p.LegalId,
                     CASE 
                         WHEN s.Id IS NOT NULL THEN 'Supervisor'
-                        WHEN pm.Id IS NOT NULL THEN 'Payroll Manager'
+                        WHEN pm.Id IS NOT NULL THEN 'PayrollManager'
                         ELSE 'Collaborator'
                     END AS Position
                 FROM Employees e

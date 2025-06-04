@@ -39,7 +39,7 @@ namespace backend.Infraestructure
         -- Calculated Role
         CASE 
             WHEN s.Id IS NOT NULL THEN 'Supervisor'
-            WHEN pm.Id IS NOT NULL THEN 'Payroll Manager'
+            WHEN pm.Id IS NOT NULL THEN 'PayrollManager'
             ELSE 'Collaborator'
         END AS Role
     FROM 

@@ -87,7 +87,7 @@
                 >
                   <option value="">Seleccione una opción</option>
                   <option value="Supervisor">Supervisor</option>
-                  <option value="Payroll Manager">Encargado Planilla</option>
+                  <option value="PayrollManager">Encargado Planilla</option>
                   <option value="Collaborator">Colaborador</option>
                 </select>
                 <div v-if="editMode && !employee.role" class="invalid-feedback">
