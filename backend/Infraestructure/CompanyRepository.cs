@@ -242,51 +242,65 @@ namespace backend.Infraestructure
             return paymentType;
         }
 
+        private void ValidateDuplicateLegalId(SqlConnection connection, string legalId, string companyId)
+        {
+            var query = "SELECT COUNT(*) FROM Persons WHERE LegalId = @LegalId AND Id <> @Id";
+            using (var cmd = new SqlCommand(query, connection))
+            {
+                cmd.Parameters.AddWithValue("@LegalId", legalId);
+                cmd.Parameters.AddWithValue("@Id", companyId);
+                if ((int)cmd.ExecuteScalar() > 0)
+                    throw new Exception("El ID ya existe.");
+            }
+        }
+
+        private void ValidateDuplicateCompanyName(SqlConnection connection, string name, string companyId)
+        {
+            var query = "SELECT COUNT(*) FROM Companies WHERE Name = @Name AND Id <> @Id";
+            using (var cmd = new SqlCommand(query, connection))
+            {
+                cmd.Parameters.AddWithValue("@Name", name);
+                cmd.Parameters.AddWithValue("@Id", companyId);
+                if ((int)cmd.ExecuteScalar() > 0)
+                    throw new Exception("Nombre de empresa ya existe.");
+            }
+        }
+
+        private void ValidateDuplicatePhoneNumber(SqlConnection connection, string phoneNumber, string personId)
+        {
+            var query = "SELECT COUNT(*) FROM Contacts WHERE PhoneNumber = @PhoneNumber AND PersonId <> @Id";
+            using (var cmd = new SqlCommand(query, connection))
+            {
+                cmd.Parameters.AddWithValue("@PhoneNumber", phoneNumber);
+                cmd.Parameters.AddWithValue("@Id", personId);
+                if ((int)cmd.ExecuteScalar() > 0)
+                    throw new Exception("Teléfono ya existe.");
+            }
+        }
+
+        private void ValidateDuplicateEmail(SqlConnection connection, string email, string personId)
+        {
+            var query = "SELECT COUNT(*) FROM Contacts WHERE Email = @Email AND PersonId <> @Id";
+            using (var cmd = new SqlCommand(query, connection))
+            {
+                cmd.Parameters.AddWithValue("@Email", email);
+                cmd.Parameters.AddWithValue("@Id", personId);
+                if ((int)cmd.ExecuteScalar() > 0)
+                    throw new Exception("Correo electrónico ya existe.");
+            }
+        }
+
+
     	public void UpdateCompany(UpdateCompanyModel company)
         {
             using (var connection = new SqlConnection(_connectionString))
             {
                 connection.Open();
 
-                // Check for duplicate LegalId
-                var legalIdQuery = @"SELECT COUNT(*) FROM Persons WHERE LegalId = @LegalId AND Id <> @Id";
-                using (var cmd = new SqlCommand(legalIdQuery, connection))
-                {
-                    cmd.Parameters.AddWithValue("@LegalId", company.Person.LegalId);
-                    cmd.Parameters.AddWithValue("@Id", company.Id);
-                    if ((int)cmd.ExecuteScalar() > 0)
-                        throw new Exception("El ID ya existe.");
-                }
-
-                // Check for duplicate Name
-                var nameQuery = @"SELECT COUNT(*) FROM Companies WHERE Name = @Name AND Id <> @Id";
-                using (var cmd = new SqlCommand(nameQuery, connection))
-                {
-                    cmd.Parameters.AddWithValue("@Name", company.Name);
-                    cmd.Parameters.AddWithValue("@Id", company.Id);
-                    if ((int)cmd.ExecuteScalar() > 0)
-                        throw new Exception("Nombre de empresa ya existe.");
-                }
-
-                // Check for duplicate PhoneNumber
-                var phoneQuery = @"SELECT COUNT(*) FROM Contacts WHERE PhoneNumber = @PhoneNumber AND PersonId <> @Id";
-                using (var cmd = new SqlCommand(phoneQuery, connection))
-                {
-                    cmd.Parameters.AddWithValue("@PhoneNumber", company.Contact.PhoneNumber);
-                    cmd.Parameters.AddWithValue("@Id", company.Id);
-                    if ((int)cmd.ExecuteScalar() > 0)
-                        throw new Exception("Teléfono ya existe.");
-                }
-
-                // heck for duplicate Email
-                var emailQuery = @"SELECT COUNT(*) FROM Contacts WHERE Email = @Email AND PersonId <> @Id";
-                using (var cmd = new SqlCommand(emailQuery, connection))
-                {
-                    cmd.Parameters.AddWithValue("@Email", company.Contact.Email);
-                    cmd.Parameters.AddWithValue("@Id", company.Id);
-                    if ((int)cmd.ExecuteScalar() > 0)
-                        throw new Exception("Correo electrónico ya existe.");
-                }
+                ValidateDuplicateLegalId(connection, company.Person.LegalId, company.Id);
+                ValidateDuplicateCompanyName(connection, company.Name, company.Id);
+                ValidateDuplicatePhoneNumber(connection, company.Contact.PhoneNumber, company.Id);
+                ValidateDuplicateEmail(connection, company.Contact.Email, company.Id);
 
                 var query = @"
                     UPDATE Companies

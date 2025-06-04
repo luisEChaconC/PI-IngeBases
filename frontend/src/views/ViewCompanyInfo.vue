@@ -7,8 +7,6 @@
     >
       ← Volver
     </button>
-
-    <!-- Contenido principal con espaciado para evitar la barra superior -->
     <div class="main-content">
       <div class="container">
         <div class="row justify-content-center">
@@ -22,14 +20,13 @@
                   <div class="col-md-6 mb-3 position-relative">
                     <label for="name" class="form-label">Nombre</label>
                     <input type="text" class="form-control pe-5" id="name" v-model="company.name" :disabled="!isEditing" />
-                    <i v-if="isEditing" class="bi bi-pencil-fill text-dark position-absolute" style="top: 40px; right: 17px;"></i>
+                    
                   </div>
 
                   <!-- Cédula Jurídica -->
                   <div class="col-md-6 mb-3 position-relative">
                     <label for="legalId" class="form-label">Cédula Jurídica</label>
-                    <input type="text" class="form-control pe-5" id="legalId" v-model="company.person.legalId" :disabled="!isEditing" />
-                    <i v-if="isEditing" class="bi bi-pencil-fill text-dark position-absolute" style="top: 40px; right: 17px;"></i>
+                    <input type="text" class="form-control pe-5" id="legalId" v-model="company.person.legalId" :disabled="!isEditing || hasPayroll" placeholder="X-XXX-XXXXXX"/>
                   </div>
 
                   <!-- Dirección -->
@@ -54,7 +51,7 @@
 
                     <!-- Modo lectura, dirección completa en una sola línea -->
                     <input v-else type="text" class="form-control pe-5" :value="fullAddress" disabled />
-                    <i v-if="isEditing" class="bi bi-pencil-fill text-dark position-absolute" style="top: 40px; right: 17px;"></i>
+                    
                   </div>
 
                   
@@ -84,28 +81,28 @@
                       <option>{{ translatedPaymentType }}</option>
                     </select>
 
-                    <i v-if="isEditing" class="bi bi-pencil-fill text-dark position-absolute" style="top: 40px; right: 17px;"></i>
+                    
                   </div>
 
                   <!-- Correo -->
                   <div class="col-md-6 mb-3 position-relative">
                     <label for="email" class="form-label">Correo</label>
-                    <input type="email" class="form-control pe-5" id="email" v-model="company.contact.email" :disabled="!isEditing" />
-                    <i v-if="isEditing" class="bi bi-pencil-fill text-dark position-absolute" style="top: 40px; right: 17px;"></i>
+                    <input type="email" class="form-control pe-5" id="email" v-model="company.contact.email" :disabled="!isEditing" placeholder="nombre@ejemplo.com"/>
+                    
                   </div>
 
                   <!-- Teléfono -->
                   <div class="col-md-6 mb-3 position-relative">
                     <label for="phoneNumber" class="form-label">Teléfono</label>
-                    <input type="tel" class="form-control pe-5" id="phoneNumber" v-model="company.contact.phoneNumber" :disabled="!isEditing" />
-                    <i v-if="isEditing" class="bi bi-pencil-fill text-dark position-absolute" style="top: 40px; right: 17px;"></i>
+                    <input type="tel" class="form-control pe-5" id="phoneNumber" v-model="company.contact.phoneNumber" :disabled="!isEditing" placeholder="8888-8888"/>
+                    
                   </div>
 
                   <!-- Cantidad máxima beneficios -->
                   <div class="col-md-6 mb-3 position-relative">
                     <label for="maxBenefits" class="form-label">Cantidad máxima de beneficios por empleado</label>
                     <input type="tel" class="form-control pe-5" id="maxBenefits" v-model="company.maxBenefits" :disabled="!isEditing" />
-                    <i v-if="isEditing" class="bi bi-pencil-fill text-dark position-absolute" style="top: 40px; right: 17px;"></i>
+                    
                   </div>
                   
                   <!-- Editar -->
@@ -131,11 +128,13 @@
 <script>
 import axios from 'axios';
 import currentUserService from "@/services/currentUserService";
+
 export default {
   name: 'ViewCompanyInfo',
   data() {
     return {
       isEditing: false,
+      hasPayroll: false,
       company: {
         name: "",
         employeesCount: 0,
@@ -153,44 +152,77 @@ export default {
           email: ""
         },
       },
+      originalCompany: {},
     };
   },
 
   methods: {
-    getCompanyById(companyId) {
-      axios.get(`https://localhost:5000/api/Company/GetCompanyById/${companyId}`)
-        .then((response) => {
-          this.company = response.data;
-          this.company.employeesCount = response.data.employeesDynamic.length;
-          
-          const contactsList = response.data.contact; 
+    async getCompanyById(companyId) {
+      try {
+ 
+        const companyResponse = await axios.get(`https://localhost:5000/api/Company/GetCompanyById/${companyId}`);
+        this.company = companyResponse.data;
+        this.company.employeesCount = companyResponse.data.employeesDynamic.length;
+        
+        const contactsList = companyResponse.data.contact; 
 
-          this.company.contact = {
-            phoneNumber: contactsList.find(c => c.phoneNumber)?.phoneNumber || "",
-            email: contactsList.find(c => c.email)?.email || ""
-          };
+        this.company.contact = {
+          phoneNumber: contactsList.find(c => c.phoneNumber)?.phoneNumber || "",
+          email: contactsList.find(c => c.email)?.email || ""
+        };
 
-          console.log(response.data);
+        this.company.maxBenefits = companyResponse.data.maxBenefitsPerEmployee;
 
-          this.company.maxBenefits = response.data.maxBenefitsPerEmployee;
+        try {
+          // verifica si la empresa tiene planilla
+          const payrollResponse = await axios.get(`https://localhost:5000/api/Payroll/company/${companyId}`);
+          this.hasPayroll = payrollResponse.data && payrollResponse.data.length > 0;
+        } catch (payrollError) {
        
-        })
-        .catch((error) => {
-          console.error("Error retrieving company:", error);
-        });
+          this.hasPayroll = false;
+        }
+      } catch (error) {
+        console.error("Error retrieving company:", error);
+      }
     },
 
     toggleEdit() {
       if (this.isEditing) {
         this.updateCompany(); 
+      } else {
+        // Guardamos una copia del objeto original
+        this.originalCompany = JSON.parse(JSON.stringify(this.company));
       }
+
       this.isEditing = !this.isEditing;
     }, 
 
-    updateCompany() {
+   updateCompany() {
+      if (!this.emailHasValidFormat()) {
+        alert("El correo no tiene un formato válido.");
+        return;
+      }
+
+      if (!this.phoneNumberHasValidFormat()) {
+        alert("El teléfono debe tener el formato ####-####.");
+        return;
+      }
+
+      if (!this.legalEntityIdHasAValidFormat() && !this.hasPayroll) {
+        alert("La cédula jurídica debe tener el formato #-###-######.");
+        return;
+      }
+
       const currentUserInformation = currentUserService.getCurrentUserInformationFromLocalStorage();
 
-      axios.put(`https://localhost:5000/api/Company/${currentUserInformation.companyId}`, this.company)
+      const companyId = currentUserInformation.position?.trim() === "SoftwareManager"
+        ? localStorage.getItem("selectedCompanyId")
+        : currentUserInformation.companyId;
+
+      this.company.id = companyId;
+      this.company.person.legalId = this.company.person.legalId.replace(/-/g, '');
+      this.company.contact.phoneNumber = this.company.contact.phoneNumber.replace(/-/g, '');
+      axios.put(`https://localhost:5000/api/Company/${companyId}`, this.company)
         .then(() => {
           alert("Company updated successfully");
         })
@@ -200,13 +232,11 @@ export default {
           } else {
             alert("An error occurred while updating the company.");
           }
-          console.error("Error while updating company", error);
           console.error("Data sent:", this.company);
           console.error("Error while updating company", error.response?.data);
         });
     },
 
-    },
 
     handleBack() {
       const raw = localStorage.getItem("currentUserInformation");
@@ -217,29 +247,46 @@ export default {
       } else {
         this.$router.push("/home-view");
       }
-    }
+    },
+
+      cancelEdit() {
+        this.company = JSON.parse(JSON.stringify(this.originalCompany));
+        this.isEditing = false;
+      },
+      phoneNumberHasValidFormat() {
+        const validFormat = /^[0-9]{4}-[0-9]{4}$/;
+        return validFormat.test(this.company.contact.phoneNumber);
+      },
+
+      emailHasValidFormat() {
+        const validFormat = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return validFormat.test(this.company.contact.email);
+      },
+
+      legalEntityIdHasAValidFormat() {
+        const validFormat = /^\d-\d{3}-\d{6}$/;
+        return validFormat.test(this.company.person.legalId);
+      }
   },
+
+
 
   created() {
+    let companyId = null;
     const currentUserInformation = currentUserService.getCurrentUserInformationFromLocalStorage();
-    this.getCompanyById(currentUserInformation.companyId); 
+    
+    if (currentUserInformation.companyId) {
+      companyId = currentUserInformation.companyId;
+    } else {
+      companyId = localStorage.getItem("selectedCompanyId");
+    }
+
+    if (companyId) {
+      this.getCompanyById(companyId);
+    } else {
+      console.error("No se encontró un companyId para mostrar.");
+    }
   },
-  let companyId = null;
-
-  const currentUserInformation = currentUserService.getCurrentUserInformationFromLocalStorage();
-  
-  if (currentUserInformation.companyId) {
-    companyId = currentUserInformation.companyId;
-  } else {
-    companyId = localStorage.getItem("selectedCompanyId");
-  }
-
-  if (companyId) {
-    this.getCompanyById(companyId);
-  } else {
-    console.error("No se encontró un companyId para mostrar.");
-  }
-},
 
   computed: {
     fullAddress() {
