@@ -16,11 +16,11 @@
           <li v-if="showOption('viewProfile')" class="nav-item">
             <router-link to="/view-employee-profile" class="nav-link">Perfil</router-link>
           </li>
-          <li v-if="showOption('viewWorkedHours')" class="nav-item">
-            <a class="nav-link" href="#">Horas Laboradas</a>
+          <li v-if="showOption('timesheet')" class="nav-item">
+            <router-link to="/employee-timesheet" class="nav-link">Reportar Horas</router-link>
           </li>
-          <li v-if="showOption('viewHours')" class="nav-item">
-            <a class="nav-link" href="#">Horas</a>
+          <li v-if="showOption('timesheetApprovals')" class="nav-item">
+            <router-link to="/timesheet-approvals" class="nav-link">Aprobar Horas</router-link>
           </li>
           <li v-if="showOption('viewPayments')" class="nav-item">
             <a class="nav-link" href="#">Pagos</a>
@@ -56,9 +56,7 @@
             </router-link>
             <a v-else href="#" class="nav-link">Beneficios</a>
           </li>
-          <li v-if="showOption('viewRequestHourCorrection')" class="nav-item">
-            <a class="nav-link" href="#">Corrección Horas</a>
-          </li>
+
           <li v-if="showOption('viewReportsPayments')" class="nav-item">
             <a class="nav-link" href="#">Reportes y Pagos</a>
           </li>
@@ -105,6 +103,7 @@ export default {
           "viewPayments", 
           "viewWorkedHours", 
           "viewBenefits",
+          "timesheet",
         ],
         Employer: [
           "viewProfile",
@@ -120,7 +119,8 @@ export default {
           "viewWorkedHours",
           "viewBenefits",
           "viewHours",
-          "viewRequestHourCorrection",
+          "timesheet",
+          "timesheetApprovals",
         ],
         SoftwareManager: [
           "viewCompanyManagement",
@@ -134,7 +134,8 @@ export default {
           "viewBenefits",
           "viewPayrolls",
           "viewBenefitsPayrollM",
-          "viewEmployees"
+          "viewEmployees",
+          "timesheet",
         ],
       };
       return permissions[this.employeeType]?.includes(option);
