@@ -6,6 +6,6 @@ CREATE TABLE PaymentDetails (
 	EmployeeId UNIQUEIDENTIFIER NOT NULL,
 	GrossSalary DECIMAL(11,3) NOT NULL,
 	IssueDate DATE NOT NULL,
-	FOREIGN KEY (PayrollId) REFERENCES Payrolls(Id),
+	FOREIGN KEY (PayrollId) REFERENCES Payrolls(Id) ON DELETE CASCADE,
 	FOREIGN KEY (EmployeeId) REFERENCES Employees(Id),
 );
