@@ -59,7 +59,7 @@ namespace backend.Infraestructure
         public List<DayModel> GetDaysByTimesheetId(Guid timesheetId)
         {
             var days = new List<DayModel>();
-            var query = @"SELECT Id, Date, HoursWorked, WorkDescription, IsApproved, TimesheetId, SupervisorId FROM Days
+            var query = @"SELECT Id, Date, HoursWorked, WorkDescription, IsApproved, TimesheetId, SupervisorId, IsSubmitted, LastSubmitTimestamp FROM Days
                 WHERE TimesheetId = @TimesheetId
                 ORDER BY Date ASC";
             try
@@ -72,6 +72,10 @@ namespace backend.Infraestructure
                     {
                         while (reader.Read())
                         {
+                            DateTime? lastSubmitTimestamp = reader["LastSubmitTimestamp"] != DBNull.Value 
+                                ? DateTime.SpecifyKind(reader.GetDateTime(reader.GetOrdinal("LastSubmitTimestamp")), DateTimeKind.Utc)
+                                : (DateTime?)null;
+
                             days.Add(new DayModel
                             {
                                 Id = reader.GetGuid(reader.GetOrdinal("Id")),
@@ -80,7 +84,9 @@ namespace backend.Infraestructure
                                 WorkDescription = reader["WorkDescription"] != DBNull.Value ? reader.GetString(reader.GetOrdinal("WorkDescription")) : null,
                                 IsApproved = reader.GetBoolean(reader.GetOrdinal("IsApproved")),
                                 TimesheetId = reader.GetGuid(reader.GetOrdinal("TimesheetId")),
-                                SupervisorId = reader["SupervisorId"] != DBNull.Value ? reader.GetGuid(reader.GetOrdinal("SupervisorId")) : (Guid?)null
+                                SupervisorId = reader["SupervisorId"] != DBNull.Value ? reader.GetGuid(reader.GetOrdinal("SupervisorId")) : (Guid?)null,
+                                IsSubmitted = reader.GetBoolean(reader.GetOrdinal("IsSubmitted")),
+                                LastSubmitTimestamp = lastSubmitTimestamp
                             });
                         }
                     }
@@ -171,7 +177,7 @@ namespace backend.Infraestructure
         public DayModel? GetDayById(Guid dayId)
         {
             DayModel? day = null;
-            var query = @"SELECT Id, Date, HoursWorked, WorkDescription, IsApproved, TimesheetId, SupervisorId 
+            var query = @"SELECT Id, Date, HoursWorked, WorkDescription, IsApproved, TimesheetId, SupervisorId, IsSubmitted, LastSubmitTimestamp 
                           FROM Days WHERE Id = @DayId";
             
             try
@@ -184,6 +190,10 @@ namespace backend.Infraestructure
                     {
                         if (reader.Read())
                         {
+                            DateTime? lastSubmitTimestamp = reader["LastSubmitTimestamp"] != DBNull.Value 
+                                ? DateTime.SpecifyKind(reader.GetDateTime(reader.GetOrdinal("LastSubmitTimestamp")), DateTimeKind.Utc)
+                                : (DateTime?)null;
+
                             day = new DayModel
                             {
                                 Id = reader.GetGuid("Id"),
@@ -192,7 +202,9 @@ namespace backend.Infraestructure
                                 WorkDescription = reader["WorkDescription"] != DBNull.Value ? reader.GetString("WorkDescription") : null,
                                 IsApproved = reader.GetBoolean("IsApproved"),
                                 TimesheetId = reader.GetGuid("TimesheetId"),
-                                SupervisorId = reader["SupervisorId"] != DBNull.Value ? reader.GetGuid("SupervisorId") : null
+                                SupervisorId = reader["SupervisorId"] != DBNull.Value ? reader.GetGuid("SupervisorId") : null,
+                                IsSubmitted = reader.GetBoolean("IsSubmitted"),
+                                LastSubmitTimestamp = lastSubmitTimestamp
                             };
                         }
                     }
@@ -233,6 +245,210 @@ namespace backend.Infraestructure
             catch (Exception ex)
             {
                 throw new Exception($"Error updating day: {ex.Message}");
+            }
+            finally
+            {
+                _connection.Close();
+            }
+        }
+
+        public List<PendingApprovalSummary> GetPendingApprovalsByEmployee()
+        {
+            var pendingApprovals = new List<PendingApprovalSummary>();
+            var query = @"
+                SELECT 
+                    t.EmployeeId,
+                    COUNT(d.Id) as PendingDaysCount,
+                    MAX(d.LastSubmitTimestamp) as LatestSubmissionTimestamp,
+                    MIN(d.Date) as EarliestDayDate,
+                    MAX(d.Date) as LatestDayDate
+                FROM Days d
+                INNER JOIN Timesheets t ON d.TimesheetId = t.Id
+                WHERE d.IsSubmitted = 1 AND d.IsApproved = 0
+                GROUP BY t.EmployeeId
+                ORDER BY MAX(d.LastSubmitTimestamp) DESC";
+            
+            try
+            {
+                _connection.Open();
+                using (var command = new SqlCommand(query, _connection))
+                {
+                    using (var reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            DateTime? latestSubmissionTimestamp = reader["LatestSubmissionTimestamp"] != DBNull.Value 
+                                ? DateTime.SpecifyKind(reader.GetDateTime(reader.GetOrdinal("LatestSubmissionTimestamp")), DateTimeKind.Utc)
+                                : (DateTime?)null;
+
+                            pendingApprovals.Add(new PendingApprovalSummary
+                            {
+                                EmployeeId = reader.GetGuid("EmployeeId"),
+                                PendingDaysCount = reader.GetInt32("PendingDaysCount"),
+                                LatestSubmissionTimestamp = latestSubmissionTimestamp,
+                                EarliestDayDate = reader.GetDateTime("EarliestDayDate"),
+                                LatestDayDate = reader.GetDateTime("LatestDayDate")
+                            });
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error retrieving pending approvals: {ex.Message}");
+            }
+            finally
+            {
+                _connection.Close();
+            }
+
+            return pendingApprovals;
+        }
+
+        public List<PendingApprovalWithEmployeeInfo> GetPendingApprovalsWithEmployeeInfo(Guid companyId)
+        {
+            var pendingApprovals = new List<PendingApprovalWithEmployeeInfo>();
+            var query = @"
+                SELECT 
+                    t.EmployeeId,
+                    COUNT(d.Id) as PendingDaysCount,
+                    MAX(d.LastSubmitTimestamp) as LatestSubmissionTimestamp,
+                    MIN(d.Date) as EarliestDayDate,
+                    MAX(d.Date) as LatestDayDate,
+                    np.FirstName,
+                    np.FirstSurname,
+                    np.SecondSurname,
+                    p.LegalId AS Cedula
+                FROM Days d
+                INNER JOIN Timesheets t ON d.TimesheetId = t.Id
+                INNER JOIN Employees e ON t.EmployeeId = e.Id
+                INNER JOIN NaturalPersons np ON e.Id = np.Id
+                INNER JOIN Persons p ON np.Id = p.Id
+                WHERE d.IsSubmitted = 1 AND d.IsApproved = 0 AND e.CompanyId = @CompanyId
+                GROUP BY t.EmployeeId, np.FirstName, np.FirstSurname, np.SecondSurname, p.LegalId
+                ORDER BY MAX(d.LastSubmitTimestamp) DESC";
+            
+            try
+            {
+                _connection.Open();
+                using (var command = new SqlCommand(query, _connection))
+                {
+                    command.Parameters.AddWithValue("@CompanyId", companyId);
+                    using (var reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            DateTime? latestSubmissionTimestamp = reader["LatestSubmissionTimestamp"] != DBNull.Value 
+                                ? DateTime.SpecifyKind(reader.GetDateTime(reader.GetOrdinal("LatestSubmissionTimestamp")), DateTimeKind.Utc)
+                                : (DateTime?)null;
+
+                            pendingApprovals.Add(new PendingApprovalWithEmployeeInfo
+                            {
+                                EmployeeId = reader.GetGuid("EmployeeId"),
+                                PendingDaysCount = reader.GetInt32("PendingDaysCount"),
+                                LatestSubmissionTimestamp = latestSubmissionTimestamp,
+                                EarliestDayDate = reader.GetDateTime("EarliestDayDate"),
+                                LatestDayDate = reader.GetDateTime("LatestDayDate"),
+                                FirstName = reader["FirstName"]?.ToString(),
+                                FirstSurname = reader["FirstSurname"]?.ToString(),
+                                SecondSurname = reader["SecondSurname"]?.ToString(),
+                                Cedula = reader["Cedula"]?.ToString()
+                            });
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error retrieving pending approvals with employee info for company {companyId}: {ex.Message}");
+            }
+            finally
+            {
+                _connection.Close();
+            }
+
+            return pendingApprovals;
+        }
+
+        public List<DayModel> GetPendingDaysByEmployee(Guid employeeId)
+        {
+            var days = new List<DayModel>();
+            var query = @"
+                SELECT d.Id, d.Date, d.HoursWorked, d.WorkDescription, d.IsApproved, d.TimesheetId, 
+                       d.SupervisorId, d.IsSubmitted, d.LastSubmitTimestamp
+                FROM Days d
+                INNER JOIN Timesheets t ON d.TimesheetId = t.Id
+                WHERE t.EmployeeId = @EmployeeId 
+                  AND d.IsSubmitted = 1 
+                  AND d.IsApproved = 0
+                ORDER BY d.LastSubmitTimestamp DESC, d.Date ASC";
+            
+            try
+            {
+                _connection.Open();
+                using (var command = new SqlCommand(query, _connection))
+                {
+                    command.Parameters.AddWithValue("@EmployeeId", employeeId);
+                    using (var reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            DateTime? lastSubmitTimestamp = reader["LastSubmitTimestamp"] != DBNull.Value 
+                                ? DateTime.SpecifyKind(reader.GetDateTime(reader.GetOrdinal("LastSubmitTimestamp")), DateTimeKind.Utc)
+                                : (DateTime?)null;
+
+                            days.Add(new DayModel
+                            {
+                                Id = reader.GetGuid("Id"),
+                                Date = reader.GetDateTime("Date"),
+                                HoursWorked = reader["HoursWorked"] != DBNull.Value ? reader.GetInt32("HoursWorked") : null,
+                                WorkDescription = reader["WorkDescription"] != DBNull.Value ? reader.GetString("WorkDescription") : null,
+                                IsApproved = reader.GetBoolean("IsApproved"),
+                                TimesheetId = reader.GetGuid("TimesheetId"),
+                                SupervisorId = reader["SupervisorId"] != DBNull.Value ? reader.GetGuid("SupervisorId") : null,
+                                IsSubmitted = reader.GetBoolean("IsSubmitted"),
+                                LastSubmitTimestamp = lastSubmitTimestamp
+                            });
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error retrieving pending days: {ex.Message}");
+            }
+            finally
+            {
+                _connection.Close();
+            }
+
+            return days;
+        }
+
+        public bool ApproveDayById(Guid dayId, Guid supervisorId)
+        {
+            Console.WriteLine(supervisorId);
+
+            var query = @"UPDATE Days 
+                          SET IsApproved = 1, 
+                              SupervisorId = @SupervisorId
+                          WHERE Id = @Id AND IsSubmitted = 1 AND IsApproved = 0";
+            
+            try
+            {
+                _connection.Open();
+                using (var command = new SqlCommand(query, _connection))
+                {
+                    command.Parameters.AddWithValue("@Id", dayId);
+                    command.Parameters.AddWithValue("@SupervisorId", supervisorId);
+                    
+                    int rowsAffected = command.ExecuteNonQuery();
+                    return rowsAffected > 0;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error approving day: {ex.Message}");
             }
             finally
             {
