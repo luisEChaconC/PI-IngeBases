@@ -51,6 +51,8 @@ builder.Services.AddScoped<IGetPaymentDetailsByEmployeeIdQuery, GetPaymentDetail
 builder.Services.AddScoped<IGetPaymentDetailsByCompanyIdQuery, GetPaymentDetailsByCompanyIdQuery>();
 builder.Services.AddScoped<IGetDaysByTimesheetIdQuery, GetDaysByTimesheetIdQuery>();
 builder.Services.AddScoped<IGetEmployeeHoursInPeriodQuery, GetEmployeeHoursInPeriodQuery>();
+builder.Services.AddScoped<IGetEmployeeTimesheetByDateQuery, GetEmployeeTimesheetByDateQuery>();
+builder.Services.AddScoped<IUpdateDayCommand, UpdateDayCommand>();
 builder.Services.AddScoped<IUpdatePayrollIdInTimesheetsCommand, UpdatePayrollIdInTimesheetsCommand>();
 
 builder.Services.AddScoped<IBenefitRepository, BenefitService>();
