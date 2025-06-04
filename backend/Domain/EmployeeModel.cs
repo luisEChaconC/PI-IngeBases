@@ -5,14 +5,14 @@ namespace backend.Domain
 {
     public class EmployeeModel
     {
-        public string Id { get; set; }
+        public Guid Id { get; set; }
 
         [Required(ErrorMessage = "WorkerId is required.")]
         [StringLength(80, ErrorMessage = "WorkerId cannot exceed 80 characters.")]
         public string WorkerId { get; set; }
 
         [Required(ErrorMessage = "CompanyId is required.")]
-        public string CompanyId { get; set; }
+        public Guid CompanyId { get; set; }
 
         [Required(ErrorMessage = "EmployeeStartDate is required.")]
         public DateTime EmployeeStartDate { get; set; }
@@ -30,16 +30,16 @@ namespace backend.Domain
 
         public EmployeeModel()
         {
-            Id = string.Empty;
+            Id = Guid.Empty;
             WorkerId = string.Empty;
-            CompanyId = string.Empty;
+            CompanyId = Guid.Empty;
             EmployeeStartDate = DateTime.Now;
             ContractType = string.Empty;
             GrossSalary = 0.0m;
             HasToReportHours = false;
         }
 
-        public EmployeeModel(string id, string workerId, string companyId, DateTime employeeStartDate, string contractType, decimal grossSalary, bool hasToReportHours)
+        public EmployeeModel(Guid id, string workerId, Guid companyId, DateTime employeeStartDate, string contractType, decimal grossSalary, bool hasToReportHours)
         {
             Id = id;
             WorkerId = workerId;

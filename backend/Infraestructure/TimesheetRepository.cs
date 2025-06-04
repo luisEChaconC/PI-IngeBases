@@ -125,5 +125,149 @@ namespace backend.Infraestructure
 
             return totalWorkHours;
         }
+
+        public TimesheetModel? GetTimesheetByEmployeeAndDate(Guid employeeId, DateTime date)
+        {
+            TimesheetModel? timesheet = null;
+            var query = @"SELECT Id, StartDate, EndDate, PayrollId
+                FROM Timesheets
+                WHERE EmployeeId = @EmployeeId
+                    AND @Date >= StartDate AND @Date <= EndDate";
+            try
+            {
+                _connection.Open();
+                using (var command = new SqlCommand(query, _connection))
+                {
+                    command.Parameters.AddWithValue("@EmployeeId", employeeId);
+                    command.Parameters.AddWithValue("@Date", date.Date);
+                    using (var reader = command.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            timesheet = new TimesheetModel
+                            {
+                                Id = reader.GetGuid(reader.GetOrdinal("Id")),
+                                StartDate = reader.GetDateTime(reader.GetOrdinal("StartDate")),
+                                EndDate = reader.GetDateTime(reader.GetOrdinal("EndDate")),
+                                EmployeeId = employeeId,
+                                PayrollId = reader["PayrollId"] != DBNull.Value ? reader.GetGuid(reader.GetOrdinal("PayrollId")) : (Guid?)null
+                            };
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error retrieving timesheet: {ex.Message}");
+            }
+            finally
+            {
+                _connection.Close();
+            }
+
+            return timesheet;
+        }
+
+        public DayModel? GetDayById(Guid dayId)
+        {
+            DayModel? day = null;
+            var query = @"SELECT Id, Date, HoursWorked, WorkDescription, IsApproved, TimesheetId, SupervisorId 
+                          FROM Days WHERE Id = @DayId";
+            
+            try
+            {
+                _connection.Open();
+                using (var command = new SqlCommand(query, _connection))
+                {
+                    command.Parameters.AddWithValue("@DayId", dayId);
+                    using (var reader = command.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            day = new DayModel
+                            {
+                                Id = reader.GetGuid("Id"),
+                                Date = reader.GetDateTime("Date"),
+                                HoursWorked = reader["HoursWorked"] != DBNull.Value ? reader.GetInt32("HoursWorked") : null,
+                                WorkDescription = reader["WorkDescription"] != DBNull.Value ? reader.GetString("WorkDescription") : null,
+                                IsApproved = reader.GetBoolean("IsApproved"),
+                                TimesheetId = reader.GetGuid("TimesheetId"),
+                                SupervisorId = reader["SupervisorId"] != DBNull.Value ? reader.GetGuid("SupervisorId") : null
+                            };
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error retrieving day: {ex.Message}");
+            }
+            finally
+            {
+                _connection.Close();
+            }
+
+            return day;
+        }
+
+        public bool UpdateDayWorkDetails(Guid dayId, int hoursWorked, string? description)
+        {
+            var query = @"UPDATE Days 
+                          SET HoursWorked = @HoursWorked, 
+                              WorkDescription = @WorkDescription
+                          WHERE Id = @Id";
+            
+            try
+            {
+                _connection.Open();
+                using (var command = new SqlCommand(query, _connection))
+                {
+                    command.Parameters.AddWithValue("@Id", dayId);
+                    command.Parameters.AddWithValue("@HoursWorked", hoursWorked);
+                    command.Parameters.AddWithValue("@WorkDescription", (object?)description ?? DBNull.Value);
+                    
+                    int rowsAffected = command.ExecuteNonQuery();
+                    return rowsAffected > 0;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error updating day: {ex.Message}");
+            }
+            finally
+            {
+                _connection.Close();
+            }
+        }
+
+        public bool UpdatePayrollIdInTimesheets(List<TimesheetModel> timesheets)
+        {
+            var query = @"UPDATE Timesheets 
+                          SET PayrollId = @PayrollId 
+                          WHERE Id = @Id";
+            
+            try
+            {
+                _connection.Open();
+                foreach (var timesheet in timesheets)
+                {
+                    using (var command = new SqlCommand(query, _connection))
+                    {
+                        command.Parameters.AddWithValue("@PayrollId", (object?)timesheet.PayrollId ?? DBNull.Value);
+                        command.Parameters.AddWithValue("@Id", timesheet.Id);
+                        command.ExecuteNonQuery();
+                    }
+                }
+                return true;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error updating payrollId in timesheets: {ex.Message}");
+            }
+            finally
+            {
+                _connection.Close();
+            }
+        }
     }
 }

@@ -98,11 +98,11 @@ namespace backend.API
                 // Handle role-specific creation
                 if (request.EmployeeRole == "Supervisor")
                 {
-                    _supervisorController.CreateSupervisorDependency(employee.Id);
+                    _supervisorController.CreateSupervisorDependency(employee.Id.ToString());
                 }
                 else if (request.EmployeeRole == "Payroll Manager")
                 {
-                    _payrollManagerController.CreatePayrollManagerDependency(employee.Id);
+                    _payrollManagerController.CreatePayrollManagerDependency(employee.Id.ToString());
                 }
 
                 return Created("", new { message = "Employee and all dependencies created successfully" });
@@ -121,7 +121,7 @@ namespace backend.API
         [NonAction]
         private void CreateEmployeeDependency(EmployeeModel employee, string naturalPersonId)
         {
-            employee.Id = naturalPersonId;
+            employee.Id = Guid.Parse(naturalPersonId);
 
             var employeeResult = CreateEmployee(employee) as ObjectResult;
             if (employeeResult == null || employeeResult.StatusCode != StatusCodes.Status201Created)

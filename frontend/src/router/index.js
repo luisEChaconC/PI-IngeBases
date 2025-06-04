@@ -14,6 +14,8 @@ import ViewEmployeeProfileEmployer from '../views/ViewEmployeeProfileEmployer.vu
 import ViewCompanyInfo from '@/views/ViewCompanyInfo.vue'
 import ViewCompaniesList from '../views/ViewCompaniesList.vue'
 import HomeView from '../views/HomeView.vue'
+import PayrollsList from '@/views/PayrollsList.vue'
+import EmployeeTimesheet from '@/views/EmployeeTimesheet.vue'
 import UnauthorizedView from '@/views/UnauthorizedView.vue'
 
 import CurrentUserService from '@/services/currentUserService'
@@ -41,6 +43,8 @@ const routes = [
             { path: '/select-change-benefit', name: 'SelectChangeBenefit', component: SelectChangeBenefit, meta: {allowedPositions: ['Employer', 'Collaborator']} },
             { path: '/view-employee-profile', name: 'ViewEmployeeProfile', component: ViewEmployeeProfile, meta: {allowedPositions: ['Employer', 'Collaborator', "Payroll Manager","Supervisor", "SoftwareManager"]}},
             { path: '/view-company-info', name: 'ViewCompanyInfo', component: ViewCompanyInfo, meta: {allowedPositions: ['Employer, SoftwareManager']} },
+            { path: '/payrolls-list', name: 'PayrollsList', component: PayrollsList },
+            { path: '/employee-timesheet', name: 'EmployeeTimesheet', component: EmployeeTimesheet}
         ],
     },
 ]

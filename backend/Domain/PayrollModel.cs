@@ -5,7 +5,7 @@ namespace backend.Domain
 {
     public class PayrollModel
     {
-        public string Id { get; set; }
+        public Guid Id { get; set; }
 
         [Required(ErrorMessage = "StartDate is required.")]
         public DateTime StartDate { get; set; }
@@ -14,21 +14,21 @@ namespace backend.Domain
         public DateTime EndDate { get; set; }
 
         [Required(ErrorMessage = "CompanyId is required.")]
-        public string CompanyId { get; set; }
+        public Guid CompanyId { get; set; }
 
         [Required(ErrorMessage = "PayrollManagerId is required.")]
-        public string PayrollManagerId { get; set; }
+        public Guid PayrollManagerId { get; set; }
 
         public PayrollModel()
         {
-            Id = string.Empty;
-            CompanyId = string.Empty;
-            PayrollManagerId = string.Empty;
+            Id = Guid.Empty;
+            CompanyId = Guid.Empty;
+            PayrollManagerId = Guid.Empty;
             StartDate = DateTime.Now;
             EndDate = DateTime.Now;
         }
 
-        public PayrollModel(string id, DateTime startDate, DateTime endDate, string companyId, string payrollManagerId)
+        public PayrollModel(Guid id, DateTime startDate, DateTime endDate, Guid companyId, Guid payrollManagerId)
         {
             Id = id;
             StartDate = startDate;

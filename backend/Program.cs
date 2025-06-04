@@ -1,13 +1,21 @@
 using backend.Application.Commands.PaymentDetails;
 using backend.Application.Queries.PaymentDetails;
 using backend.Application.Queries;
+using backend.Application.Commands;
 using backend.Application.GrossPaymentCalculation;
+using backend.Application.Queries.Payroll;
+using backend.Application.Commands.Payroll;
+using backend.Application.Queries.Employees;
+using backend.Application.Queries.Company;
 using backend.Domain.Strategies;
 using backend.Services;
 using backend.Application;
 using backend.Infraestructure;
-using backend.Application.GrossPaymentCalculation;
+using backend.Application.DeductionCalculation;
 using System.Text.Json.Serialization;
+using backend.Application.Orchestrators.Deduction;
+using backend.Application.Orchestrators.Payroll;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -41,16 +49,40 @@ builder.Services.AddScoped<IGetPaymentDetailsByEmployeeIdQuery, GetPaymentDetail
 builder.Services.AddScoped<IGetPaymentDetailsByCompanyIdQuery, GetPaymentDetailsByCompanyIdQuery>();
 builder.Services.AddScoped<IGetDaysByTimesheetIdQuery, GetDaysByTimesheetIdQuery>();
 builder.Services.AddScoped<IGetEmployeeHoursInPeriodQuery, GetEmployeeHoursInPeriodQuery>();
+builder.Services.AddScoped<IGetEmployeeTimesheetByDateQuery, GetEmployeeTimesheetByDateQuery>();
+builder.Services.AddScoped<IUpdateDayCommand, UpdateDayCommand>();
+builder.Services.AddScoped<IUpdatePayrollIdInTimesheetsCommand, UpdatePayrollIdInTimesheetsCommand>();
 
 builder.Services.AddScoped<IPayrollRepository, PayrollRepository>();
-builder.Services.AddScoped<IPayrollService, PayrollService>();
+builder.Services.AddScoped<IGetPayrollsByCompanyIdQuery, GetPayrollsByCompanyIdQuery>();
+builder.Services.AddScoped<IGetPayrollsSummaryByCompanyIdQuery, GetPayrollsSummaryByCompanyIdQuery>();
 builder.Services.AddScoped<ITimesheetRepository, TimesheetRepository>();
+builder.Services.AddScoped<ICheckPayrollExistsQuery, CheckPayrollExistsQuery>();
+builder.Services.AddScoped<IGetEmployeesByCompanyIdQuery, GetEmployeesByCompanyIdQuery>();
+builder.Services.AddScoped<ICreatePayrollCommand, CreatePayrollCommand>();
+builder.Services.AddScoped<IGetCompanyPaymentTypeByCompanyIdQuery, GetCompanyPaymentTypeByCompanyIdQuery>();
+builder.Services.AddScoped<IPayrollOrchestrator, PayrollOrchestrator>();
+builder.Services.AddScoped<ICompanyRepository, CompanyRepository>();
+builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
 
+builder.Services.AddScoped<BenefitService>();
+builder.Services.AddScoped<IDeductionOrchestrator, DeductionOrchestrator>();
 
 // Register Payment Calculation Strategies
 builder.Services.AddScoped<MonthlyPaymentStrategy>();
 builder.Services.AddScoped<BiweeklyPaymentStrategy>();
 builder.Services.AddScoped<WeeklyPaymentStrategy>();
+
+// Register Deduction Calculation Strategies
+builder.Services.AddScoped<CcssDeductionStrategy>();
+builder.Services.AddScoped<IncomeTaxDeductionStrategy>();
+builder.Services.AddScoped<BenefitDeductionStrategy>();
+
+// Register Calculation Orchestrator
+builder.Services.AddScoped<DeductionCalculationOrchestrator>();
+
+builder.Services.AddScoped<IDeductionDetailRepository, DeductionDetailRepository>();
+builder.Services.AddScoped<IInsertDeductionDetailsCommand, InsertDeductionDetailsCommand>();
 
 
 // Register Strategy Orchestrator
