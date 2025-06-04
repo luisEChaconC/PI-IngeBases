@@ -19,14 +19,16 @@ namespace backend.API
         private readonly IGetEmployeeTimesheetByDateQuery _getEmployeeTimesheetByDateQuery;
         private readonly IUpdateDayCommand _updateDayCommand;
         private readonly IUpdatePayrollIdInTimesheetsCommand _updatePayrollIdInTimesheetsCommand;
+        private readonly IInsertTimesheetsForPeriodCommand _insertTimesheetsForPeriodCommand;
 
-        public TimesheetController(IGetDaysByTimesheetIdQuery getDaysByTimesheetIdQuery, IGetEmployeeHoursInPeriodQuery getEmployeeHoursInPeriodQuery, IUpdatePayrollIdInTimesheetsCommand updatePayrollIdInTimesheetsCommand, IGetEmployeeTimesheetByDateQuery getEmployeeTimesheetByDateQuery, IUpdateDayCommand updateDayCommand)
+        public TimesheetController(IGetDaysByTimesheetIdQuery getDaysByTimesheetIdQuery, IGetEmployeeHoursInPeriodQuery getEmployeeHoursInPeriodQuery, IUpdatePayrollIdInTimesheetsCommand updatePayrollIdInTimesheetsCommand, IGetEmployeeTimesheetByDateQuery getEmployeeTimesheetByDateQuery, IUpdateDayCommand updateDayCommand, IInsertTimesheetsForPeriodCommand insertTimesheetsForPeriodCommand)
         {
             _getDaysByTimesheetIdQuery = getDaysByTimesheetIdQuery;
             _getEmployeeHoursInPeriodQuery = getEmployeeHoursInPeriodQuery;
             _getEmployeeTimesheetByDateQuery = getEmployeeTimesheetByDateQuery;
             _updateDayCommand = updateDayCommand;
             _updatePayrollIdInTimesheetsCommand = updatePayrollIdInTimesheetsCommand;
+            _insertTimesheetsForPeriodCommand = insertTimesheetsForPeriodCommand;
         }
 
         [HttpGet("{timesheetId}/days")]
@@ -193,6 +195,52 @@ namespace backend.API
                 return StatusCode(StatusCodes.Status500InternalServerError, new
                 {
                     message = "An error occurred while updating payrollId in timesheets",
+                    error = ex.Message
+                });
+            }
+        }
+
+        [HttpPost("employee/{employeeId}/timesheets-for-period")]
+        public IActionResult InsertTimesheetsForPeriod(Guid employeeId, [FromQuery] DateTime periodStartDate, [FromQuery] DateTime periodEndDate, [FromQuery] Guid? payrollId = null)
+        {
+            try
+            {
+                if (employeeId == Guid.Empty)
+                {
+                    return BadRequest("EmployeeId is required");
+                }
+
+                if (periodStartDate == default)
+                {
+                    return BadRequest("PeriodStartDate is required");
+                }
+
+                if (periodEndDate == default)
+                {
+                    return BadRequest("PeriodEndDate is required");
+                }
+
+                if (periodEndDate <= periodStartDate)
+                {
+                    return BadRequest("PeriodEndDate must be after PeriodStartDate");
+                }
+
+                _insertTimesheetsForPeriodCommand.Execute(periodStartDate, periodEndDate, employeeId, payrollId);
+
+                return Ok(new
+                {
+                    message = "Timesheets inserted successfully for the specified period",
+                    employeeId = employeeId,
+                    periodStartDate = periodStartDate.ToString("yyyy-MM-dd"),
+                    periodEndDate = periodEndDate.ToString("yyyy-MM-dd"),
+                    payrollId = payrollId
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new
+                {
+                    message = "An error occurred while inserting timesheets for period",
                     error = ex.Message
                 });
             }

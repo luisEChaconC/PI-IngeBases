@@ -35,7 +35,6 @@
                 El formato no es correcto, por favor revisa nuevamente.
               </div>
             </div>
-
             <div class="mb-3">
               <label for="contractType" class="form-label">Tipo de Contrato</label>
               <select

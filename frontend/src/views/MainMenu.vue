@@ -62,9 +62,9 @@
           <li v-if="showOption('viewReportsPayments')" class="nav-item">
             <a class="nav-link" href="#">Reportes y Pagos</a>
           </li>
-          <li v-if="showOption('viewRoleAssignment')" class="nav-item">
+          <!--<li v-if="showOption('viewRoleAssignment')" class="nav-item">
             <a class="nav-link" href="#">Asignación de Roles</a>
-          </li>
+          </li> -->
           <li v-if="showOption('viewCompanyManagement')" class="nav-item">
             <router-link class="nav-link" to="/view-companies-list">Gestión de Empresas</router-link>
           </li>

@@ -1,4 +1,4 @@
-﻿using backend.Domain;
+using backend.Domain;
 
 namespace backend.Infraestructure
 {
@@ -11,6 +11,6 @@ namespace backend.Infraestructure
         bool AssignBenefitsToEmployee(Guid employeeId, List<Guid> benefitIds);
         bool IsBenefitAssignedToAnyEmployee(Guid benefitId);
         Benefit? GetBenefitById(Guid id);
+        bool DisableBenefitForEmployee(Guid benefitId, Guid employeeId);
     }
 }
-
