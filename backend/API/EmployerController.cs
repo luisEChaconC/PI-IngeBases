@@ -15,6 +15,7 @@ namespace backend.API
         private readonly UserController _userController;
         private readonly NaturalPersonController _naturalPersonController;
         private readonly ContactController _contactController;
+        private readonly EmployeeRepository _employeeRepository;
 
         // Constructor to initialize the repositories
         public EmployerController()
@@ -24,6 +25,7 @@ namespace backend.API
             _userController = new UserController();
             _naturalPersonController = new NaturalPersonController();
             _contactController = new ContactController();
+            _employeeRepository = new EmployeeRepository();
         }
 
         /// <summary>
@@ -116,5 +118,36 @@ namespace backend.API
                 throw new Exception("Failed to create employer.");
             }
         }
+[HttpPatch]
+[Route("UpdateEmployee")]
+public IActionResult UpdateEmployee([FromBody] UpdateEmployeeModel updateModel)
+{
+    if (!ModelState.IsValid)
+    {
+        return BadRequest(ModelState);
+    }
+
+    try
+    {
+        _employeeRepository.UpdateEmployee(updateModel);
+        return Ok(new { message = "Empleado actualizado correctamente." });
+    }
+    catch (InvalidOperationException ex)
+    {
+        // Validación de negocio como duplicados
+        return BadRequest(new { error = ex.Message });
+    }
+    catch (Exception ex)
+    {
+        // Otros errores internos
+        return StatusCode(StatusCodes.Status500InternalServerError, new { error = "Error interno al actualizar el empleado.", detalle = ex.Message });
+    }
+    }
+[HttpGet("HasPayments/{id}")]
+public IActionResult HasPayments(string id)
+{
+    var hasPayments = _employeeRepository.HasPaymentRecords(id);
+    return Ok(new { hasPayments });
+}
     }
 }
