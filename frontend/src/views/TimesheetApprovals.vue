@@ -271,11 +271,6 @@ export default {
         const fetchedDays = await approvalService.getPendingDaysByEmployee(employeeId);
         this.selectedEmployeeDays = fetchedDays;
 
-        if (fetchedDays && fetchedDays.length > 0) {
-            const firstDay = fetchedDays[0];
-            const dateObj = new Date(firstDay.lastSubmitTimestamp);
-        }
-
       } catch (error) {
         this.modalError = error.message || 'Error al cargar los días pendientes del empleado.';
       } finally {
