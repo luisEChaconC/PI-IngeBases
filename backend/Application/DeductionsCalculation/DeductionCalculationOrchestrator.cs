@@ -62,6 +62,6 @@ namespace backend.Application.DeductionCalculation
             }
 
             return details;
-        git stash pop        }
+        }
     }
 }
