@@ -29,6 +29,7 @@ namespace backend.Application.Orchestrators.Payroll
         private readonly IGetCompanyPaymentTypeByCompanyIdQuery _getCompanyPaymentTypeByCompanyIdQuery;
         private readonly ICreatePaymentDetailCommand _createPaymentDetailCommand;
         private readonly IUpdatePayrollIdInTimesheetsCommand _updatePayrollIdInTimesheetsCommand;
+        private readonly IInsertTimesheetsForPeriodCommand _insertTimesheetsForPeriodCommand;
         private readonly IDeductionOrchestrator _deductionOrchestrator;
 
         public PayrollOrchestrator(
@@ -40,6 +41,7 @@ namespace backend.Application.Orchestrators.Payroll
             IGetCompanyPaymentTypeByCompanyIdQuery getCompanyPaymentTypeByCompanyIdQuery,
             ICreatePaymentDetailCommand createPaymentDetailCommand,
             IUpdatePayrollIdInTimesheetsCommand updatePayrollIdInTimesheetsCommand,
+            IInsertTimesheetsForPeriodCommand insertTimesheetsForPeriodCommand,
             IDeductionOrchestrator deductionOrchestrator)
         {
             _checkPayrollExistsQuery = checkPayrollExistsQuery;
@@ -50,6 +52,7 @@ namespace backend.Application.Orchestrators.Payroll
             _getCompanyPaymentTypeByCompanyIdQuery = getCompanyPaymentTypeByCompanyIdQuery;
             _createPaymentDetailCommand = createPaymentDetailCommand;
             _updatePayrollIdInTimesheetsCommand = updatePayrollIdInTimesheetsCommand;
+            _insertTimesheetsForPeriodCommand = insertTimesheetsForPeriodCommand;
             _deductionOrchestrator = deductionOrchestrator;
         }
 
@@ -108,7 +111,12 @@ namespace backend.Application.Orchestrators.Payroll
                 };
 
                 _deductionOrchestrator.CalculateDeductions(deductionsDto);
+
+                if (companyPaymentType == "Weekly") {
+                    _insertTimesheetsForPeriodCommand.Execute(model.StartDate + TimeSpan.FromDays(7), model.EndDate + TimeSpan.FromDays(7), employee.Id, payrollId);
+                }
             }
+
             return payrollId;
         }
     }
