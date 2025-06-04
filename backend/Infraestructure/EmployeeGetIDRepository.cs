@@ -76,7 +76,7 @@ namespace backend.Infraestructure
                                 Email = reader["Email"]?.ToString(),
                                 IsAdmin = reader["IsAdmin"] != DBNull.Value ? Convert.ToBoolean(reader["IsAdmin"]) : (bool?)null,
                                 PhoneNumber = reader["PhoneNumber"]?.ToString(),
-                                Gender = reader["Gender"]?.ToString()
+                               
                             };
                         }
                     }

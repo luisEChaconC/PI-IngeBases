@@ -26,10 +26,8 @@ namespace backend.Domain
 
         public string? UserId { get; set; }
 
-        [Required(ErrorMessage = "Gender is required.")]
-        [StringLength(1, ErrorMessage = "Gender must be a single character.")]
-        [RegularExpression("^[FM]$", ErrorMessage = "Gender must be 'F' or 'M'.")]
-        public string Gender { get; set; }
+        
+        
 
         public NaturalPersonModel()
         {
