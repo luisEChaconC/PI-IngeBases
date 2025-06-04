@@ -1,4 +1,3 @@
-using backend.Domain;
 using backend.Infraestructure;
 
 namespace backend.Application.Commands
