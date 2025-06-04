@@ -129,6 +129,7 @@ export default {
           "viewBenefits",
           "viewGeneratePayroll",
           "viewPayrolls",
+          "viewEmployees"
         ],
       };
       return permissions[this.employeeType]?.includes(option);
