@@ -1,4 +1,5 @@
 using backend.Application.DeductionCalculation;
+using backend.Application.GrossPaymentCalculation;
 using backend.Infraestructure;
 
 namespace backend.Application.Orchestrators.Deduction
@@ -10,9 +11,9 @@ namespace backend.Application.Orchestrators.Deduction
 
     public class DeductionOrchestrator : IDeductionOrchestrator
     {
+        private readonly IBenefitRepository _benefitRepository;
         private readonly DeductionCalculationOrchestrator _deductionOrchestrator;
         private readonly IInsertDeductionDetailsCommand _insertDeductionDetailsCommand;
-        private readonly IBenefitRepository _benefitRepository;
 
         public DeductionOrchestrator(
             IBenefitRepository benefitRepository,
