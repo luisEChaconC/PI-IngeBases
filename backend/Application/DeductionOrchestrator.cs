@@ -1,22 +1,28 @@
 using backend.Application.DeductionCalculation;
-using backend.Application.GrossPaymentCalculation;
 using backend.Services;
 
-public class DeductionOrchestrator
+namespace backend.Application.Orchestrators.Deduction
 {
-    private readonly BenefitService _benefitService;
-    private readonly DeductionCalculationOrchestrator _deductionOrchestrator;
-    private readonly IInsertDeductionDetailsCommand _insertDeductionDetailsCommand;
-
-    public DeductionOrchestrator(
-        BenefitService benefitService,
-        DeductionCalculationOrchestrator deductionOrchestrator,
-        IInsertDeductionDetailsCommand insertDeductionDetailsCommand)
+    public interface IDeductionOrchestrator
     {
-        _benefitService = benefitService;
-        _deductionOrchestrator = deductionOrchestrator;
-        _insertDeductionDetailsCommand = insertDeductionDetailsCommand;
+        (object gross, object deductions) CalculateDeductions(CalculateDeductionDto dto);
     }
+
+    public class DeductionOrchestrator : IDeductionOrchestrator
+    {
+        private readonly BenefitService _benefitService;
+        private readonly DeductionCalculationOrchestrator _deductionOrchestrator;
+        private readonly IInsertDeductionDetailsCommand _insertDeductionDetailsCommand;
+
+        public DeductionOrchestrator(
+            BenefitService benefitService,
+            DeductionCalculationOrchestrator deductionOrchestrator,
+            IInsertDeductionDetailsCommand insertDeductionDetailsCommand)
+        {
+            _benefitService = benefitService;
+            _deductionOrchestrator = deductionOrchestrator;
+            _insertDeductionDetailsCommand = insertDeductionDetailsCommand;
+        }
 
     public (object gross, object deductions) CalculateDeductions(CalculateDeductionDto dto)
     {

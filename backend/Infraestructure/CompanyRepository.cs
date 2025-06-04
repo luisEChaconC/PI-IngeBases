@@ -7,13 +7,23 @@ namespace backend.Infraestructure
     /// <summary>
     /// Repository for managing operations related to the Companies table.
     /// </summary>
-    public class CompanyRepository
+    public class CompanyRepository : ICompanyRepository
     {
         private SqlConnection _connection; // SQL connection object
         private string _connectionString; // Connection string for the database
         private readonly PersonRepository _personRepository; // Instance of PersonRepository for managing persons
         private readonly ContactRepository _contactRepository; // Instance of PersonRepository for managing persons
         private readonly EmployeeRepository _employeeRepository; // Instance of EmployeeRepository for managing employees
+
+        public CompanyRepository()
+        {
+            // Create a configuration builder to retrieve the connection string
+            var builder = WebApplication.CreateBuilder();
+            _connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+
+            // Initialize the SQL connection with the connection string
+            _connection = new SqlConnection(_connectionString);
+        }
 
         /// <summary>
         /// Constructor to initialize the connection string and SQL connection.
@@ -51,7 +61,7 @@ namespace backend.Infraestructure
                 try
                 {
                     connection.Open();
-                    
+
                     // Create a SQL command with the query and connection
                     using (var command = new SqlCommand(query, connection))
                     {
@@ -84,9 +94,9 @@ namespace backend.Infraestructure
         /// </summary>
         /// <returns>A list of company models.</returns>
         public List<CompanyModel> GetCompanies()
-{
-    List<CompanyModel> companies = new List<CompanyModel>();
- var query = @"
+        {
+            List<CompanyModel> companies = new List<CompanyModel>();
+            var query = @"
         SELECT c.Id, c.Name, c.Description, c.PaymentType, c.MaxBenefitsPerEmployee, 
                c.CreationDate, c.CreationAuthor, c.LastModificationDate, c.LastModificationAuthor,
                p.Province, p.Canton, p.Neighborhood, p.AdditionalDirectionDetails, p.LegalId,
@@ -95,48 +105,48 @@ namespace backend.Infraestructure
         INNER JOIN Persons p ON c.Id = p.Id
         ORDER BY c.Name";
 
-    using (var connection = new SqlConnection(_connectionString))
-    {
-        try
-        {
-            connection.Open();
-
-            using (var command = new SqlCommand(query, connection))
+            using (var connection = new SqlConnection(_connectionString))
             {
-                using (var reader = command.ExecuteReader())
+                try
                 {
-                    while (reader.Read())
-                    {
-                        var company = new CompanyModel
-                        {
-                            Id = reader["Id"].ToString(),
-                            Name = reader["Name"].ToString(),
-                            Description = reader["Description"] != DBNull.Value ? reader["Description"].ToString() : null,
-                            PaymentType = reader["PaymentType"].ToString(),
-                            MaxBenefitsPerEmployee = reader["MaxBenefitsPerEmployee"] != DBNull.Value ? (int?)reader["MaxBenefitsPerEmployee"] : null,
-                            CreationDate = (DateTime)reader["CreationDate"],
-                            CreationAuthor = reader["CreationAuthor"] != DBNull.Value ? reader["CreationAuthor"].ToString() : null,
-                            LastModificationDate = reader["LastModificationDate"] != DBNull.Value ? (DateTime?)reader["LastModificationDate"] : null,
-                            LastModificationAuthor = reader["LastModificationAuthor"] != DBNull.Value ? reader["LastModificationAuthor"].ToString() : null,
-                            Employees = new List<EmployeeModel>(),
-                            EmployeeCount = Convert.ToInt32(reader["EmployeeCount"]),
-                            LegalId = reader["LegalId"].ToString()
-                        };
+                    connection.Open();
 
-                        companies.Add(company);
+                    using (var command = new SqlCommand(query, connection))
+                    {
+                        using (var reader = command.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                var company = new CompanyModel
+                                {
+                                    Id = reader["Id"].ToString(),
+                                    Name = reader["Name"].ToString(),
+                                    Description = reader["Description"] != DBNull.Value ? reader["Description"].ToString() : null,
+                                    PaymentType = reader["PaymentType"].ToString(),
+                                    MaxBenefitsPerEmployee = reader["MaxBenefitsPerEmployee"] != DBNull.Value ? (int?)reader["MaxBenefitsPerEmployee"] : null,
+                                    CreationDate = (DateTime)reader["CreationDate"],
+                                    CreationAuthor = reader["CreationAuthor"] != DBNull.Value ? reader["CreationAuthor"].ToString() : null,
+                                    LastModificationDate = reader["LastModificationDate"] != DBNull.Value ? (DateTime?)reader["LastModificationDate"] : null,
+                                    LastModificationAuthor = reader["LastModificationAuthor"] != DBNull.Value ? reader["LastModificationAuthor"].ToString() : null,
+                                    Employees = new List<EmployeeModel>(),
+                                    EmployeeCount = Convert.ToInt32(reader["EmployeeCount"]),
+                                    LegalId = reader["LegalId"].ToString()
+                                };
+
+                                companies.Add(company);
+                            }
+                        }
                     }
                 }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error retrieving companies: {ex.Message}");
+                    throw;
+                }
             }
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error retrieving companies: {ex.Message}");
-            throw;
-        }
-    }
 
-    return companies;
-}
+            return companies;
+        }
 
 
         /// <summary>
@@ -147,7 +157,7 @@ namespace backend.Infraestructure
         public CompanyModel GetCompanyById(string id)
         {
             CompanyModel company = null;
-            
+
             // SQL query to select a company by ID
             var query = @"
                 SELECT c.Id, c.Name, c.Description, c.PaymentType, c.MaxBenefitsPerEmployee, 
@@ -163,7 +173,7 @@ namespace backend.Infraestructure
                 try
                 {
                     connection.Open();
-                    
+
                     // Create a SQL command with the query and connection
                     using (var command = new SqlCommand(query, connection))
                     {
@@ -205,9 +215,30 @@ namespace backend.Infraestructure
                     throw; // Re-throw the exception to be handled by the controller
                 }
             }
-            
+
             // Return the company (or null if not found)
             return company;
+        }
+        
+        public async Task<string> GetPaymentTypeByIdAsync(Guid companyId)
+        {
+            string paymentType = null;
+            var query = @"SELECT PaymentType FROM Companies WHERE Id = @CompanyId";
+
+            using (var connection = new SqlConnection(_connectionString))
+            using (var command = new SqlCommand(query, connection))
+            {
+                command.Parameters.AddWithValue("@CompanyId", companyId);
+
+                await connection.OpenAsync();
+                var result = await command.ExecuteScalarAsync();
+                if (result != null && result != DBNull.Value)
+                {
+                    paymentType = result.ToString();
+                }
+            }
+
+            return paymentType;
         }
     }
 }
