@@ -1,0 +1,10 @@
+CREATE FUNCTION dbo.DayNumber
+(
+    @Date DATE
+)
+RETURNS INT
+AS
+BEGIN
+    DECLARE @DayNumber INT = (DATEPART(WEEKDAY, @Date) + @@DATEFIRST - 2) % 7
+    RETURN @DayNumber
+END
