@@ -16,6 +16,7 @@ import ViewCompaniesList from '../views/ViewCompaniesList.vue'
 import HomeView from '../views/HomeView.vue'
 import PayrollsList from '@/views/PayrollsList.vue'
 import EmployeeTimesheet from '@/views/EmployeeTimesheet.vue'
+import TimesheetApprovals from '@/views/TimesheetApprovals.vue'
 
 const routes = [
     { path: '/', redirect: '/login' },
@@ -26,9 +27,9 @@ const routes = [
 
     {
         path: '/',
-        component: MainLayout,  
+        component: MainLayout,
         children: [
-   
+
             { path: '/home-view', name: 'HomeView', component: HomeView },
             { path: '/add-employee', name: 'AddEmployee', component: AddEmployee},
             { path: '/view-employee-profile/:id', name: 'ViewEmployeeProfile', component: ViewEmployeeProfile },
@@ -42,7 +43,8 @@ const routes = [
             { path: '/view-employee-profile', name: 'ViewEmployeeProfile', component: ViewEmployeeProfile },
             { path: '/view-company-info', name: 'ViewCompanyInfo', component: ViewCompanyInfo },
             { path: '/payrolls-list', name: 'PayrollsList', component: PayrollsList },
-            { path: '/employee-timesheet', name: 'EmployeeTimesheet', component: EmployeeTimesheet}
+            { path: '/employee-timesheet', name: 'EmployeeTimesheet', component: EmployeeTimesheet },
+            { path: '/timesheet-approvals', name: 'TimesheetApprovals', component: TimesheetApprovals }
         ],
     },
 ]
