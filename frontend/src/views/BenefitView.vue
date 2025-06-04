@@ -169,10 +169,7 @@
       return {
         name: false,
         description: false,
-<<<<<<< HEAD
         type: false,
-=======
->>>>>>> develop
         linkAPI: false,
         fixedPercentage: false,
         fixedAmount: false,
