@@ -6,7 +6,7 @@ CREATE TABLE ParametersValues (
 	EmployeeId UNIQUEIDENTIFIER NOT NULL,
     ValueType VARCHAR(7) 
        NOT NULL 
-       CHECK (ValueType IN ('String', 'Date', 'Int')),
+       CHECK (ValueType IN ('string', 'date', 'int')),
 	StringValue VARCHAR(30),
 	IntValue INT,
 	DateValue DATE,
