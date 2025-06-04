@@ -26,6 +26,11 @@ namespace backend.Domain
 
         public string? UserId { get; set; }
 
+        [Required(ErrorMessage = "Gender is required.")]
+        [StringLength(1, ErrorMessage = "Gender must be a single character.")]
+        [RegularExpression("^[FM]$", ErrorMessage = "Gender must be 'F' or 'M'.")]
+        public string Gender { get; set; }
+
         public NaturalPersonModel()
         {
             Id = string.Empty;
@@ -33,15 +38,17 @@ namespace backend.Domain
             FirstSurname = string.Empty;
             SecondSurname = string.Empty;
             UserId = null;
+            Gender = "M"; 
         }
 
-        public NaturalPersonModel(string id, string firstName, string firstSurname, string secondSurname, string? userId)
+        public NaturalPersonModel(string id, string firstName, string firstSurname, string secondSurname, string? userId, string gender)
         {
             Id = id;
             FirstName = firstName;
             FirstSurname = firstSurname;
             SecondSurname = secondSurname;
             UserId = userId;
+            Gender = gender;
         }
     }
 }

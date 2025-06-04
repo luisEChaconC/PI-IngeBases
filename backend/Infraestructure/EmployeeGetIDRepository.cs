@@ -35,7 +35,8 @@ namespace backend.Infraestructure
                     e.HasToReportHours,
                     u.Email,
                     u.IsAdmin,
-                    c.PhoneNumber
+                    c.PhoneNumber,
+                    np.Gender  
                 FROM 
                     Employees e
                 JOIN NaturalPersons np ON e.Id = np.Id
@@ -74,7 +75,8 @@ namespace backend.Infraestructure
                                 Cedula = reader["Cedula"]?.ToString(),
                                 Email = reader["Email"]?.ToString(),
                                 IsAdmin = reader["IsAdmin"] != DBNull.Value ? Convert.ToBoolean(reader["IsAdmin"]) : (bool?)null,
-                                PhoneNumber = reader["PhoneNumber"]?.ToString()
+                                PhoneNumber = reader["PhoneNumber"]?.ToString(),
+                                Gender = reader["Gender"]?.ToString()
                             };
                         }
                     }
