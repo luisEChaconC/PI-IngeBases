@@ -118,7 +118,7 @@ namespace backend.Infraestructure
                 SET
                     FirstName = ISNULL(NULLIF(@FirstName, ''), FirstName),
                     FirstSurname = ISNULL(NULLIF(@FirstSurname, ''), FirstSurname),
-                    SecondSurname = ISNULL(NULLIF(@SecondSurname, ''), SecondSurname)
+                    SecondSurname = ISNULL(NULLIF(@SecondSurname, ''), SecondSurname),
                     Gender = ISNULL(NULLIF(@Gender, ''), Gender)
                 WHERE Id = @Id;
 

@@ -20,7 +20,7 @@
         <h2 class="card-title">Perfil de Empleado</h2>
         <div class="row">
           <div class="col-md-6">
-            <div class="mb-3" v-for="field in leftFields" :key="field.key">
+            <div class="mb-3" v-for="field in filteredLeftFields" :key="field.key">
               <label :for="field.key" class="form-label">{{ field.label }}</label>
               <input
                 :type="field.type"
@@ -35,7 +35,30 @@
                 El formato no es correcto, por favor revisa nuevamente.
               </div>
             </div>
+
+
+            <div class="mb-3">
+              <label for="contractType" class="form-label">Tipo de Contrato</label>
+              <select
+                id="contractType"
+                class="form-select"
+                v-model="employee.contractType"
+                :disabled="!editMode"
+                :class="{ 'is-invalid': editMode && !validations.contractType }"
+                @change="validateField('contractType')"
+              >
+                <option value="">Seleccione una opción</option>
+                <option value="Part-Time">Media Jornada</option>
+                <option value="Full-Time">Jornada Completa</option>
+                <option value="Professional Services">Servicios Profesionales</option>
+                <option value="Hourly">Por Hora</option>
+              </select>
+              <div v-if="editMode && !validations.contractType" class="invalid-feedback">
+                Seleccione un tipo de contrato válido.
+              </div>
+            </div>
           </div>
+
           <div class="col-md-6">
             <div class="mb-3" v-for="field in rightFields" :key="field.key">
               <label :for="field.key" class="form-label">{{ field.label }}</label>
@@ -74,8 +97,6 @@
             El género debe ser 'M' o 'F'.
           </div>
         </div>
-
-        <!-- Botones -->
         <div class="d-flex justify-content-start mt-3 gap-2">
           <button type="button" class="btn btn-dark" @click="toggleEdit">
             {{ editMode ? 'Cancelar' : 'Editar' }}
@@ -88,7 +109,6 @@
       </div>
     </div>
 
-    <!-- Modal de eliminación -->
     <div class="modal fade" id="deleteModal" tabindex="-1" ref="deleteModal">
       <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
@@ -130,7 +150,7 @@ export default {
 
     const regex = {
       email: /^[\w.-]+@([\w-]+\.)+[\w-]{2,4}$/,
-      phoneNumber: /^$|^\d{4}-\d{4}$/,
+      phoneNumber: /^$|^\d{4}-?\d{4}$/,
       grossSalary: /^\d+(\.\d{1,2})?$/,
       legalId: /^((?!0)\d{9,12}|(?!0)\d{1,2}-\d{4}-\d{4}|(?!0)\d-\d{3}-\d{6})$/,
       workerId: /^[A-Z0-9#-]{3,20}$/,
@@ -142,13 +162,18 @@ export default {
 
     const fieldErrors = ref({});
 
-    const leftFields = [
-      { key: 'firstName', label: 'Nombre', type: 'text' },
-      { key: 'secondSurname', label: 'Segundo Apellido', type: 'text' },
-      { key: 'workerId', label: 'ID Trabajador', type: 'text' },
-      { key: 'contractType', label: 'Tipo de Contrato', type: 'text' },
-      { key: 'email', label: 'Correo Electrónico', type: 'email' }
-    ];
+   const leftFields = ref([
+  { key: 'firstName', label: 'Nombre', type: 'text' },
+  { key: 'secondSurname', label: 'Segundo Apellido', type: 'text' },
+  { key: 'workerId', label: 'ID Trabajador', type: 'text' },
+  { key: 'contractType', label: 'Tipo de Contrato', type: 'text' },
+  { key: 'email', label: 'Correo Electrónico', type: 'email' }
+]);
+
+const filteredLeftFields = computed(() =>
+  leftFields.value.filter(field => field.key !== 'contractType')
+);
+
 
     const rightFields = [
       { key: 'firstSurname', label: 'Primer Apellido', type: 'text' },
@@ -193,6 +218,7 @@ export default {
       try {
         const id = route.params.id;
         const response = await axios.get(`https://localhost:5000/api/EmployeeGetID/GetEmployeeById/${id}`);
+        console.log("Datos del empleado:", response.data);
         employee.value = {
           id: response.data.id,
           firstName: response.data.firstName,
@@ -296,7 +322,8 @@ export default {
       rightFields,
       validateField,
       hasPayments,
-      onInputChange
+      onInputChange,
+      filteredLeftFields
     };
   }
 };
