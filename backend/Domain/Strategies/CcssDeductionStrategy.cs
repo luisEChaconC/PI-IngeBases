@@ -9,7 +9,7 @@ namespace backend.Domain.Strategies
 
         private const decimal MinBaseSem = 341227m;
         private const decimal MinBaseIvm = 319384m;
-       public decimal CalculateDeduction(decimal grossSalary, string contractType, string gender, Benefit? benefit = null)
+       public decimal CalculateDeduction(decimal grossSalary, string contractType, string gender, Benefit? benefit = null, Guid? employeeId = null)
 {
     // Exclude "Professional Services" employees from deductions
     if (contractType == "Professional Services")

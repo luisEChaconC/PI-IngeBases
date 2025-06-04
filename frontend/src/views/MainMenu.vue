@@ -19,9 +19,6 @@
           <li v-if="showOption('viewWorkedHours')" class="nav-item">
             <a class="nav-link" href="#">Horas Laboradas</a>
           </li>
-          <li v-if="showOption('viewGeneratePayroll')" class="nav-item">
-            <a class="nav-link" href="#">Generar Planillas</a>
-          </li>
           <li v-if="showOption('viewHours')" class="nav-item">
             <a class="nav-link" href="#">Horas</a>
           </li>
@@ -33,6 +30,14 @@
           </li>
           <li v-if="showOption('viewEmployees')" class="nav-item">
             <router-link to="/employees-list" class="nav-link">Empleados</router-link>
+          </li>
+          <li v-if="showOption('viewBenefitsPayrollM')" class="nav-item">
+            <router-link
+              to="/benefits"
+              class="nav-link"
+            >
+              Editar Beneficios
+            </router-link>
           </li>
           <li v-if="showOption('viewBenefits')" class="nav-item">
             <router-link
@@ -99,7 +104,7 @@ export default {
           "viewProfile", 
           "viewPayments", 
           "viewWorkedHours", 
-          "viewBenefits"
+          "viewBenefits",
         ],
         Employer: [
           "viewProfile",
@@ -118,7 +123,6 @@ export default {
           "viewRequestHourCorrection",
         ],
         SoftwareManager: [
-          "viewProfile",
           "viewCompanyManagement",
           "viewReports",
         ],
@@ -126,9 +130,11 @@ export default {
           "viewProfile",
           "viewPayments",
           "viewWorkedHours",
+          "viewEmployees",
           "viewBenefits",
-          "viewGeneratePayroll",
           "viewPayrolls",
+          "viewBenefitsPayrollM",
+          "viewEmployees"
         ],
       };
       return permissions[this.employeeType]?.includes(option);
