@@ -190,15 +190,45 @@ using (var checkCmd = new SqlCommand(checkWorkerIdQuery, connection))
                         command.Parameters.AddWithValue("@PhoneNumber", (object?)updated.PhoneNumber ?? DBNull.Value);
 
                         command.ExecuteNonQuery();
+                        var roles = new[] { "Supervisors", "PayrollManagers" };
+
+                foreach (var table in roles)
+                {
+                    if (!string.Equals(updated.Role + "s", table, StringComparison.OrdinalIgnoreCase))
+                    {
+                        var deleteRole = $"DELETE FROM {table} WHERE Id = @Id";
+                        using var deleteCmd = new SqlCommand(deleteRole, connection);
+                        deleteCmd.Parameters.AddWithValue("@Id", updated.Id);
+                        deleteCmd.ExecuteNonQuery();
                     }
                 }
-                catch (Exception ex)
+
+                if (updated.Role == "Supervisor" || updated.Role == "PayrollManager")
                 {
-                    Console.WriteLine($"Error updating employee: {ex.Message}");
-                    throw;
+                    var roleTable = updated.Role + "s"; // Supervisors o PayrollManagers
+
+                    var existsQuery = $"SELECT COUNT(*) FROM {roleTable} WHERE Id = @Id";
+                    using var existsCmd = new SqlCommand(existsQuery, connection);
+                    existsCmd.Parameters.AddWithValue("@Id", updated.Id);
+                    var exists = (int)existsCmd.ExecuteScalar() > 0;
+
+                    if (!exists)
+                    {
+                        var insertRole = $"INSERT INTO {roleTable} (Id) VALUES (@Id)";
+                        using var insertCmd = new SqlCommand(insertRole, connection);
+                        insertCmd.Parameters.AddWithValue("@Id", updated.Id);
+                        insertCmd.ExecuteNonQuery();
+                    }
                 }
-            }
-        }
+                                    }
+                                }
+                                catch (Exception ex)
+                                {
+                                    Console.WriteLine($"Error updating employee: {ex.Message}");
+                                    throw;
+                                }
+                            }
+                        }
         
 public bool HasPaymentRecords(string employeeId)
 {

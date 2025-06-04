@@ -36,7 +36,6 @@
               </div>
             </div>
 
-
             <div class="mb-3">
               <label for="contractType" class="form-label">Tipo de Contrato</label>
               <select
@@ -62,7 +61,9 @@
           <div class="col-md-6">
             <div class="mb-3" v-for="field in rightFields" :key="field.key">
               <label :for="field.key" class="form-label">{{ field.label }}</label>
+
               <input
+                v-if="field.key !== 'role'"
                 :type="field.type"
                 class="form-control"
                 :id="field.key"
@@ -71,14 +72,33 @@
                 :class="{ 'is-invalid': editMode && !validations[field.key] }"
                 @input="onInputChange(field.key)"
               />
-              <div v-if="editMode && !validations[field.key]" class="invalid-feedback">
+              <div v-if="editMode && !validations[field.key] && field.key !== 'role'" class="invalid-feedback">
                 El formato no es correcto, por favor revisa nuevamente.
+              </div>
+
+              <div v-else-if="field.key === 'role'">
+                <select
+                  id="role"
+                  class="form-select"
+                  v-model="employee.role"
+                  :disabled="!editMode"
+                  :class="{ 'is-invalid': editMode && !employee.role }"
+                  required
+                  @change="validateField('role')"
+                >
+                  <option value="">Seleccione una opción</option>
+                  <option value="Supervisor">Supervisor</option>
+                  <option value="Payroll Manager">Encargado Planilla</option>
+                  <option value="Collaborator">Colaborador</option>
+                </select>
+                <div v-if="editMode && !employee.role" class="invalid-feedback">
+                  Seleccione un rol válido.
+                </div>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- Campo de Género -->
         <div class="mb-3">
           <label for="gender" class="form-label">Género</label>
           <select
@@ -97,6 +117,7 @@
             El género debe ser 'M' o 'F'.
           </div>
         </div>
+
         <div class="d-flex justify-content-start mt-3 gap-2">
           <button type="button" class="btn btn-dark" @click="toggleEdit">
             {{ editMode ? 'Cancelar' : 'Editar' }}
@@ -227,7 +248,7 @@ const filteredLeftFields = computed(() =>
           gender: response.data.gender,
           legalId: response.data.cedula,
           workerId: response.data.workerId,
-          role: response.data.isAdmin ? 'Admin' : 'Employee',
+          role: response.data.role,
           contractType: response.data.contractType,
           grossSalary: response.data.grossSalary,
           email: response.data.email,
@@ -263,6 +284,7 @@ const filteredLeftFields = computed(() =>
           Gender: employee.value.gender,
           LegalId: employee.value.legalId,
           WorkerId: employee.value.workerId,
+          Role: employee.value.role,
           ContractType: employee.value.contractType,
           GrossSalary: employee.value.grossSalary,
           Email: employee.value.email,

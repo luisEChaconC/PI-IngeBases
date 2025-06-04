@@ -20,6 +20,8 @@ namespace backend.Domain
         public bool? IsAdmin { get; set; }
         public string PhoneNumber { get; set; }
         public string Gender { get; set; }
+        public string? Role { get; set; }
+
         
 
         
