@@ -114,8 +114,17 @@
           </div>
           
           <div class="modal-body">
+            <!-- Modal Error state -->
+            <div v-if="modalError && !loadingDays" class="alert alert-danger" role="alert">
+              <h6><i class="bi bi-exclamation-triangle me-2"></i>Error al cargar los días</h6>
+              <p class="mb-2">{{ modalError }}</p>
+              <button class="btn btn-sm btn-outline-danger" @click="retryLoadEmployeeDays">
+                <i class="bi bi-arrow-clockwise me-1"></i> Reintentar
+              </button>
+            </div>
+
             <!-- Loading days -->
-            <div v-if="loadingDays" class="text-center py-4">
+            <div v-else-if="loadingDays" class="text-center py-4">
               <div class="spinner-border" role="status">
                 <span class="visually-hidden">Cargando días...</span>
               </div>
@@ -202,6 +211,7 @@ export default {
       loadingEmployeeId: null,
       approvingDayId: null,
       error: null,
+      modalError: null,
       employeeDaysModal: null,
       dateService: dateService
     };
@@ -214,6 +224,11 @@ export default {
   async mounted() {
     await this.loadPendingApprovals();
     this.employeeDaysModal = new Modal(this.$refs.employeeDaysModal);
+    
+    // Clear modal error when modal is hidden
+    this.$refs.employeeDaysModal.addEventListener('hidden.bs.modal', () => {
+      this.modalError = null;
+    });
   },
   methods: {
     formatCedula(cedula) {
@@ -249,6 +264,7 @@ export default {
       this.loadingEmployeeId = employeeId;
       this.loadingDays = true;
       this.selectedEmployeeDays = [];
+      this.modalError = null; // Clear previous errors
       
       try {
         this.employeeDaysModal.show();
@@ -267,10 +283,16 @@ export default {
 
       } catch (error) {
         console.error('Error loading employee days:', error);
-        // TODO: Show error in modal
+        this.modalError = error.message || 'Error al cargar los días pendientes del empleado.';
       } finally {
         this.loadingDays = false;
         this.loadingEmployeeId = null;
+      }
+    },
+
+    retryLoadEmployeeDays() {
+      if (this.selectedEmployeeId) {
+        this.viewEmployeePendingDays(this.selectedEmployeeId);
       }
     },
 
