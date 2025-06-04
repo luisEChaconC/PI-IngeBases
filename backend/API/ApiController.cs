@@ -10,9 +10,9 @@ namespace backend.API
     {
         private readonly APIRepository _repo;
 
-        public APIController(IConfiguration configuration)
+        public APIController(APIRepository repo)
         {
-            _repo = new APIRepository();
+            _repo = repo;
         }
         [HttpGet]
         public ActionResult<List<ApiModel>> GetAPIs()

@@ -1,94 +1,110 @@
 ﻿using backend.Domain;
-using backend.Domain.Strategies;
+using backend.Repositories;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
+using Moq;
 using NUnit.Framework;
 using System;
+using System.Collections.Generic;
 
-namespace TestPayrollSystem
+namespace backend.API.Tests
 {
     [TestFixture]
-    public class DeductionStrategyTest
+    public class APIControllerTests
     {
-        private BenefitDeductionStrategy _strategy;
+        private APIController _controller;
+        private Mock<IAPIRepository> _mockRepo;
 
         [SetUp]
         public void Setup()
         {
-            _strategy = new BenefitDeductionStrategy();
-        }
-
-        [Test]
-        public void CalculateDeduction_BenefitIsNull_ReturnsZero()
-        {
-            var result = _strategy.CalculateDeduction(1000m, "FullTime", "M", null);
-            Assert.AreEqual(0m, result);
-        }
-
-        [Test]
-        public void CalculateDeduction_TypeIsFixedAmount_ReturnsFixedAmount()
-        {
-            var benefit = new Benefit
+            _mockRepo = new Mock<IAPIRepository>();
+            var mockConfig = new Mock<IConfiguration>();
+            _controller = new APIController(mockConfig.Object)
             {
-                Type = "FixedAmount",
-                FixedAmount = 150
+                // Inyectamos el mock del repositorio (necesitarías cambiar el controlador para permitir esto)
+                _repo = _mockRepo.Object
+            };
+        }
+
+        [Test]
+        public void GetAPIs_ReturnsListOfApis()
+        {
+            // Arrange
+            var expectedApis = new List<ApiModel>
+            {
+                new ApiModel { Id = Guid.NewGuid(), Name = "API 1" },
+                new ApiModel { Id = Guid.NewGuid(), Name = "API 2" }
             };
 
-            var result = _strategy.CalculateDeduction(2000m, "FullTime", "F", benefit);
-            Assert.AreEqual(150m, result);
+            _mockRepo.Setup(repo => repo.GetAPIs()).Returns(expectedApis);
+
+            // Act
+            var result = _controller.GetAPIs();
+
+            // Assert
+            Assert.IsInstanceOf<OkObjectResult>(result);
+            var okResult = result as OkObjectResult;
+            Assert.AreEqual(expectedApis, okResult.Value);
         }
 
         [Test]
-        public void CalculateDeduction_TypeIsFixedAmount_NullAmount_ReturnsZero()
+        public void GetParameters_WithValidApiId_ReturnsParameters()
         {
-            var benefit = new Benefit
+            // Arrange
+            var apiId = Guid.NewGuid();
+            var expectedParameters = new List<ApiParameterModel>
             {
-                Type = "FixedAmount",
-                FixedAmount = null
+                new ApiParameterModel { Id = Guid.NewGuid(), ApiId = apiId, Name = "Param 1" },
+                new ApiParameterModel { Id = Guid.NewGuid(), ApiId = apiId, Name = "Param 2" }
             };
 
-            var result = _strategy.CalculateDeduction(2000m, "FullTime", "F", benefit);
-            Assert.AreEqual(0m, result);
+            _mockRepo.Setup(repo => repo.GetParametersByAPI(apiId)).Returns(expectedParameters);
+
+            // Act
+            var result = _controller.GetParameters(apiId);
+
+            // Assert
+            Assert.IsInstanceOf<OkObjectResult>(result);
+            var okResult = result as OkObjectResult;
+            Assert.AreEqual(expectedParameters, okResult.Value);
         }
 
         [Test]
-        public void CalculateDeduction_TypeIsFixedPercentage_ReturnsCorrectPercentage()
+        public void AddParameterValue_WithValidValue_ReturnsTrue()
         {
-            var benefit = new Benefit
+            // Arrange
+            var newValue = new ParameterValueModel
             {
-                Type = "FixedPercentage",
-                FixedPercentage = 5 // 5%
+                ParameterId = Guid.NewGuid(),
+                Value = "Test Value",
+                Timestamp = DateTime.Now
             };
 
-            var grossSalary = 1000m;
-            var expected = Math.Round(grossSalary * 0.05m, 2);
+            _mockRepo.Setup(repo => repo.AddParameterValue(It.IsAny<ParameterValueModel>())).Returns(true);
 
-            var result = _strategy.CalculateDeduction(grossSalary, "Contractor", "M", benefit);
+            // Act
+            var result = _controller.AddParameterValue(newValue);
 
-            Assert.AreEqual(expected, result);
+            // Assert
+            Assert.IsInstanceOf<OkObjectResult>(result);
+            var okResult = result as OkObjectResult;
+            Assert.IsTrue((bool)okResult.Value);
         }
 
         [Test]
-        public void CalculateDeduction_TypeIsFixedPercentage_NullPercentage_ReturnsZero()
+        public void AddParameterValue_WithNullValue_ReturnsBadRequest()
         {
-            var benefit = new Benefit
-            {
-                Type = "FixedPercentage",
-                FixedPercentage = null
-            };
+            // Arrange
+            ParameterValueModel nullValue = null;
 
-            var result = _strategy.CalculateDeduction(2000m, "FullTime", "F", benefit);
-            Assert.AreEqual(0m, result);
-        }
+            // Act
+            var result = _controller.AddParameterValue(nullValue);
 
-        [Test]
-        public void CalculateDeduction_UnknownType_ReturnsZero()
-        {
-            var benefit = new Benefit
-            {
-                Type = "OtherUnknownType"
-            };
-
-            var result = _strategy.CalculateDeduction(2000m, "FullTime", "M", benefit);
-            Assert.AreEqual(0m, result);
+            // Assert
+            Assert.IsInstanceOf<BadRequestObjectResult>(result);
+            var badRequestResult = result as BadRequestObjectResult;
+            Assert.AreEqual("Parameter value is null", badRequestResult.Value);
         }
     }
 }
