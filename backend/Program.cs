@@ -108,7 +108,7 @@ builder.Services.AddScoped<IInsertDeductionDetailsCommand, InsertDeductionDetail
 builder.Services.AddScoped<GrossPaymentCalculationOrchestrator>();
 
 builder.Services.AddScoped<ICalculateGrossPaymentQuery, CalculateGrossPaymentQuery>();
-
+builder.Services.AddScoped<IDisableBenefitForEmployeeCommand, DisableBenefitForEmployeeCommand>();
 
 var app = builder.Build();
 

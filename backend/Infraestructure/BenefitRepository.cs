@@ -138,7 +138,6 @@ namespace backend.Infraestructure
             return true;
         }
 
-
         public List<Benefit> GetAssignedBenefitsForEmployee(Guid employeeId)
         {
             var benefits = new List<Benefit>();
@@ -339,6 +338,22 @@ namespace backend.Infraestructure
             _connection.Close();
             return benefit;
         }
+        
+        public bool DisableBenefitForEmployee(Guid benefitId, Guid employeeId)
+        {
+            const string deleteQuery = @"
+                DELETE FROM EmployeeXBenefit
+                WHERE BenefitId = @BenefitId AND EmployeeId = @EmployeeId";
 
+            using var command = new SqlCommand(deleteQuery, _connection);
+            command.Parameters.AddWithValue("@BenefitId", benefitId);
+            command.Parameters.AddWithValue("@EmployeeId", employeeId);
+
+            _connection.Open();
+            int rowsAffected = command.ExecuteNonQuery();
+            _connection.Close();
+
+            return rowsAffected > 0;
+        }
     }
 }
