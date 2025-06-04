@@ -66,8 +66,8 @@
           <li v-if="showOption('viewReports')" class="nav-item">
             <a class="nav-link" href="#">Reportes</a>
           </li>
-          <li v-if="showOption('viewPayrollHistory')" class="nav-item">
-            <a class="nav-link" href="#">Historial de Planillas</a>
+          <li v-if="showOption('viewPayrolls')" class="nav-item">
+            <router-link to="/payrolls-list" class="nav-link">Planillas</router-link>
           </li>
         </ul>
 
@@ -128,7 +128,7 @@ export default {
           "viewWorkedHours",
           "viewBenefits",
           "viewGeneratePayroll",
-          "viewPayrollHistory",
+          "viewPayrolls",
         ],
       };
       return permissions[this.employeeType]?.includes(option);

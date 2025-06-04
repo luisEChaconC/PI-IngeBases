@@ -111,7 +111,7 @@ VALUES (@Emp2PersonId, 'WID-1-2', @CompanyPersonId, 'Part-Time', 57006.88, 0);
 INSERT INTO Contacts (Type, PhoneNumber, PersonId)
 VALUES ('Phone Number', '62459713', @Emp2PersonId);
 
-
+GO
 -- ============End of First Execution==============
 
 
@@ -219,7 +219,7 @@ VALUES (@Emp2PersonId, 'WID-2-2', @CompanyPersonId, 'Hourly', 34571.93, 1);
 INSERT INTO Contacts (Type, PhoneNumber, PersonId)
 VALUES ('Phone Number', '83731394', @Emp2PersonId);
 
-
+GO
 -- ============End of Second Execution============
 
 
@@ -325,6 +325,7 @@ VALUES (@Emp2PersonId, 'WID-3-2', @CompanyPersonId, 'Full-Time', 58975.01, 1);
 INSERT INTO Contacts (Type, PhoneNumber, PersonId)
 VALUES ('Phone Number', '77711478', @Emp2PersonId);
 
+GO
 -- ============End of Third Execution============
 
 
@@ -352,5 +353,5 @@ VALUES
     (@CompanyId3, 'Subsidio para Educación', 'Apoyo para estudios universitarios', 1, 'FixedAmount', NULL, NULL, 10000, 18),
     (@CompanyId3, 'API de Evaluación de Desempeño', 'Evaluación automática de desempeño', 1, 'API', 'https://api.ejemplo.com/evaluacion', NULL, NULL, 0);
 
-
+GO
 -- ============End of Fourth Execution============

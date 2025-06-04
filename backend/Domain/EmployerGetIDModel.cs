@@ -14,5 +14,6 @@ namespace backend.Domain
         public string Email { get; set; }
         public bool? IsAdmin { get; set; }
         public string PhoneNumber { get; set; }
+        public string Gender { get; set; }
     }
 }
