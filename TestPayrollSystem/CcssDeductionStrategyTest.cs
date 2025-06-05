@@ -28,6 +28,34 @@ namespace TestPayrollSystem
             var result = _strategy.CalculateDeduction(gross, "Permanent", "F");
             Assert.AreEqual(expected, result);
         }
+         [Test]
+        public void CalculateDeduction_CorrectForSalary3910000()
+        {
+            
+            decimal grossSalary = 3_910_000m;
+            string contractType = "Permanent";
+            string gender = "F";
+
+            decimal expectedTotal = 378_097m;
+
+            var result = _strategy.CalculateDeduction(grossSalary, contractType, gender);
+
+            Assert.AreEqual(expectedTotal, result);
+        }
+           [Test]
+        public void CalculateDeduction_CorrectForSalary7000000()
+        {
+            
+            decimal grossSalary = 7_000_000m;
+            string contractType = "Permanent";
+            string gender = "F";
+
+            decimal expectedTotal = 676_900m;
+
+            var result = _strategy.CalculateDeduction(grossSalary, contractType, gender);
+
+            Assert.AreEqual(expectedTotal, result);
+        }
     }
 }
 
