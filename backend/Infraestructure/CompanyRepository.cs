@@ -280,16 +280,14 @@ namespace backend.Infraestructure
 
         private void ValidateDuplicateEmail(SqlConnection connection, string email, string personId)
         {
-            var query = "SELECT COUNT(*) FROM Contacts WHERE Email = @Email AND PersonId <> @Id";
-            using (var cmd = new SqlCommand(query, connection))
+            using (var cmd = new SqlCommand("ValidateDuplicateEmail", connection))
             {
+                cmd.CommandType = CommandType.StoredProcedure;
                 cmd.Parameters.AddWithValue("@Email", email);
-                cmd.Parameters.AddWithValue("@Id", personId);
-                if ((int)cmd.ExecuteScalar() > 0)
-                    throw new Exception("Correo electrónico ya existe.");
+                cmd.Parameters.AddWithValue("@PersonId", personId);
+                cmd.ExecuteNonQuery(); 
             }
         }
-
 
     	public void UpdateCompany(UpdateCompanyModel company)
         {
