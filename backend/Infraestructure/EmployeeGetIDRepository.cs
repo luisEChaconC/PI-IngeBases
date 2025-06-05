@@ -19,31 +19,39 @@ namespace backend.Infraestructure
 
         public EmployeeGetIDModel GetEmployeeById(string id)
         {
-            var query = @"
-                SELECT 
-                    e.Id AS EmployeeId,
-                    e.CompanyId,
-                    np.FirstName,
-                    np.FirstSurname,
-                    np.SecondSurname,
-                    np.Gender,
-                    p.LegalId AS Cedula,
-                    e.WorkerId,
-                    e.ContractType,
-                    e.GrossSalary,
-                    e.EmployeeStartDate,
-                    e.HasToReportHours,
-                    u.Email,
-                    u.IsAdmin,
-                    c.PhoneNumber,
-                    np.Gender  
-                FROM 
-                    Employees e
-                JOIN NaturalPersons np ON e.Id = np.Id
-                JOIN Persons p ON np.Id = p.Id
-                LEFT JOIN Users u ON np.UserId = u.Id
-                LEFT JOIN Contacts c ON p.Id = c.PersonId AND c.Type = 'Phone Number'
-                WHERE e.Id = @Id";
+          var query = @"
+    SELECT 
+        e.Id AS EmployeeId,
+        e.CompanyId,
+        np.FirstName,
+        np.FirstSurname,
+        np.SecondSurname,
+        np.Gender,
+        p.LegalId AS Cedula,
+        e.WorkerId,
+        e.ContractType,
+        e.GrossSalary,
+        e.EmployeeStartDate,
+        e.HasToReportHours,
+        u.Email,
+        u.IsAdmin,
+        c.PhoneNumber,
+        -- Calculated Role
+        CASE 
+            WHEN s.Id IS NOT NULL THEN 'Supervisor'
+            WHEN pm.Id IS NOT NULL THEN 'PayrollManager'
+            ELSE 'Collaborator'
+        END AS Role
+    FROM 
+        Employees e
+    JOIN NaturalPersons np ON e.Id = np.Id
+    JOIN Persons p ON np.Id = p.Id
+    LEFT JOIN Users u ON np.UserId = u.Id
+    LEFT JOIN Contacts c ON p.Id = c.PersonId AND c.Type = 'Phone Number'
+    LEFT JOIN Supervisors s ON e.Id = s.Id
+    LEFT JOIN PayrollManagers pm ON e.Id = pm.Id
+    WHERE e.Id = @Id";
+
 
             EmployeeGetIDModel employee = null;
 
@@ -76,6 +84,8 @@ namespace backend.Infraestructure
                                 Email = reader["Email"]?.ToString(),
                                 IsAdmin = reader["IsAdmin"] != DBNull.Value ? Convert.ToBoolean(reader["IsAdmin"]) : (bool?)null,
                                 PhoneNumber = reader["PhoneNumber"]?.ToString(),
+                                Role = reader["Role"]?.ToString(),
+
                                
                             };
                         }

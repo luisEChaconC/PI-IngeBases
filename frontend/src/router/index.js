@@ -16,8 +16,8 @@ import ViewCompaniesList from '../views/ViewCompaniesList.vue'
 import HomeView from '../views/HomeView.vue'
 import PayrollsList from '@/views/PayrollsList.vue'
 import EmployeeTimesheet from '@/views/EmployeeTimesheet.vue'
+import TimesheetApprovals from '@/views/TimesheetApprovals.vue'
 import UnauthorizedView from '@/views/UnauthorizedView.vue'
-
 import CurrentUserService from '@/services/currentUserService'
 
 const routes = [
@@ -29,7 +29,7 @@ const routes = [
     { path: '/unauthorized', name: 'UnauthorizedView', component: UnauthorizedView },
     {
         path: '/',
-        component: MainLayout,  
+        component: MainLayout,
         children: [
             { path: '/home-view', name: 'HomeView', component: HomeView, meta: {allowedPositions: ['Employer', 'Collaborator', 'Payroll Manager', 'Supervisor', 'SoftwareManager']} },
             { path: '/add-employee', name: 'AddEmployee', component: AddEmployee, meta: {allowedPositions: ['Employer']} },
@@ -44,7 +44,8 @@ const routes = [
             { path: '/view-employee-profile', name: 'ViewEmployeeProfile', component: ViewEmployeeProfile, meta: {allowedPositions: ['Employer', 'Collaborator', 'Payroll Manager', 'Supervisor']} },
             { path: '/view-company-info', name: 'ViewCompanyInfo', component: ViewCompanyInfo, meta: {allowedPositions: ['Employer', 'SoftwareManager']} },
             { path: '/payrolls-list', name: 'PayrollsList', component: PayrollsList, meta: {allowedPositions: ['Payroll Manager']} },
-            { path: '/employee-timesheet', name: 'EmployeeTimesheet', component: EmployeeTimesheet}
+            { path: '/employee-timesheet', name: 'EmployeeTimesheet', component: EmployeeTimesheet, meta: {allowedPositions: ['Collaborator', 'Payroll Manager', 'Supervisor']} },
+            { path: '/timesheet-approvals', name: 'TimesheetApprovals', component: TimesheetApprovals, meta: {allowedPositions: ['Supervisor']} }
         ],
     },
 ]

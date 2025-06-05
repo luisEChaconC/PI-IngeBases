@@ -95,7 +95,7 @@ export default {
       switch (position) {
         case 'Supervisor':
           return 'Supervisor'
-        case 'Payroll Manager':
+        case 'PayrollManager':
           return 'Encargado de planilla'
         case 'Collaborator':
           return 'Colaborador'
