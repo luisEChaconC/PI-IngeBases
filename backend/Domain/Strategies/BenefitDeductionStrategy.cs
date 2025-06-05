@@ -17,6 +17,10 @@ namespace backend.Domain.Strategies
             _httpClient = httpClient;
         }
 
+        public BenefitDeductionStrategy()
+        {
+        }
+
         public decimal CalculateDeduction(decimal grossSalary, string contractType, string gender, Benefit? benefit = null, Guid? employeeId = null)
         {
             if (benefit == null) return 0;
