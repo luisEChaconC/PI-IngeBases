@@ -50,11 +50,7 @@ namespace backend.Infraestructure
 
                 // Open the database connection
                 _connection.Open();
-
-                // Execute the query
                 command.ExecuteNonQuery();
-
-                // Close the database connection
                 _connection.Close();
             }
         }
@@ -70,7 +66,7 @@ namespace backend.Infraestructure
                     p.LegalId,
                     CASE 
                         WHEN s.Id IS NOT NULL THEN 'Supervisor'
-                        WHEN pm.Id IS NOT NULL THEN 'Payroll Manager'
+                        WHEN pm.Id IS NOT NULL THEN 'PayrollManager'
                         ELSE 'Collaborator'
                     END AS Position
                 FROM Employees e
@@ -83,7 +79,6 @@ namespace backend.Infraestructure
             using (var command = new SqlCommand(query, _connection))
             {
                 command.Parameters.AddWithValue("@CompanyId", companyId);
-
                 _connection.Open();
 
                 using (var reader = command.ExecuteReader())
@@ -105,6 +100,150 @@ namespace backend.Infraestructure
 
             return employees;
         }
+
+        /// <summary>
+        /// Updates an existing employee across multiple tables.
+        /// </summary>
+        public void UpdateEmployee(UpdateEmployeeModel updated)
+        {
+            
+            var query = @"
+                UPDATE Employees
+                SET
+                    WorkerId = ISNULL(NULLIF(@WorkerId, ''), WorkerId),
+                    ContractType = ISNULL(NULLIF(@ContractType, ''), ContractType),
+                    GrossSalary = ISNULL(@GrossSalary, GrossSalary)
+                WHERE Id = @Id;
+
+                UPDATE NaturalPersons
+                SET
+                    FirstName = ISNULL(NULLIF(@FirstName, ''), FirstName),
+                    FirstSurname = ISNULL(NULLIF(@FirstSurname, ''), FirstSurname),
+                    SecondSurname = ISNULL(NULLIF(@SecondSurname, ''), SecondSurname),
+                    Gender = ISNULL(NULLIF(@Gender, ''), Gender)
+                WHERE Id = @Id;
+
+                UPDATE Persons
+                SET
+                    LegalId = ISNULL(NULLIF(@LegalId, ''), LegalId)
+                WHERE Id = @Id;
+               
+                UPDATE Contacts
+                SET
+                    Email = ISNULL(NULLIF(@Email, ''), Email)
+                WHERE PersonId = @Id AND Type = 'Email';
+
+                UPDATE Contacts
+                SET
+                     PhoneNumber = ISNULL(NULLIF(@PhoneNumber, ''), PhoneNumber)
+                WHERE PersonId = @Id AND Type = 'Phone Number';
+            ";
+
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                try
+                {
+                    connection.Open();
+                    var checkDuplicates = @"
+            SELECT COUNT(*) FROM Persons WHERE LegalId = @LegalId AND Id != @Id;
+            SELECT COUNT(*) FROM Employees WHERE WorkerId = @WorkerId AND Id != @Id;
+        ";
+
+       var checkLegalIdQuery = "SELECT COUNT(*) FROM Persons WHERE LegalId = @LegalId AND Id != @Id";
+using (var checkCmd = new SqlCommand(checkLegalIdQuery, connection))
+{
+    checkCmd.Parameters.AddWithValue("@LegalId", updated.LegalId ?? "");
+    checkCmd.Parameters.AddWithValue("@Id", updated.Id);
+
+    int count = (int)checkCmd.ExecuteScalar();
+    if (count > 0)
+        throw new InvalidOperationException("CEDULA_DUPLICADA");
+}
+
+// Verifie duplicate worker id
+var checkWorkerIdQuery = "SELECT COUNT(*) FROM Employees WHERE WorkerId = @WorkerId AND Id != @Id";
+using (var checkCmd = new SqlCommand(checkWorkerIdQuery, connection))
+{
+    checkCmd.Parameters.AddWithValue("@WorkerId", updated.WorkerId ?? "");
+    checkCmd.Parameters.AddWithValue("@Id", updated.Id);
+
+    int count = (int)checkCmd.ExecuteScalar();
+    if (count > 0)
+        throw new InvalidOperationException("WORKERID_DUPLICADO");
+}
+
+                    using (var command = new SqlCommand(query, connection))
+                    {
+                        command.Parameters.AddWithValue("@Id", updated.Id);
+                        command.Parameters.AddWithValue("@WorkerId", (object?)updated.WorkerId ?? DBNull.Value);
+                        command.Parameters.AddWithValue("@ContractType", (object?)updated.ContractType ?? DBNull.Value);
+                        command.Parameters.AddWithValue("@GrossSalary", (object?)updated.GrossSalary ?? DBNull.Value);
+
+                        command.Parameters.AddWithValue("@FirstName", (object?)updated.FirstName ?? DBNull.Value);
+                        command.Parameters.AddWithValue("@FirstSurname", (object?)updated.FirstSurname ?? DBNull.Value);
+                        command.Parameters.AddWithValue("@SecondSurname", (object?)updated.SecondSurname ?? DBNull.Value);
+                        command.Parameters.AddWithValue("@Gender", (object?)updated.Gender ?? DBNull.Value);
+
+
+                        command.Parameters.AddWithValue("@LegalId", (object?)updated.LegalId ?? DBNull.Value);
+                        command.Parameters.AddWithValue("@Email", (object?)updated.Email ?? DBNull.Value);
+                        command.Parameters.AddWithValue("@PhoneNumber", (object?)updated.PhoneNumber ?? DBNull.Value);
+
+                        command.ExecuteNonQuery();
+                        var roles = new[] { "Supervisors", "PayrollManagers" };
+
+                foreach (var table in roles)
+                {
+                    if (!string.Equals(updated.Role + "s", table, StringComparison.OrdinalIgnoreCase))
+                    {
+                        var deleteRole = $"DELETE FROM {table} WHERE Id = @Id";
+                        using var deleteCmd = new SqlCommand(deleteRole, connection);
+                        deleteCmd.Parameters.AddWithValue("@Id", updated.Id);
+                        deleteCmd.ExecuteNonQuery();
+                    }
+                }
+
+                if (updated.Role == "Supervisor" || updated.Role == "PayrollManager")
+                {
+                    var roleTable = updated.Role + "s"; // Supervisors o PayrollManagers
+
+                    var existsQuery = $"SELECT COUNT(*) FROM {roleTable} WHERE Id = @Id";
+                    using var existsCmd = new SqlCommand(existsQuery, connection);
+                    existsCmd.Parameters.AddWithValue("@Id", updated.Id);
+                    var exists = (int)existsCmd.ExecuteScalar() > 0;
+
+                    if (!exists)
+                    {
+                        var insertRole = $"INSERT INTO {roleTable} (Id) VALUES (@Id)";
+                        using var insertCmd = new SqlCommand(insertRole, connection);
+                        insertCmd.Parameters.AddWithValue("@Id", updated.Id);
+                        insertCmd.ExecuteNonQuery();
+                    }
+                }
+                                    }
+                                }
+                                catch (Exception ex)
+                                {
+                                    Console.WriteLine($"Error updating employee: {ex.Message}");
+                                    throw;
+                                }
+                            }
+                        }
+        
+public bool HasPaymentRecords(string employeeId)
+{
+    var query = "SELECT dbo.HasPaymentRecords(@EmployeeId) AS Result";
+
+
+    using (var connection = new SqlConnection(_connectionString))
+    using (var command = new SqlCommand(query, connection))
+    {
+        command.Parameters.AddWithValue("@EmployeeId", employeeId);
+        connection.Open();
+        var result = command.ExecuteScalar();
+        return result != null && Convert.ToBoolean(result);
+    }
+}
 
         public async Task<List<EmployeeSummaryDto>> GetSummaryByCompanyIdAsync(Guid companyId)
         {

@@ -16,14 +16,11 @@
           <li v-if="showOption('viewProfile')" class="nav-item">
             <router-link to="/view-employee-profile" class="nav-link">Perfil</router-link>
           </li>
-          <li v-if="showOption('viewWorkedHours')" class="nav-item">
-            <a class="nav-link" href="#">Horas Laboradas</a>
+          <li v-if="showOption('timesheet')" class="nav-item">
+            <router-link to="/employee-timesheet" class="nav-link">Reportar Horas</router-link>
           </li>
-          <li v-if="showOption('viewGeneratePayroll')" class="nav-item">
-            <a class="nav-link" href="#">Generar Planillas</a>
-          </li>
-          <li v-if="showOption('viewHours')" class="nav-item">
-            <a class="nav-link" href="#">Horas</a>
+          <li v-if="showOption('timesheetApprovals')" class="nav-item">
+            <router-link to="/timesheet-approvals" class="nav-link">Aprobar Horas</router-link>
           </li>
           <li v-if="showOption('viewPayments')" class="nav-item">
             <a class="nav-link" href="#">Pagos</a>
@@ -33,6 +30,14 @@
           </li>
           <li v-if="showOption('viewEmployees')" class="nav-item">
             <router-link to="/employees-list" class="nav-link">Empleados</router-link>
+          </li>
+          <li v-if="showOption('viewBenefitsPayrollM')" class="nav-item">
+            <router-link
+              to="/benefits"
+              class="nav-link"
+            >
+              Editar Beneficios
+            </router-link>
           </li>
           <li v-if="showOption('viewBenefits')" class="nav-item">
             <router-link
@@ -51,15 +56,13 @@
             </router-link>
             <a v-else href="#" class="nav-link">Beneficios</a>
           </li>
-          <li v-if="showOption('viewRequestHourCorrection')" class="nav-item">
-            <a class="nav-link" href="#">Corrección Horas</a>
-          </li>
+
           <li v-if="showOption('viewReportsPayments')" class="nav-item">
             <a class="nav-link" href="#">Reportes y Pagos</a>
           </li>
-          <li v-if="showOption('viewRoleAssignment')" class="nav-item">
+          <!--<li v-if="showOption('viewRoleAssignment')" class="nav-item">
             <a class="nav-link" href="#">Asignación de Roles</a>
-          </li>
+          </li> -->
           <li v-if="showOption('viewCompanyManagement')" class="nav-item">
             <router-link class="nav-link" to="/view-companies-list">Gestión de Empresas</router-link>
           </li>
@@ -99,7 +102,8 @@ export default {
           "viewProfile", 
           "viewPayments", 
           "viewWorkedHours", 
-          "viewBenefits"
+          "viewBenefits",
+          "timesheet",
         ],
         Employer: [
           "viewProfile",
@@ -115,10 +119,10 @@ export default {
           "viewWorkedHours",
           "viewBenefits",
           "viewHours",
-          "viewRequestHourCorrection",
+          "timesheet",
+          "timesheetApprovals",
         ],
         SoftwareManager: [
-          "viewProfile",
           "viewCompanyManagement",
           "viewReports",
         ],
@@ -126,9 +130,12 @@ export default {
           "viewProfile",
           "viewPayments",
           "viewWorkedHours",
+          "viewEmployees",
           "viewBenefits",
-          "viewGeneratePayroll",
           "viewPayrolls",
+          "viewBenefitsPayrollM",
+          "viewEmployees",
+          "timesheet",
         ],
       };
       return permissions[this.employeeType]?.includes(option);

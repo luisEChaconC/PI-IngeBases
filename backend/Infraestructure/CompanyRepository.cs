@@ -1,6 +1,7 @@
 using backend.Domain;
 using System.Data;
 using Microsoft.Data.SqlClient;
+using backend.Models;
 
 namespace backend.Infraestructure
 {
@@ -239,6 +240,111 @@ namespace backend.Infraestructure
             }
 
             return paymentType;
+        }
+
+        private void ValidateDuplicateLegalId(SqlConnection connection, string legalId, string companyId)
+        {
+            var query = "SELECT COUNT(*) FROM Persons WHERE LegalId = @LegalId AND Id <> @Id";
+            using (var cmd = new SqlCommand(query, connection))
+            {
+                cmd.Parameters.AddWithValue("@LegalId", legalId);
+                cmd.Parameters.AddWithValue("@Id", companyId);
+                if ((int)cmd.ExecuteScalar() > 0)
+                    throw new Exception("El ID ya existe.");
+            }
+        }
+
+        private void ValidateDuplicateCompanyName(SqlConnection connection, string name, string companyId)
+        {
+            var query = "SELECT COUNT(*) FROM Companies WHERE Name = @Name AND Id <> @Id";
+            using (var cmd = new SqlCommand(query, connection))
+            {
+                cmd.Parameters.AddWithValue("@Name", name);
+                cmd.Parameters.AddWithValue("@Id", companyId);
+                if ((int)cmd.ExecuteScalar() > 0)
+                    throw new Exception("Nombre de empresa ya existe.");
+            }
+        }
+
+        private void ValidateDuplicatePhoneNumber(SqlConnection connection, string phoneNumber, string personId)
+        {
+            var query = "SELECT COUNT(*) FROM Contacts WHERE PhoneNumber = @PhoneNumber AND PersonId <> @Id";
+            using (var cmd = new SqlCommand(query, connection))
+            {
+                cmd.Parameters.AddWithValue("@PhoneNumber", phoneNumber);
+                cmd.Parameters.AddWithValue("@Id", personId);
+                if ((int)cmd.ExecuteScalar() > 0)
+                    throw new Exception("Teléfono ya existe.");
+            }
+        }
+
+        private void ValidateDuplicateEmail(SqlConnection connection, string email, string personId)
+        {
+            using (var cmd = new SqlCommand("ValidateDuplicateEmail", connection))
+            {
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@Email", email);
+                cmd.Parameters.AddWithValue("@PersonId", personId);
+                cmd.ExecuteNonQuery(); 
+            }
+        }
+
+    	public void UpdateCompany(UpdateCompanyModel company)
+        {
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                connection.Open();
+
+                ValidateDuplicateLegalId(connection, company.Person.LegalId, company.Id);
+                ValidateDuplicateCompanyName(connection, company.Name, company.Id);
+                ValidateDuplicatePhoneNumber(connection, company.Contact.PhoneNumber, company.Id);
+                ValidateDuplicateEmail(connection, company.Contact.Email, company.Id);
+
+                var query = @"
+                    UPDATE Companies
+                    SET Name = @Name,
+                        PaymentType = @PaymentType,
+                        LastModificationDate = GETDATE(),
+                        MaxBenefitsPerEmployee = @MaxBenefitsPerEmployee
+                    WHERE Id = @Id
+                    
+                    UPDATE Persons
+                    SET LegalId = @LegalId,
+                        Province = @Province,
+                        Canton = @Canton,   
+                        Neighborhood = @Neighborhood,
+                        AdditionalDirectionDetails = @AdditionalDirectionDetails
+                    WHERE Id = @Id;
+                    
+                    UPDATE Contacts
+                    SET
+                        PhoneNumber = CASE 
+                            WHEN Email IS NULL OR Email = '' THEN @PhoneNumber
+                            ELSE PhoneNumber
+                        END,
+                        Email = CASE 
+                            WHEN PhoneNumber IS NULL OR PhoneNumber = '' THEN @Email
+                            ELSE Email
+                        END
+                    WHERE PersonId = @Id";
+
+                using (var command = new SqlCommand(query, connection))
+                {
+                    command.Parameters.AddWithValue("@Id", company.Id);
+                    command.Parameters.AddWithValue("@Name", company.Name);
+                    command.Parameters.AddWithValue("@LegalId", company.Person.LegalId);
+                    command.Parameters.AddWithValue("@PaymentType", company.PaymentType);
+                    command.Parameters.AddWithValue("@Province", company.Person.Province);
+                    command.Parameters.AddWithValue("@Canton", company.Person.Canton);
+                    command.Parameters.AddWithValue("@Neighborhood", company.Person.Neighborhood);
+                    command.Parameters.AddWithValue("@AdditionalDirectionDetails", company.Person.AdditionalDirectionDetails);
+                    command.Parameters.AddWithValue("@PhoneNumber", company.Contact.PhoneNumber);
+                    command.Parameters.AddWithValue("@Email", company.Contact.Email);
+                    command.Parameters.AddWithValue("@MaxBenefitsPerEmployee", company.MaxBenefits);
+
+                    command.ExecuteNonQuery();
+                }
+            }
         }
     }
 }

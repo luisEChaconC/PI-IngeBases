@@ -24,5 +24,10 @@ namespace backend.Domain
         public Guid TimesheetId { get; set; }
 
         public Guid? SupervisorId { get; set; }
+
+        [Required(ErrorMessage = "IsSubmitted is required.")]
+        public bool IsSubmitted { get; set; }
+
+        public DateTime? LastSubmitTimestamp { get; set; }
     }
 }
