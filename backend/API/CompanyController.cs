@@ -186,9 +186,24 @@ namespace backend.API
             {
                 // Check for known validation errors
                 if (ex.Message.Contains("ya existe"))
-                    return Conflict(new { message = ex.Message }); 
+                    return Conflict(new { message = ex.Message });
 
                 return StatusCode(500, $"An update error occurred: {ex.Message}");
+            }
+        }
+        
+        [HttpDelete]
+        [Route("{id}")]
+        public IActionResult DeleteCompany(string id)
+        {
+            try
+            {
+                _companyRepository.DeleteCompany(id);
+                return Ok(new { message = "Company deleted successfully." });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while deleting the company.", error = ex.Message });
             }
         }
 

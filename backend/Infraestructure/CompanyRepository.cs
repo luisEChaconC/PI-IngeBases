@@ -220,7 +220,7 @@ namespace backend.Infraestructure
             // Return the company (or null if not found)
             return company;
         }
-        
+
         public async Task<string> GetPaymentTypeByIdAsync(Guid companyId)
         {
             string paymentType = null;
@@ -285,11 +285,11 @@ namespace backend.Infraestructure
                 cmd.CommandType = CommandType.StoredProcedure;
                 cmd.Parameters.AddWithValue("@Email", email);
                 cmd.Parameters.AddWithValue("@PersonId", personId);
-                cmd.ExecuteNonQuery(); 
+                cmd.ExecuteNonQuery();
             }
         }
 
-    	public void UpdateCompany(UpdateCompanyModel company)
+        public void UpdateCompany(UpdateCompanyModel company)
         {
             using (var connection = new SqlConnection(_connectionString))
             {
@@ -342,6 +342,20 @@ namespace backend.Infraestructure
                     command.Parameters.AddWithValue("@Email", company.Contact.Email);
                     command.Parameters.AddWithValue("@MaxBenefitsPerEmployee", company.MaxBenefits);
 
+                    command.ExecuteNonQuery();
+                }
+            }
+        }
+        
+        public void DeleteCompany(string companyId)
+        {
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                connection.Open();
+                using (var command = new SqlCommand("sp_DeleteCompany", connection))
+                {
+                    command.CommandType = CommandType.StoredProcedure;
+                    command.Parameters.AddWithValue("@CompanyId", Guid.Parse(companyId));
                     command.ExecuteNonQuery();
                 }
             }
