@@ -112,6 +112,10 @@
                     <button v-if="isEditing" type="button" class="btn btn-outline-secondary px-4" @click="cancelEdit">
                       Cancelar
                     </button>
+
+                    <button type="button" class="btn btn-outline-danger px-4" @click="deleteCompany">
+                      Eliminar
+                    </button>
                   </div>
                 </div>
               </div>
@@ -126,6 +130,7 @@
 <script>
 import axios from 'axios';
 import currentUserService from "@/services/currentUserService";
+import Swal from 'sweetalert2';
 
 export default {
   name: 'ViewCompanyInfo',
@@ -164,7 +169,6 @@ export default {
         const companyResponse = await axios.get(`https://localhost:5000/api/Company/GetCompanyById/${companyId}`);
         this.company = companyResponse.data;
         this.company.employeesCount = companyResponse.data.employeesDynamic.length;
-        
         const contactsList = companyResponse.data.contact; 
 
         this.company.contact = {
@@ -239,6 +243,46 @@ export default {
           console.error("Error while updating company", error.response?.data);
         });
     },
+
+    deleteCompany() {
+      Swal.fire({
+        title: '¿Estás seguro?',
+        text: "Esta acción eliminará la empresa",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: 'Sí, eliminar',
+        cancelButtonText: 'Cancelar'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          const currentUserInformation = currentUserService.getCurrentUserInformationFromLocalStorage();
+
+          const companyId = currentUserInformation.position?.trim() === "SoftwareManager"
+            ? localStorage.getItem("selectedCompanyId")
+            : currentUserInformation.companyId;
+
+          axios.delete(`https://localhost:5000/api/Company/${companyId}`)
+            .then(() => {
+              Swal.fire(
+                'Eliminado',
+                'La empresa ha sido eliminada exitosamente.',
+                'success'
+              );
+              this.$router.push("/view-companies-list");
+            })
+            .catch(error => {
+              Swal.fire(
+                'Error',
+                'Ocurrió un error al eliminar la empresa.',
+                'error'
+              );
+              console.error("Error al eliminar empresa:", error.response?.data || error);
+            });
+        }
+      });
+    },
+
 
 
     handleBack() {

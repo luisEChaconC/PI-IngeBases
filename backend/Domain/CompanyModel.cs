@@ -42,6 +42,7 @@ namespace backend.Domain
         public List<ContactModel> ?Contact { get; set; }
 
         public List<dynamic> ?EmployeesDynamic { get; set; }
+        public bool IsDeleted { get; set; } = false;
 
         public CompanyModel()
         {
@@ -58,6 +59,7 @@ namespace backend.Domain
             Contact = null;
             Employees = null;
             EmployeesDynamic = null;
+            IsDeleted = false;
         }
         public CompanyModel(string id, string name, string? description, string paymentType, List<EmployeeModel> employees, int? maxBenefitsPerEmployee, DateTime creationDate, string? creationAuthor, DateTime? lastModificationDate, string? lastModificationAuthor)
         {

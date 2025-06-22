@@ -24,7 +24,7 @@
                 </tr>
               </thead>
               <tbody>
-                <tr v-for="(company, index) in companies" :key="index">
+                <tr v-for="(company, index) in companies.filter(c => !c.isDeleted)" :key="index">
                   <td>{{ company.name }}</td>
                   <td>{{ company.creationAuthor }}</td>
                   <td>{{ company.legalId }}</td>

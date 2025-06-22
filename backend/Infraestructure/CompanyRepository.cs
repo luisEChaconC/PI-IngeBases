@@ -99,7 +99,7 @@ namespace backend.Infraestructure
             List<CompanyModel> companies = new List<CompanyModel>();
             var query = @"
         SELECT c.Id, c.Name, c.Description, c.PaymentType, c.MaxBenefitsPerEmployee, 
-               c.CreationDate, c.CreationAuthor, c.LastModificationDate, c.LastModificationAuthor,
+               c.CreationDate, c.CreationAuthor, c.LastModificationDate, c.LastModificationAuthor, c.isDeleted,
                p.Province, p.Canton, p.Neighborhood, p.AdditionalDirectionDetails, p.LegalId,
                (SELECT COUNT(*) FROM Employees e WHERE e.CompanyId = c.Id) AS EmployeeCount
         FROM Companies c
@@ -131,7 +131,8 @@ namespace backend.Infraestructure
                                     LastModificationAuthor = reader["LastModificationAuthor"] != DBNull.Value ? reader["LastModificationAuthor"].ToString() : null,
                                     Employees = new List<EmployeeModel>(),
                                     EmployeeCount = Convert.ToInt32(reader["EmployeeCount"]),
-                                    LegalId = reader["LegalId"].ToString()
+                                    LegalId = reader["LegalId"].ToString(),
+                                    IsDeleted = reader["isDeleted"] != DBNull.Value && (bool)reader["isDeleted"],
                                 };
 
                                 companies.Add(company);
@@ -162,7 +163,7 @@ namespace backend.Infraestructure
             // SQL query to select a company by ID
             var query = @"
                 SELECT c.Id, c.Name, c.Description, c.PaymentType, c.MaxBenefitsPerEmployee, 
-                       c.CreationDate, c.CreationAuthor, c.LastModificationDate, c.LastModificationAuthor,
+                       c.CreationDate, c.CreationAuthor, c.LastModificationDate, c.LastModificationAuthor, c.isDeleted,
                        p.Province, p.Canton, p.Neighborhood, p.AdditionalDirectionDetails
                 FROM Companies c
                 INNER JOIN Persons p ON c.Id = p.Id
@@ -201,7 +202,8 @@ namespace backend.Infraestructure
                                     LastModificationAuthor = reader["LastModificationAuthor"] != DBNull.Value ? reader["LastModificationAuthor"].ToString() : null,
                                     Person = _personRepository.GetPersonById(reader["Id"].ToString()),
                                     Contact = _contactRepository.GetContactsById(reader["Id"].ToString()),
-                                    EmployeesDynamic = _employeeRepository.GetEmployeesByCompanyId(reader["Id"].ToString())
+                                    EmployeesDynamic = _employeeRepository.GetEmployeesByCompanyId(reader["Id"].ToString()),
+                                    IsDeleted = reader["isDeleted"] != DBNull.Value && (bool)reader["isDeleted"]
                                 };
                             }
                         }
