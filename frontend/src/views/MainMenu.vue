@@ -153,7 +153,7 @@ export default {
     if (currentUserInformation?.position) {
       this.employeeType = currentUserInformation.position.replace(/\s/g, '');
     }
-    console.log("Rol del usuario:", this.employeeType);
+
   }
 };
 </script>

@@ -101,9 +101,12 @@ namespace backend.Infraestructure
         SELECT c.Id, c.Name, c.Description, c.PaymentType, c.MaxBenefitsPerEmployee, 
                c.CreationDate, c.CreationAuthor, c.LastModificationDate, c.LastModificationAuthor, c.isDeleted,
                p.Province, p.Canton, p.Neighborhood, p.AdditionalDirectionDetails, p.LegalId,
-               (SELECT COUNT(*) FROM Employees e WHERE e.CompanyId = c.Id) AS EmployeeCount
+               (SELECT COUNT(*) FROM Employees e WHERE e.CompanyId = c.Id) AS EmployeeCount,
+               np.FirstName + ' ' + np.FirstSurname + ' ' + ISNULL(np.SecondSurname, '') AS EmployerFullName
         FROM Companies c
         INNER JOIN Persons p ON c.Id = p.Id
+        INNER JOIN Employers e ON c.Id = e.CompanyId
+        INNER JOIN NaturalPersons np ON e.Id = np.Id
         ORDER BY c.Name";
 
             using (var connection = new SqlConnection(_connectionString))
@@ -126,7 +129,7 @@ namespace backend.Infraestructure
                                     PaymentType = reader["PaymentType"].ToString(),
                                     MaxBenefitsPerEmployee = reader["MaxBenefitsPerEmployee"] != DBNull.Value ? (int?)reader["MaxBenefitsPerEmployee"] : null,
                                     CreationDate = (DateTime)reader["CreationDate"],
-                                    CreationAuthor = reader["CreationAuthor"] != DBNull.Value ? reader["CreationAuthor"].ToString() : null,
+                                    CreationAuthor = reader["EmployerFullName"] != DBNull.Value ? reader["EmployerFullName"].ToString() : null,
                                     LastModificationDate = reader["LastModificationDate"] != DBNull.Value ? (DateTime?)reader["LastModificationDate"] : null,
                                     LastModificationAuthor = reader["LastModificationAuthor"] != DBNull.Value ? reader["LastModificationAuthor"].ToString() : null,
                                     Employees = new List<EmployeeModel>(),
@@ -203,7 +206,7 @@ namespace backend.Infraestructure
                                     Person = _personRepository.GetPersonById(reader["Id"].ToString()),
                                     Contact = _contactRepository.GetContactsById(reader["Id"].ToString()),
                                     EmployeesDynamic = _employeeRepository.GetEmployeesByCompanyId(reader["Id"].ToString()),
-                                    IsDeleted = reader["isDeleted"] != DBNull.Value && (bool)reader["isDeleted"]
+                                    IsDeleted = reader["isDeleted"] != DBNull.Value && Convert.ToBoolean(reader["isDeleted"]),
                                 };
                             }
                         }

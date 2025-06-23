@@ -44,6 +44,7 @@ namespace backend.Domain
         public List<dynamic> ?EmployeesDynamic { get; set; }
         public bool IsDeleted { get; set; } = false;
 
+
         public CompanyModel()
         {
             Id = string.Empty;

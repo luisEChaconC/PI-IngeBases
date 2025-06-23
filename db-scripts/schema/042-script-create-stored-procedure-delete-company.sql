@@ -14,6 +14,7 @@ BEGIN
     ELSE
     BEGIN
         -- Sino, borrado físico
+		DELETE FROM Employees WHERE CompanyId = @CompanyId;
 		DELETE FROM Employers WHERE CompanyId = @CompanyId;
         DELETE FROM Companies WHERE Id = @CompanyId;
     END

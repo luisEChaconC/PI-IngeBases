@@ -19,7 +19,7 @@ class CurrentUserService {
 
 
             const userInformation = response.data;
-            console.log("User info recibido:", userInformation);
+          
 
             localStorage.setItem('currentUserInformation', JSON.stringify(userInformation));
         } catch (error) {

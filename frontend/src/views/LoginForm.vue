@@ -74,6 +74,7 @@
 <script>
 import axios from "axios"; // Importing Axios for making HTTP requests
 import currentUserService from "@/services/currentUserService";
+import Swal from 'sweetalert2';
 
 export default {
   name: "LoginForm", // Component name
@@ -90,49 +91,62 @@ export default {
      * Makes an API call to validate the user's credentials.
      */
     async handleLogin() {
-      // Reset the error message before starting the login process
-      this.errorMessage = "";
+    this.errorMessage = "";
 
-      try {
-        // Make a GET request to the backend to fetch user data by email
-        const response = await axios.get("https://localhost:5000/api/User/GetUserByEmail", {
-          params: { email: this.email } // Pass the email as a query parameter
-        });
+    try {
+      const response = await axios.get("https://localhost:5000/api/User/GetUserByEmail", {
+        params: { email: this.email }
+      });
 
-        // Check if the response status is 200 (OK)
-        if (response.status === 200) {
-          const user = response.data; // Extract user data from the response
+      if (response.status === 200) {
+        const user = response.data;
 
-          // Validate the password entered by the user
-          if (this.password !== user.password) {
-            // Set an error message if the password is incorrect
-            this.errorMessage = "Correo electrónico o contraseña incorrectos.";
-            return; // Exit the function
-          }
-
-          // Use the global service instance to fetch and save user information
-          await currentUserService.fetchAndSaveCurrentUserInformationToLocalStorage(this.email);
-
-          // Uncomment the following line to enable navigation
-          this.$router.push({ name: "HomeView" });
+        if (this.password !== user.password) {
+          this.errorMessage = "Correo electrónico o contraseña incorrectos.";
+          return;
         }
-      } catch (error) {
-        // Handle errors that occur during the API call
-        if (error.response) {
-          // Handle specific HTTP status codes
-          if (error.response.status === 404) {
-            // User not found
-            this.errorMessage = "Correo electrónico o contraseña incorrectos.";
-          } else if (error.response.status === 500) {
-            // Server error
-            this.errorMessage = "Ocurrió un error en el servidor. Inténtelo más tarde.";
-          }
-        } else {
-          // Handle unexpected errors (e.g., network issues)
-          this.errorMessage = "No se pudo conectar con el servidor.";
+
+        // Save user info
+        await currentUserService.fetchAndSaveCurrentUserInformationToLocalStorage(this.email);
+
+        const currentUserInformation = currentUserService.getCurrentUserInformationFromLocalStorage();
+        const companyId = currentUserInformation.companyId;
+        
+        let companyResponse = null;
+        let company = null;
+        
+        if(companyId) {
+          companyResponse = await axios.get(`https://localhost:5000/api/Company/GetCompanyById/${companyId}`);
+          company = companyResponse.data;
         }
+        
+
+        if (((company && company.isDeleted) || companyId === null) && currentUserInformation.position != "SoftwareManager") {
+          await Swal.fire({
+            icon: 'error',
+            title: 'Empresa eliminada',
+            text: 'Su empresa ha sido eliminada del sistema. Por favor, contacte con el equipo de soporte.',
+            confirmButtonText: 'Entendido',
+            confirmButtonColor: '#d33'
+          });
+          return;
+        }
+
+
+        this.$router.push({ name: "HomeView" });
       }
-    },
+    } catch (error) {
+      if (error.response) {
+        if (error.response.status === 404) {
+          this.errorMessage = "Correo electrónico o contraseña incorrectos.";
+        } else if (error.response.status === 500) {
+          this.errorMessage = "Ocurrió un error en el servidor. Inténtelo más tarde.";
+        }
+      } else {
+        this.errorMessage = "No se pudo conectar con el servidor.";
+      }
+    }
+  },
     /**
      * Handles the registration process when the "Registrar Empresa" button is clicked.
      * Simulates navigation to the registration page.
