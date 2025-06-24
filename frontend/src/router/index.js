@@ -19,7 +19,8 @@ import EmployeeTimesheet from '@/views/EmployeeTimesheet.vue'
 import TimesheetApprovals from '@/views/TimesheetApprovals.vue'
 import UnauthorizedView from '@/views/UnauthorizedView.vue'
 import CurrentUserService from '@/services/currentUserService'
-import EmployeePayslip from '@/views/EmployeePayslip.vue'
+import PayslipView from '@/views/PayslipView.vue'
+import PayslipList from '@/views/PayslipList.vue'
 
 const routes = [
     { path: '/', redirect: '/login' },
@@ -47,7 +48,8 @@ const routes = [
             { path: '/payrolls-list', name: 'PayrollsList', component: PayrollsList, meta: {allowedPositions: ['Payroll Manager']} },
             { path: '/employee-timesheet', name: 'EmployeeTimesheet', component: EmployeeTimesheet, meta: {allowedPositions: ['Collaborator', 'Payroll Manager', 'Supervisor']} },
             { path: '/timesheet-approvals', name: 'TimesheetApprovals', component: TimesheetApprovals, meta: {allowedPositions: ['Supervisor']} },
-            { path: '/employee-payslip', name: 'EmployeePayslip', component: EmployeePayslip, meta: {allowedPositions: ['Collaborator', 'Payroll Manager', 'Supervisor']}}
+            { path: '/view-payslip', name: 'PayslipView', component: PayslipView, meta: {allowedPositions: ['Collaborator', 'Payroll Manager', 'Supervisor']}},
+            { path: '/view-payslip-list', name: 'PayslipList', component: PayslipList, meta: {allowedPositions: ['Collaborator', 'Payroll Manager', 'Supervisor']}}
         ],
     },
 ]
