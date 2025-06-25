@@ -59,7 +59,7 @@ class EmployerService {
                 phoneNumber: formData.phoneNumber
             },
             employer: {
-                companyId: currentUserService.getCurrentUserInformationFromLocalStorage()?.companyId || ""
+                companyId: formData.companyId || currentUserService.getCurrentUserInformationFromLocalStorage()?.companyId || ""
             }
         };
     }
