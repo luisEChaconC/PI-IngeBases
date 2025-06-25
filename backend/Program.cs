@@ -19,6 +19,7 @@ using backend.Application.Orchestrators.Deduction;
 using backend.Application.Orchestrators.Payroll;
 using backend.Application.Queries.Payroll;
 using backend.Repositories;
+using backend.Application.Payslip.Queries;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -104,8 +105,12 @@ builder.Services.AddScoped<IDeductionDetailRepository, DeductionDetailRepository
 builder.Services.AddScoped<IInsertDeductionDetailsCommand, InsertDeductionDetailsCommand>();
 
 
+//Payslip
 
+builder.Services.AddScoped<IPayslipRepository, PayslipRepository>();
 
+builder.Services.AddScoped<GetPayslipsByEmployeeIdQuery>();
+builder.Services.AddScoped<GetPayslipByEmployeeIdAndStartDateQuery>();
 
 // Register Strategy Orchestrator
 builder.Services.AddScoped<GrossPaymentCalculationOrchestrator>();
