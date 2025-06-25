@@ -389,7 +389,7 @@ export default {
                     return;
                 }
                 
-                const response = await employeeService.createEmployeeWithDependencies(this.formData);
+                await employeeService.createEmployeeWithDependencies(this.formData);
                 
                 alert("Empleado agregado exitosamente");
 
