@@ -6,6 +6,7 @@ namespace backend.Domain.Strategies
         private const decimal WorkerIvmRate = 0.0417m;
         private const decimal EmployerSemRate = 0.0925m;
         private const decimal EmployerIvmRate = 0.0542m;
+        private const decimal PopularBankRate = 0.01m;
 
         private const decimal MinBaseSem = 341227m;
         private const decimal MinBaseIvm = 319384m;
@@ -22,12 +23,16 @@ namespace backend.Domain.Strategies
     // Worker deduction
     decimal semWorker = Math.Round(semBase * WorkerSemRate, 2);
     decimal ivmWorker = Math.Round(ivmBase * WorkerIvmRate, 2);
-    decimal totalWorker = semWorker + ivmWorker;
+    decimal popularBank = Math.Round(grossSalary * PopularBankRate, 2);
+    decimal totalWorker = semWorker + ivmWorker + popularBank;
+
 
     // Employer deduction (calculated, but unused for now)
     decimal semEmployer = Math.Round(semBase * EmployerSemRate, 2);
     decimal ivmEmployer = Math.Round(ivmBase * EmployerIvmRate, 2);
     decimal totalEmployer = semEmployer + ivmEmployer;
+
+    
 
     // TODO: Store totalEmployer if needed later
 
