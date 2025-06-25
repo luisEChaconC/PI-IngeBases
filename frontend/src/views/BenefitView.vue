@@ -1,15 +1,14 @@
 <template>
-  <h3 class="fw-bold mb-4 text-center">Beneficio</h3>
-  <div class="container d-flex justify-content-center align-items-center mt-5">
-    <router-link
-      to="/benefits"
-      class="btn btn-outline-secondary position-absolute top-0 start-0 m-3"
-      title="Volver a la lista de beneficios"
-    >
-      ← Volver
-    </router-link>
-
-    <div class="card shadow-sm p-4 rounded-4" style="width: 400px;">
+  <router-link
+    to="/benefits"
+    class="btn btn-outline-secondary ms-5 mt-3"
+    title="Volver a la lista de beneficios"
+    style="z-index: 10;"
+  >
+    ← Volver
+  </router-link>
+  <div class="container d-flex flex-column justify-content-center align-items-center" >
+    <div class="card shadow-sm p-4 rounded-4 my-5" style="width: 400px;">
       <h3 class="fw-bold mb-4">Beneficio</h3>
 
       <div class="mb-3">
@@ -109,23 +108,29 @@
         </ul>
       </div>
 
-      <div class="text-center mt-4">
-        <button v-if="!isEditable" class="btn btn-dark" @click="handleEditClick">
-          Editar beneficio
+      <div class="d-flex justify-content-center align-items-center mt-4">
+        <div class="text-center me-2">
+          <button v-if="!isEditable" class="btn btn-dark" @click="handleEditClick">
+            Editar
+          </button>
+
+          <div v-else>
+            <button class="btn btn-success me-2" @click="guardarCambios">
+              Guardar Cambios
+            </button>
+            <button class="btn btn-outline-secondary" @click="cancelarEdicion">
+              Cancelar
+            </button>
+          </div>
+
+          <div v-if="showApiEditWarning" class="alert alert-warning mt-3" role="alert">
+            El beneficio tiene parámetros y ya ha sido seleccionado
+          </div>
+        </div>
+
+        <button v-if="!isEditable" class="btn btn-danger" @click="deleteBenefit">
+          Eliminar
         </button>
-
-        <div v-else>
-          <button class="btn btn-success me-2" @click="guardarCambios">
-            Guardar Cambios
-          </button>
-          <button class="btn btn-outline-secondary" @click="cancelarEdicion">
-            Cancelar
-          </button>
-        </div>
-
-        <div v-if="showApiEditWarning" class="alert alert-warning mt-3" role="alert">
-          El beneficio tiene parámetros y ya ha sido seleccionado
-        </div>
       </div>
     </div>
   </div>
@@ -138,7 +143,8 @@
   import { computed, onMounted, ref } from 'vue'
   import { useRoute } from 'vue-router'
   import axios from 'axios'
-  
+  import Swal from 'sweetalert2'
+
   const route = useRoute()
   const benefitId = route.params.id
   const benefit = ref({})
@@ -225,6 +231,23 @@
       console.error('Error al verificar si el beneficio está asignado:', error)
       alert('Hubo un error al verificar el estado del beneficio.')
     }
+  }
+
+  const deleteBenefit = () => {
+    Swal.fire({
+      title: '¿Estás seguro?',
+      text: "Esta acción eliminará el beneficio",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#6c757d',
+      confirmButtonText: 'Sí, eliminar',
+      cancelButtonText: 'Cancelar'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        alert("eliminado")
+      }
+    });
   }
 
   const cancelarEdicion = () => {

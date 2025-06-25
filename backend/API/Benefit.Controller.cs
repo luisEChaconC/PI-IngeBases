@@ -13,6 +13,7 @@ namespace backend.API
         private readonly GetBenefitsQuery _getBenefitsQuery;
         private readonly GetBenefitByIdQuery _getBenefitByIdQuery;
         private readonly CreateBenefitCommand _createBenefitCommand;
+        private readonly DeleteBenefitCommand _deleteBenefitCommand;
         private readonly AssignBenefitsToEmployeeCommand _assignBenefitsCommand;
         private readonly GetAssignedBenefitsQuery _getAssignedBenefitsQuery;
         private readonly UpdateBenefitCommand _updateBenefitCommand;
@@ -22,6 +23,7 @@ namespace backend.API
             GetBenefitsQuery getBenefitsQuery,
             GetBenefitByIdQuery getBenefitByIdQuery,
             CreateBenefitCommand createBenefitCommand,
+            DeleteBenefitCommand deleteBenefitCommand,
             AssignBenefitsToEmployeeCommand assignBenefitsCommand,
             GetAssignedBenefitsQuery getAssignedBenefitsQuery,
             UpdateBenefitCommand updateBenefitCommand,
@@ -30,6 +32,7 @@ namespace backend.API
             _getBenefitsQuery = getBenefitsQuery;
             _getBenefitByIdQuery = getBenefitByIdQuery;
             _createBenefitCommand = createBenefitCommand;
+            _deleteBenefitCommand = deleteBenefitCommand;
             _assignBenefitsCommand = assignBenefitsCommand;
             _getAssignedBenefitsQuery = getAssignedBenefitsQuery;
             _updateBenefitCommand = updateBenefitCommand;
@@ -61,6 +64,24 @@ namespace backend.API
             {
                 return StatusCode(StatusCodes.Status500InternalServerError,
                     $"Error creating benefit: {ex.Message}");
+            }
+        }
+
+        [HttpDelete]
+        public ActionResult<bool> DeleteBenefit(Guid benefitId)
+        {
+            try
+            {
+                if (benefitId == Guid.Empty)
+                    return BadRequest("The benefit id is required.");
+
+                var result = _deleteBenefitCommand.Execute(benefitId);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    $"Error deleting benefit: {ex.Message}");
             }
         }
 

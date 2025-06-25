@@ -82,7 +82,8 @@ namespace backend.Application.DeductionCalculation
                         Name = strategy.GetType().Name.Replace("DeductionStrategy", ""),
                         AmountDeduced = amount,
                         PaymentDetailsId = paymentDetailsId,
-                        DeductionType = "mandatory"
+                        DeductionType = "mandatory",
+                        BenefitId = null
                     });
                 }
             }
@@ -141,7 +142,8 @@ namespace backend.Application.DeductionCalculation
                     Name = item.Benefit.Name,
                     AmountDeduced = item.Amount,
                     PaymentDetailsId = paymentDetailsId,
-                    DeductionType = "voluntary"
+                    DeductionType = "voluntary",
+                    BenefitId = Guid.Parse(item.Benefit.Id)
                 });
             }
         }

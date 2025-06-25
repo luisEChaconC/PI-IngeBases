@@ -304,6 +304,20 @@ namespace backend.Infraestructure
             return true;
         }
 
+        public bool DeleteBenefit(Guid benefitId)
+        {
+            _connection.Open();
+            int rowsAffected = 0;
+            using (var command = new SqlCommand("sp_DeleteBenefit", _connection))
+            {
+                command.CommandType = CommandType.StoredProcedure;
+                command.Parameters.AddWithValue("@BenefitId", benefitId);
+                rowsAffected = command.ExecuteNonQuery();
+            }
+            _connection.Close();
+            return rowsAffected > 0;
+        }
+
         public Benefit? GetBenefitById(Guid id)
         {
             const string query = "SELECT * FROM Benefits WHERE Id = @Id";

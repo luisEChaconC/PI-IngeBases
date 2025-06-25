@@ -40,6 +40,8 @@ namespace backend.Domain
         [MinLength(1, ErrorMessage = "Debe seleccionar al menos un tipo de empleado.")]
         [EligibleEmployeeTypesValidation]
         public List<string> EligibleEmployeeTypes { get; set; }
+
+        public bool IsDeleted { get; set; } = false;
     }
 
     public class EligibleEmployeeTypesValidationAttribute : ValidationAttribute
