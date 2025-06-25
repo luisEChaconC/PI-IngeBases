@@ -83,7 +83,7 @@ class CompanyService {
                 legalId: formattedLegalId
             },
             company: formData.company,
-            contact: formData.contact
+            contacts: formData.contacts
         };
     }
 
