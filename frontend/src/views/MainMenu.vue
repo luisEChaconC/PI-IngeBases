@@ -172,19 +172,19 @@ export default {
     reportsByRole() {
       const reports = {
         Collaborator: [
-          { name: "Pago de planilla actual", route: "/current-payroll" }, 
+          { name: "Desglose de pagos", route: "/current-payroll" }, 
           { name: "Historial de pagos", route: "/payroll-history" },
         ],
         Supervisor: [
-          { name: "Pago de planilla actual", route: "/current-payroll" },
+          { name: "Desglose de pagos", route: "/current-payroll" },
           { name: "Historial de pagos", route: "/payroll-history" },
         ],
         PayrollManager: [
-          { name: "Pago de planilla actual", route: "/current-payroll" },
+          { name: "Desglose de pagos", route: "/current-payroll" },
           { name: "Historial de pagos", route: "/payroll-history" },
         ],
         Employer: [
-          { name: "Costo total pago de planilla", route: "/payroll-total-cost" },
+          { name: "Costos de planilla", route: "/payroll-total-cost" },
           { name: "Pagos de planilla por empleado", route: "/employee-payroll-payments" },
         ],
         SoftwareManager: [
