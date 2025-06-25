@@ -1,18 +1,15 @@
 import axios from 'axios';
 import API_CONFIG from '@/config/api';
 import currentUserService from '@/services/currentUserService';
+import { handleApiError, buildApiUrl } from '@/utils/apiUtils';
 
 class TimesheetService {
-    constructor() {
-        this.apiBaseUrl = API_CONFIG.BASE_URL;
-    }
-
     async getEmployeeTimesheetByDate(employeeId, date) {
         try {
             const dateString = date.toISOString().split('T')[0]; // YYYY-MM-DD
             const endpoint = API_CONFIG.ENDPOINTS.TIMESHEET.GET_BY_EMPLOYEE_AND_DATE(employeeId);
 
-            const response = await axios.get(`${this.apiBaseUrl}${endpoint}`, {
+            const response = await axios.get(buildApiUrl(endpoint), {
                 params: { date: dateString }
             });
             return response.data;
@@ -23,18 +20,18 @@ class TimesheetService {
                 return null; // No timesheet found
             }
 
-            throw this.handleApiError(error, 'Error al obtener el timesheet del empleado');
+            throw handleApiError(error, 'Error al obtener el timesheet del empleado');
         }
     }
 
     async getDaysByTimesheetId(timesheetId) {
         try {
             const endpoint = API_CONFIG.ENDPOINTS.TIMESHEET.GET_DAYS_BY_TIMESHEET_ID(timesheetId);
-            const response = await axios.get(`${this.apiBaseUrl}${endpoint}`);
+            const response = await axios.get(buildApiUrl(endpoint));
             return response.data;
         } catch (error) {
             console.error('Error fetching timesheet days:', error);
-            throw this.handleApiError(error, 'Error al obtener los días del timesheet');
+            throw handleApiError(error, 'Error al obtener los días del timesheet');
         }
     }
 
@@ -54,10 +51,10 @@ class TimesheetService {
                     hours: backendDay.hoursWorked || 0,
                     description: backendDay.workDescription || '',
                     status: backendDay.isApproved ? 'Aceptado' : 'Sin revisión',
-                    isCurrent: false, // Determined in the parent component
+                    isCurrent: false,
                     isOutOfPeriod: false,
                     isWeekend: weekDay.isWeekend,
-                    backendId: backendDay.id // Save ID for future updates
+                    backendId: backendDay.id
                 };
             } else {
                 // Day does not exist in backend or is out of period
@@ -74,24 +71,6 @@ class TimesheetService {
                 };
             }
         });
-    }
-
-    handleApiError(error, defaultMessage) {
-        const apiError = new Error(defaultMessage);
-
-        if (error.response) {
-            // Server error
-            apiError.message = error.response.data?.message || defaultMessage;
-            apiError.status = error.response.status;
-        } else if (error.request) {
-            // Network error
-            apiError.message = 'Connection error. Please check your internet connection.';
-        } else {
-            // Configuration error
-            apiError.message = 'Internal error. Please try again.';
-        }
-
-        return apiError;
     }
 
     isSameDate(date1, date2) {
@@ -113,44 +92,23 @@ class TimesheetService {
             return await this.updateExistingDay(dayData);
         } catch (error) {
             console.error('Error saving day:', error);
-            throw this.handleApiError(error, 'Error al guardar el día');
+            throw handleApiError(error, 'Error al guardar el día');
         }
     }
 
     async updateExistingDay(dayData) {
-        try {
-            const endpoint = API_CONFIG.ENDPOINTS.TIMESHEET.UPDATE_DAY(dayData.backendId);
-            const fullUrl = `${this.apiBaseUrl}${endpoint}`;
+        const endpoint = API_CONFIG.ENDPOINTS.TIMESHEET.UPDATE_DAY(dayData.backendId);
+        const formattedData = this.formatDayForBackend(dayData);
 
-            // Map frontend properties to backend DTO
-            const payload = {
-                WorkedHours: dayData.hours || 0,
-                Description: (dayData.description && dayData.description.trim()) ? dayData.description.trim() : 'Trabajo realizado' // Backend requires non-empty description
-            };
+        const response = await axios.put(buildApiUrl(endpoint), formattedData);
+        return response.data;
+    }
 
-            console.log('Attempting to update day:', {
-                url: fullUrl,
-                payload: payload,
-                dayData: dayData
-            });
-
-            const response = await axios.put(fullUrl, payload);
-
-            console.log('Day updated successfully:', response.data);
-            return response.data;
-        } catch (error) {
-            console.error('Error in updateExistingDay:', {
-                url: `${this.apiBaseUrl}${API_CONFIG.ENDPOINTS.TIMESHEET.UPDATE_DAY(dayData.backendId)}`,
-                payload: {
-                    WorkedHours: dayData.hours || 0,
-                    Description: (dayData.description && dayData.description.trim()) ? dayData.description.trim() : 'Trabajo realizado'
-                },
-                error: error,
-                response: error.response?.data,
-                status: error.response?.status
-            });
-            throw error; // Re-throw to be handled by saveDay
-        }
+    formatDayForBackend(dayData) {
+        return {
+            WorkedHours: dayData.hours || 0,
+            Description: (dayData.description && dayData.description.trim()) ? dayData.description.trim() : 'Trabajo realizado'
+        };
     }
 }
 
