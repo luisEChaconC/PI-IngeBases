@@ -252,7 +252,7 @@ export default {
             ? localStorage.getItem("selectedCompanyId")
             : currentUserInformation.companyId;
 
-          axios.delete(`https://localhost:5000/api/Company/${companyId}`)
+          companyService.deleteCompany(companyId)
             .then(() => {
               Swal.fire(
                 'Eliminado',
