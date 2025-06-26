@@ -72,9 +72,7 @@
 </template>
 
 <script>
-import axios from "axios"; // Importing Axios for making HTTP requests
-import currentUserService from "@/services/currentUserService";
-import Swal from 'sweetalert2';
+import userService from "@/services/userService";
 
 export default {
   name: "LoginForm", // Component name
@@ -86,67 +84,16 @@ export default {
     };
   },
   methods: {
-    /**
-     * Handles the login process when the form is submitted.
-     * Makes an API call to validate the user's credentials.
-     */
     async handleLogin() {
-    this.errorMessage = "";
+      this.errorMessage = "";
 
-    try {
-      const response = await axios.get("https://localhost:5000/api/User/GetUserByEmail", {
-        params: { email: this.email }
-      });
-
-      if (response.status === 200) {
-        const user = response.data;
-
-        if (this.password !== user.password) {
-          this.errorMessage = "Correo electrónico o contraseña incorrectos.";
-          return;
-        }
-
-        // Save user info
-        await currentUserService.fetchAndSaveCurrentUserInformationToLocalStorage(this.email);
-
-        const currentUserInformation = currentUserService.getCurrentUserInformationFromLocalStorage();
-        const companyId = currentUserInformation.companyId;
-        
-        let companyResponse = null;
-        let company = null;
-        
-        if(companyId) {
-          companyResponse = await axios.get(`https://localhost:5000/api/Company/GetCompanyById/${companyId}`);
-          company = companyResponse.data;
-        }
-        
-
-        if (((company && company.isDeleted) || companyId === null) && currentUserInformation.position != "SoftwareManager") {
-          await Swal.fire({
-            icon: 'error',
-            title: 'Empresa eliminada',
-            text: 'Su empresa ha sido eliminada del sistema. Por favor, contacte con el equipo de soporte.',
-            confirmButtonText: 'Entendido',
-            confirmButtonColor: '#d33'
-          });
-          return;
-        }
-
-
+      try {
+        await userService.login(this.email, this.password);
         this.$router.push({ name: "HomeView" });
+      } catch (error) {
+        this.errorMessage = error.message;
       }
-    } catch (error) {
-      if (error.response) {
-        if (error.response.status === 404) {
-          this.errorMessage = "Correo electrónico o contraseña incorrectos.";
-        } else if (error.response.status === 500) {
-          this.errorMessage = "Ocurrió un error en el servidor. Inténtelo más tarde.";
-        }
-      } else {
-        this.errorMessage = "No se pudo conectar con el servidor.";
-      }
-    }
-  },
+    },
     /**
      * Handles the registration process when the "Registrar Empresa" button is clicked.
      * Simulates navigation to the registration page.

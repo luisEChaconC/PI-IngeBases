@@ -137,7 +137,7 @@
   
   import { computed, onMounted, ref } from 'vue'
   import { useRoute } from 'vue-router'
-  import axios from 'axios'
+  import benefitService from '@/services/benefitService'
   
   const route = useRoute()
   const benefitId = route.params.id
@@ -207,8 +207,7 @@
   const handleEditClick = async () => {
     try {
       const isApiType = benefit.value.type === 'API'
-      const response = await axios.get(`https://localhost:5000/api/benefit/benefits/${benefit.value.id}/is-assigned`)
-      assigned.value = response.data
+      assigned.value = await benefitService.benefitIsAssigned(benefit.value.id)
 
       if (isApiType && assigned.value) {
         showApiEditWarning.value = true
@@ -241,16 +240,11 @@
         companyId, 
       }
 
-      const response = await axios.put(
-        `https://localhost:5000/api/benefit/${benefit.value.id}`,
-        updatedBenefit
-      )
-
-      if (response.status === 200) {
-        isEditable.value = false
-        originalBenefit.value = JSON.parse(JSON.stringify(benefit.value)) 
-        alert('Beneficio actualizado correctamente.')
-      }
+      await benefitService.updateBenefit(benefit.value.id, updatedBenefit)
+    
+      isEditable.value = false
+      originalBenefit.value = JSON.parse(JSON.stringify(benefit.value)) 
+      alert('Beneficio actualizado correctamente.')
     } catch (error) {
       if (error.response?.status === 409) {
         alert('No se puede editar el beneficio porque ya fue asignado a empleados.')
@@ -267,10 +261,7 @@
   onMounted(async () => {
     try {
       const companyId = getCurrentUserInformationFromLocalStorage()?.companyId
-      const response = await axios.get(`https://localhost:5000/api/benefit/${benefitId}`, {
-        params: { companyId }
-      })
-    const data = response.data
+      const data = await benefitService.getBenefitById(benefitId, companyId)
     data.eligibleEmployeeTypes = data.eligibleEmployeeTypes || []
     benefit.value = data
     } catch (error) {

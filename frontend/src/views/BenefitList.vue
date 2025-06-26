@@ -56,7 +56,8 @@
 </template>
 
 <script setup>
-import axios from "axios";
+import benefitService from "@/services/benefitService";
+import companyService from "@/services/companyService";
 import { ref, onMounted } from 'vue';
 import currentUserService from "@/services/currentUserService";
 
@@ -68,12 +69,10 @@ const role = currentUserService.getCurrentUserInformationFromLocalStorage()?.pos
 const getCompanyMaxBenefits = async () => {
   try {
     const companyId = currentUserService.getCurrentUserInformationFromLocalStorage()?.companyId;
-    console.log("Company ID obtenido:", companyId);
+    const company = await companyService.getCompanyById(companyId);
 
-    const response = await axios.get(`https://localhost:5000/api/company/GetCompanyById/${companyId}`);
-
-    if (response.data?.maxBenefitsPerEmployee !== undefined) {
-      maxBenefits.value = response.data.maxBenefitsPerEmployee;
+    if (company?.maxBenefitsPerEmployee !== undefined) {
+      maxBenefits.value = company.maxBenefitsPerEmployee;
     }
   } catch (error) {
     console.error("Error obteniendo maxBenefitsPerEmployee:", error);
@@ -84,31 +83,23 @@ const benefits = ref([]);
 
 const translateType = (type) => {
     switch (type) {
-        case 'API': return 'API';
-        case 'FixedAmount': return 'Monto fijo';
-        case 'FixedPercentage': return 'Porcentaje fijo';
-        default: return 'Desconocido';
-    }
-};
-
-const getCurrentUserInformationFromLocalStorage = () => {
-    const userInformation = localStorage.getItem('currentUserInformation');
-    return userInformation ? JSON.parse(userInformation) : null;
+            case 'API': return 'API';
+            case 'FixedAmount': return 'Monto fijo';
+            case 'FixedPercentage': return 'Porcentaje fijo';
+            default: return 'Desconocido';
+        }
 };
 
 const getBenefits = async () => {
     try {
-        console.log(getCurrentUserInformationFromLocalStorage())
-        const companyId = getCurrentUserInformationFromLocalStorage()?.companyId;
-        
+        const companyId = currentUserService.getCurrentUserInformationFromLocalStorage()?.companyId;
 
         if (!companyId) {
             console.error("No se encontró el ID de la empresa en el localStorage.");
             return;
         }
 
-        const response = await axios.get(`https://localhost:5000/api/benefit?companyId=${companyId}`);
-        benefits.value = response.data;
+        benefits.value = await benefitService.getBenefitsByCompanyId(companyId);
     } catch (error) {
         console.error("No se pudieron obtener los beneficios:", error);
     }
