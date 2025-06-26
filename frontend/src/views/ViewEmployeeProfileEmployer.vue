@@ -149,10 +149,10 @@
 
 
 <script>
-import axios from 'axios';
 import { ref, onMounted, computed } from 'vue';
 import { useRoute } from 'vue-router';
 import { Modal } from 'bootstrap';
+import employeeService from '@/services/employeeService';
 
 export default {
   name: 'ViewEmployeeProfile',
@@ -237,25 +237,23 @@ const filteredLeftFields = computed(() =>
     const getEmployee = async () => {
       try {
         const id = route.params.id;
-        const response = await axios.get(`https://localhost:5000/api/EmployeeGetID/GetEmployeeById/${id}`);
-        console.log("Datos del empleado:", response.data);
+        const data = await employeeService.getEmployeeById(id);
         employee.value = {
-          id: response.data.id,
-          firstName: response.data.firstName,
-          firstSurname: response.data.firstSurname,
-          secondSurname: response.data.secondSurname,
-          gender: response.data.gender,
-          legalId: response.data.cedula,
-          workerId: response.data.workerId,
-          role: response.data.role,
-          contractType: response.data.contractType,
-          grossSalary: response.data.grossSalary,
-          email: response.data.email,
-          phoneNumber: response.data.phoneNumber
+          id: data.id,
+          firstName: data.firstName,
+          firstSurname: data.firstSurname,
+          secondSurname: data.secondSurname,
+          gender: data.gender,
+          legalId: data.cedula,
+          workerId: data.workerId,
+          role: data.role,
+          contractType: data.contractType,
+          grossSalary: data.grossSalary,
+          email: data.email,
+          phoneNumber: data.phoneNumber
         };
         Object.keys(employee.value).forEach(validateField);
-        const paymentCheck = await axios.get(`https://localhost:5000/api/Employer/HasPayments/${employee.value.id}`);
-    hasPayments.value = paymentCheck.data.hasPayments;
+        hasPayments.value = await employeeService.checkEmployeeHasPayments(employee.value.id);
       } catch (err) {
         error.value = "Error loading employee data.";
       } finally {
@@ -289,7 +287,7 @@ const filteredLeftFields = computed(() =>
           Email: employee.value.email,
           PhoneNumber: employee.value.phoneNumber
         };
-        await axios.patch('https://localhost:5000/api/Employer/UpdateEmployee', payload);
+        await employeeService.updateEmployeeAsEmployer(payload);
         editMode.value = false;
         await getEmployee();
       } catch (err) {

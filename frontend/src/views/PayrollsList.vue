@@ -56,7 +56,7 @@
 </template>
 
 <script>
-import axios from "axios";
+import payrollService from "@/services/payrollService";
 import currentUserService from "@/services/currentUserService";
 import GeneratePayrollModal from "@/components/GeneratePayrollModal.vue";
 
@@ -81,16 +81,15 @@ export default {
           this.payrolls = [];
           return;
         }
-        const response = await axios.get(`https://localhost:5000/api/payroll/company/${companyId}/summary`);
-        this.payrolls = response.data;
+        this.payrolls = await payrollService.getPayrollsSummaryByCompanyId(companyId);
       } catch (error) {
         this.payrolls = [];
       }
     },
     formatDate(dateStr) {
       if (!dateStr) return '';
-      const date = new Date(dateStr);
-      return date.toLocaleDateString('es-CR');
+        const date = new Date(dateStr);
+        return date.toLocaleDateString('es-CR');
     },
     formatCurrency(amount) {
       if (amount == null) return '';
