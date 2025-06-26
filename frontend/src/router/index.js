@@ -19,6 +19,7 @@ import EmployeeTimesheet from '@/views/EmployeeTimesheet.vue'
 import TimesheetApprovals from '@/views/TimesheetApprovals.vue'
 import UnauthorizedView from '@/views/UnauthorizedView.vue'
 import CurrentUserService from '@/services/currentUserService'
+import CompaniesReport from '@/views/CompaniesReport.vue'
 
 const routes = [
     { path: '/', redirect: '/login' },
@@ -45,7 +46,8 @@ const routes = [
             { path: '/view-company-info', name: 'ViewCompanyInfo', component: ViewCompanyInfo, meta: {allowedPositions: ['Employer', 'SoftwareManager']} },
             { path: '/payrolls-list', name: 'PayrollsList', component: PayrollsList, meta: {allowedPositions: ['Payroll Manager']} },
             { path: '/employee-timesheet', name: 'EmployeeTimesheet', component: EmployeeTimesheet, meta: {allowedPositions: ['Collaborator', 'Payroll Manager', 'Supervisor']} },
-            { path: '/timesheet-approvals', name: 'TimesheetApprovals', component: TimesheetApprovals, meta: {allowedPositions: ['Supervisor']} }
+            { path: '/timesheet-approvals', name: 'TimesheetApprovals', component: TimesheetApprovals, meta: {allowedPositions: ['Supervisor']} },
+            { path: '/companies-report', name: 'CompaniesReport', component: CompaniesReport, meta: {allowedPositions: ['SoftwareManager']} }
         ],
     },
 ]
