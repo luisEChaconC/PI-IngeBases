@@ -104,7 +104,8 @@ builder.Services.AddScoped<IDeductionDetailRepository, DeductionDetailRepository
 builder.Services.AddScoped<IInsertDeductionDetailsCommand, InsertDeductionDetailsCommand>();
 
 
-
+builder.Services.AddScoped<ICompanyReportRepository, CompanyReportRepository>();
+builder.Services.AddScoped<IGetCompanyReportsQuery, GetCompanyReportsQuery>();
 
 
 // Register Strategy Orchestrator
