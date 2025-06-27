@@ -69,6 +69,7 @@
 import {ref, onMounted} from 'vue'
 import { useRoute } from 'vue-router'
 import axios from 'axios'
+import currentUserService from '@/services/currentUserService';
 
 const route = useRoute()
 const payslipDate = route.params.date
@@ -76,7 +77,7 @@ console.log(payslipDate)
 
 const payslipData = ref(null)
 
-const employeeId = '618C7338-E1AC-48EF-8562-4ED0A95F00E1'
+const employeeId = currentUserService.getCurrentUserInformationFromLocalStorage().idNaturalPerson;
 
 const fetchPayslip = async () => {
   try {

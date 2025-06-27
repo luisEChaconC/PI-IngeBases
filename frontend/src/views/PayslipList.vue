@@ -27,41 +27,48 @@
       </div>
     </div>
 
-    <table class="table table-bordered">
-      <thead class="table-light">
-        <tr class="text-center align-middle">
-          <th>Tipo de reporte</th>
-          <th>Fecha de pago</th>
-          <th>Monto total</th>
-          <th>Detalle</th>
-        </tr>
-      </thead>
-      <tbody class="text-center align-middle">
-        <tr v-for="(payslip, index) in filteredPayslips" :key="index">
-          <td>Colilla de pago – {{ payslip.periodType }}</td>
-          <td>{{ payslip.dateRange }}</td>
-          <td>{{ formatCurrency(payslip.netPay) }}</td>
-          <td>
-            <router-link
-              :to="`/view-payslip/${getStartDateForRouting(payslip.dateRange)}`"
-              class="btn btn-outline-dark"
-              title="Ver detalles"
-            >
-              <i class="fas fa-eye"></i>
-            </router-link>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+    <!-- Si hay colillas, muestra la tabla -->
+<table v-if="filteredPayslips.length > 0" class="table table-bordered">
+  <thead class="table-light">
+    <tr class="text-center align-middle">
+      <th>Tipo de reporte</th>
+      <th>Fecha de pago</th>
+      <th>Monto total</th>
+      <th>Detalle</th>
+    </tr>
+  </thead>
+  <tbody class="text-center align-middle">
+    <tr v-for="(payslip, index) in filteredPayslips" :key="index">
+      <td>Colilla de pago – {{ payslip.periodType }}</td>
+      <td>{{ payslip.dateRange }}</td>
+      <td>{{ formatCurrency(payslip.netPay) }}</td>
+      <td>
+        <router-link
+          :to="`/view-payslip/${getStartDateForRouting(payslip.dateRange)}`"
+          class="btn btn-outline-dark"
+          title="Ver detalles"
+        >
+          <i class="fas fa-eye"></i>
+        </router-link>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<!-- Si NO hay colillas -->
+<div v-else class="alert alert-warning text-center fs-4 fw-bold py-5">
+  No hay registros de pago disponibles.
+</div>
   </div>
 </template>
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import axios from 'axios'
+import currentUserService from '@/services/currentUserService';
 
-// ID quemada por ahora
-const employeeId = '618C7338-E1AC-48EF-8562-4ED0A95F00E1'
+
+const employeeId = currentUserService.getCurrentUserInformationFromLocalStorage().idNaturalPerson;
 const searchDate = ref('')
 const payslips = ref([])
 
