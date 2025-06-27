@@ -1,79 +1,55 @@
-using System;
-using System.Data;
 using NUnit.Framework;
+using Moq;
+using backend.Application.Commands.Company;
 using backend.Infraestructure;
+using System;
 
-namespace backend.Infraestructure.Tests
+namespace backend.Application.Tests.Commands.Company
 {
-    public class SimpleFakeCommand
-    {
-        public string CommandText { get; set; }
-        public CommandType CommandType { get; set; }
-        public bool WasExecuted { get; private set; }
-        public Guid? PassedCompanyId { get; private set; }
-
-        public void AddParameter(string name, object value)
-        {
-            if (name == "@CompanyId")
-                PassedCompanyId = (Guid)value;
-        }
-
-        public void Execute()
-        {
-            WasExecuted = true;
-        }
-    }
-
     [TestFixture]
-    public class CompanyRepositoryTest
+    public class DeleteCompanyCommandTest
     {
         [Test]
-        public void DeleteCompany_CallsProcedureWithCorrectId()
+        public void Execute_CallsRepositoryDeleteCompany_WithCorrectId()
         {
-            // Arrange
-            var testId = Guid.NewGuid();
-            var repo = new SimpleTestableCompanyRepository();
+            var mockRepo = new Mock<ICompanyRepository>();
+            var command = new DeleteCompanyCommand(mockRepo.Object);
+            var companyId = "F7D6626A-B039-45FR-A077-BBBF3A2BA000";
 
-            // Act
-            repo.DeleteCompany(testId.ToString());
+            command.Execute(companyId);
 
-            // Assert
-            var cmd = repo.LastCommand;
-
-            Assert.IsNotNull(cmd); // se creó con éxito el comando
-            Assert.AreEqual("sp_DeleteCompany", cmd.CommandText); // nombre de stored procedure correcto
-            Assert.AreEqual(CommandType.StoredProcedure, cmd.CommandType); // tipo de comando correcto
-            Assert.AreEqual(testId, cmd.PassedCompanyId); // se pasó el company ID correcto
-            Assert.IsTrue(cmd.WasExecuted);
+            mockRepo.Verify(r => r.DeleteCompany(companyId), Times.Once);
         }
 
         [Test]
-        public void DeleteCompany_InvalidGuid_ThrowsFormatException()
+        public void Execute_ThrowsArgumentNullException_WhenCompanyIdIsNull()
         {
+            var mockRepo = new Mock<ICompanyRepository>();
+            var command = new DeleteCompanyCommand(mockRepo.Object);
 
-            var repo = new SimpleTestableCompanyRepository();
-            var invalidId = "not-a-guid";
-
-            Assert.Throws<FormatException>(() => repo.DeleteCompany(invalidId));
+            Assert.Throws<ArgumentNullException>(() => command.Execute(null));
         }
-    }
 
-    public class SimpleTestableCompanyRepository : CompanyRepository
-    {
-        public SimpleFakeCommand LastCommand { get; private set; }
-
-        public new void DeleteCompany(string companyId)
+        [Test]
+        public void Execute_DoesNotCallRepository_WhenCompanyIdIsEmpty()
         {
+            var mockRepo = new Mock<ICompanyRepository>();
+            var command = new DeleteCompanyCommand(mockRepo.Object);
 
-            var cmd = new SimpleFakeCommand
-            {
-                CommandText = "sp_DeleteCompany",
-                CommandType = CommandType.StoredProcedure
-            };
-            cmd.AddParameter("@CompanyId", Guid.Parse(companyId));
-            cmd.Execute();
+            Assert.Throws<ArgumentException>(() => command.Execute(string.Empty));
+            mockRepo.Verify(r => r.DeleteCompany(It.IsAny<string>()), Times.Never);
+        }
 
-            LastCommand = cmd;
+        [Test]
+        public void Execute_PropagatesException_FromRepository()
+        {
+            var mockRepo = new Mock<ICompanyRepository>();
+            var companyId = "F7D6626A-B039-45FR-A077-BBBF3A2BA000";
+            mockRepo.Setup(r => r.DeleteCompany(companyId)).Throws(new InvalidOperationException());
+
+            var command = new DeleteCompanyCommand(mockRepo.Object);
+
+            Assert.Throws<InvalidOperationException>(() => command.Execute(companyId));
         }
     }
 }

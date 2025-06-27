@@ -1,3 +1,4 @@
+using backend.Application.Commands.Company;
 using backend.Domain;
 using backend.Domain.Requests;
 using backend.Infraestructure;
@@ -15,6 +16,7 @@ namespace backend.API
 
         private readonly PersonController _personController; // Controller to handle person operations
         private readonly ContactController _contactController; // Controller to handle contact operations
+        private readonly IDeleteCompanyCommand _deleteCompanyCommand;
         // Constructor to initialize the repositories
         public CompanyController()
         {
@@ -25,6 +27,7 @@ namespace backend.API
 
             _personController = new PersonController(); // Initialize the person controller
             _contactController = new ContactController(); // Initialize the contact controller
+            _deleteCompanyCommand = new DeleteCompanyCommand(_companyRepository);
         }
 
         /// <summary>
@@ -198,7 +201,7 @@ namespace backend.API
         {
             try
             {
-                _companyRepository.DeleteCompany(id);
+                _deleteCompanyCommand.Execute(id);
                 return Ok(new { message = "Company deleted successfully." });
             }
             catch (Exception ex)
