@@ -146,7 +146,7 @@
 
 <script setup>
 import { ref, watch } from 'vue'
-import axios from 'axios'
+import benefitService from '@/services/benefitService'
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
@@ -219,24 +219,12 @@ const validateBenefit = () => {
   }
 }
 
-// Guardar beneficio
 const saveBenefit = async () => {
   validateBenefit()
   if (Object.keys(errors.value).length > 0) return
 
-  const userInfo = localStorage.getItem('currentUserInformation')
-  const companyId = userInfo ? JSON.parse(userInfo).companyId : null
-
-  if (!companyId) {
-    alert('No se encontró la empresa del usuario actual.')
-    return
-  }
-
-  benefit.value.companyId = companyId
-
   try {
-    console.log('Datos enviados al backend:', benefit.value)
-    await axios.post('https://localhost:5000/api/benefit', benefit.value)
+    await benefitService.createBenefit(benefit.value)
     alert('Beneficio guardado exitosamente')
     router.push('/benefits')
   } catch (err) {
@@ -245,13 +233,11 @@ const saveBenefit = async () => {
   }
 }
 
-// Cargar APIs
 const fetchAPIs = async () => {
   try {
-    const response = await axios.get('https://localhost:5000/api/API')
-    apis.value = response.data
+    apis.value = await benefitService.getAPIs()
   } catch (err) {
-    console.error('Error cargando APIs:', err.response?.data || err.message)
+    console.error('Error cargando APIs:', err.message)
   }
 }
 
