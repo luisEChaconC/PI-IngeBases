@@ -1,20 +1,26 @@
-﻿using backend.Domain;
+﻿using backend.Application.Payslip.Services;
+using backend.Domain;
 using backend.Infraestructure;
 
-namespace backend.Application.Payslip.Queries
+public class GetPayslipByEmployeeIdAndStartDateQuery
 {
-    public class GetPayslipByEmployeeIdAndStartDateQuery
+    private readonly IPayslipRepository _repository;
+    private readonly IBuildPayslipItems _builder;
+
+    public GetPayslipByEmployeeIdAndStartDateQuery(IPayslipRepository repository, IBuildPayslipItems builder)
     {
-        private readonly IPayslipRepository _repository;
+        _repository = repository;
+        _builder = builder;
+    }
 
-        public GetPayslipByEmployeeIdAndStartDateQuery(IPayslipRepository repository)
-        {
-            _repository = repository;
-        }
+    public async Task<PayslipModel?> ExecuteAsync(Guid employeeId, DateTime startDate)
+    {
+        var payslip = await _repository.GetByEmployeeIdAndStartDateAsync(employeeId, startDate);
+        if (payslip is null) return null;
 
-        public async Task<PayslipModel?> ExecuteAsync(Guid employeeId, DateTime startDate)
-        {
-            return await _repository.GetByEmployeeIdAndStartDateAsync(employeeId, startDate);
-        }
+        var rawItems = await _repository.GetDeductionDetailsAsync(Guid.Parse(payslip.Id!));
+        payslip.Items = _builder.Build(rawItems);
+
+        return payslip;
     }
 }

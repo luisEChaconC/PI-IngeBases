@@ -46,7 +46,7 @@ namespace backend.Infraestructure
             while (await reader.ReadAsync())
             {
                 var payslipId = reader["PaymentDetailsId"].ToString();
-                var items = await GetDeductionItemsAsync(Guid.Parse(payslipId!));
+               
 
                 payslips.Add(new PayslipModel
                 {
@@ -58,7 +58,7 @@ namespace backend.Infraestructure
                     PaymentMonth = reader["PaymentMonth"].ToString(),
                     GrossSalary = reader.GetDecimal(reader.GetOrdinal("GrossSalary")),
                     NetPay = reader.GetDecimal(reader.GetOrdinal("NetPay")),
-                    Items = items
+                  
                 });
             }
 
@@ -98,7 +98,7 @@ namespace backend.Infraestructure
             if (await reader.ReadAsync())
             {
                 var payslipId = reader["PaymentDetailsId"].ToString();
-                var items = await GetDeductionItemsAsync(Guid.Parse(payslipId!));
+              
 
                 payslip = new PayslipModel
                 {
@@ -110,19 +110,16 @@ namespace backend.Infraestructure
                     PaymentMonth = reader["PaymentMonth"].ToString(),
                     GrossSalary = reader.GetDecimal(reader.GetOrdinal("GrossSalary")),
                     NetPay = reader.GetDecimal(reader.GetOrdinal("NetPay")),
-                    Items = items
+                    
                 };
             }
 
             return payslip;
         }
 
-        private async Task<List<PayslipItem>> GetDeductionItemsAsync(Guid paymentDetailsId)
+        public async Task<List<DeductionDetailModel>> GetDeductionDetailsAsync(Guid paymentDetailsId)
         {
-            var voluntaryItems = new List<PayslipItem>();
-            var mandatoryItems = new List<PayslipItem>();
-            decimal voluntaryTotal = 0;
-            decimal mandatoryTotal = 0;
+            var list = new List<DeductionDetailModel>();
 
             var query = @"
         SELECT Name, AmountDeduced, DeductionType
@@ -137,54 +134,16 @@ namespace backend.Infraestructure
             using var reader = await command.ExecuteReaderAsync();
             while (await reader.ReadAsync())
             {
-                var deductionType = reader["DeductionType"].ToString()?.ToLower();
-                var amount = reader.GetDecimal(reader.GetOrdinal("AmountDeduced"));
-                var item = new PayslipItem
+                list.Add(new DeductionDetailModel
                 {
-                    Label = reader["Name"].ToString(),
-                    Amount = -amount, // siempre negativo
-                    IsBold = false // todos los ítems individuales son false
-                };
-
-                if (deductionType == "voluntary")
-                {
-                    voluntaryItems.Add(item);
-                    voluntaryTotal += amount;
-                }
-                else if (deductionType == "mandatory")
-                {
-                    mandatoryItems.Add(item);
-                    mandatoryTotal += amount;
-                }
+                    Name = reader["Name"].ToString()!,
+                    AmountDeduced = reader.GetDecimal(reader.GetOrdinal("AmountDeduced")),
+                    DeductionType = reader["DeductionType"].ToString()!
+                });
             }
 
-            var result = new List<PayslipItem>();
-
-            // Voluntarias primero
-            result.AddRange(voluntaryItems);
-
-            // Total voluntarias (siempre lo agregamos, aunque sea 0)
-            result.Add(new PayslipItem
-            {
-                Label = "Total Deducciones Voluntarias",
-                Amount = -voluntaryTotal,
-                IsBold = true
-            });
-
-            // Mandatorias después
-            result.AddRange(mandatoryItems);
-
-            // Total mandatorias
-            result.Add(new PayslipItem
-            {
-                Label = "Total Deducciones Obligatorias",
-                Amount = -mandatoryTotal,
-                IsBold = true
-            });
-
-            return result;
+            return list;
         }
-
 
         private static string TranslatePeriodType(string periodType)
         {
