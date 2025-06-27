@@ -37,21 +37,18 @@
         </tr>
       </thead>
       <tbody class="text-center align-middle">
-        <tr
-          v-for="(payslip, index) in filteredPayslips"
-          :key="index"
-        >
+        <tr v-for="(payslip, index) in filteredPayslips" :key="index">
           <td>Colilla de pago – {{ payslip.periodType }}</td>
-          <td>{{ payslip.date }}</td>
-          <td>{{ payslip.total }}</td>
+          <td>{{ payslip.dateRange }}</td>
+          <td>{{ formatCurrency(payslip.netPay) }}</td>
           <td>
-          <router-link
-            :to="`/view-payslip/`"
-            class="btn btn-outline-dark"
-            title="Ver detalles"
-          >
-            <i class="fas fa-eye"></i>
-          </router-link>
+            <router-link
+              :to="`/view-payslip/${getStartDateForRouting(payslip.dateRange)}`"
+              class="btn btn-outline-dark"
+              title="Ver detalles"
+            >
+              <i class="fas fa-eye"></i>
+            </router-link>
           </td>
         </tr>
       </tbody>
@@ -60,42 +57,49 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted } from 'vue'
+import axios from 'axios'
 
-const searchDate = ref('');
+// ID quemada por ahora
+const employeeId = '618C7338-E1AC-48EF-8562-4ED0A95F00E1'
+const searchDate = ref('')
+const payslips = ref([])
 
-const payslips = ref([
-  {
-    id: 1,
-    periodType: 'SEMANAL',
-    date: '01-06-25',
-    total: '₡780,500'
-  },
-  {
-    id: 2,
-    periodType: 'QUINCENAL',
-    date: '15-06-25',
-    total: '₡895,200'
-  },
-  {
-    id: 3,
-    periodType: 'MENSUAL',
-    date: '30-06-25',
-    total: '₡1,050,000'
+
+const fetchPayslips = async () => {
+  try {
+    const response = await axios.get(`https://localhost:5000/api/payslip/employee/${employeeId}`)
+    payslips.value = response.data
+    console.log(payslips.value)
+  } catch (error) {
+    console.error('Error al obtener colillas:', error)
   }
-]);
+}
+
+
+onMounted(fetchPayslips)
 
 const filteredPayslips = computed(() => {
-  if (!searchDate.value.trim()) {
-    return payslips.value;
-  }
+  if (!searchDate.value.trim()) return payslips.value
+  return payslips.value.filter(p => p.dateRange.includes(searchDate.value.trim()))
+})
 
-  return payslips.value.filter(p =>
-    p.date.includes(searchDate.value.trim())
-  );
-});
+const formatCurrency = (amount) => {
+  return new Intl.NumberFormat('es-CR', {
+    style: 'currency',
+    currency: 'CRC',
+    minimumFractionDigits: 0
+  }).format(amount)
+}
+
+const getStartDateForRouting = (dateRange) => {
+  const startRaw = dateRange.split(' / ')[0] // ej: "26-05-25"
+  const [day, month, year2] = startRaw.split('-')
+  const yearFull = parseInt(year2, 10) < 50 ? '20' + year2 : '19' + year2
+  console.log(`${yearFull}-${month}-${day}`)
+  return `${yearFull}-${month}-${day}` // formato YYYY-MM-DD
+}
 </script>
 
 <style scoped>
-
 </style>

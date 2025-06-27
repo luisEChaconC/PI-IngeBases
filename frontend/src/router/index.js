@@ -49,7 +49,8 @@ const routes = [
             { path: '/employee-timesheet', name: 'EmployeeTimesheet', component: EmployeeTimesheet, meta: {allowedPositions: ['Collaborator', 'Payroll Manager', 'Supervisor']} },
             { path: '/timesheet-approvals', name: 'TimesheetApprovals', component: TimesheetApprovals, meta: {allowedPositions: ['Supervisor']} },
             { path: '/view-payslip', name: 'PayslipView', component: PayslipView, meta: {allowedPositions: ['Collaborator', 'Payroll Manager', 'Supervisor']}},
-            { path: '/view-payslip-list', name: 'PayslipList', component: PayslipList, meta: {allowedPositions: ['Collaborator', 'Payroll Manager', 'Supervisor']}}
+            { path: '/view-payslip-list', name: 'PayslipList', component: PayslipList, meta: {allowedPositions: ['Collaborator', 'Payroll Manager', 'Supervisor']}},
+            { path: '/view-payslip/:date', name: 'PayslipView', component: PayslipView, meta: {allowedPositions: ['Collaborator', 'Payroll Manager', 'Supervisor']}}
         ],
     },
 ]
