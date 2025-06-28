@@ -245,8 +245,9 @@
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          const response = await axios.delete(`https://localhost:5000/api/benefit?benefitId=${benefit.value.id}`);
-          const { resultCode, resultMessage } = response.data;
+          // Usa el servicio en vez de axios directamente
+          const response = await benefitService.deleteBenefit(benefit.value.id);
+          const { resultCode, resultMessage } = response;
 
           let mensaje = '';
           switch (resultCode) {

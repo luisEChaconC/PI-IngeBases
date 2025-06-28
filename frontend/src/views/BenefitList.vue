@@ -106,8 +106,8 @@ const getBenefits = async () => {
             return;
         }
 
-        const response = await axios.get(`https://localhost:5000/api/benefit?companyId=${companyId}`);
-        const allBenefits = response.data;
+        // Usa el servicio para obtener los beneficios de la empresa
+        const allBenefits = await benefitService.getBenefitsByCompanyId(companyId);
 
         const filteredBenefits = [];
         for (const benefit of allBenefits) {
@@ -115,8 +115,9 @@ const getBenefits = async () => {
                 filteredBenefits.push(benefit);
             } else {
                 try {
-                    const res = await axios.get(`https://localhost:5000/api/benefit/benefits/${benefit.id}/is-assigned`);
-                    if (res.data === true) {
+                    // Usa el servicio para verificar si el beneficio está asignado
+                    const isAssigned = await benefitService.benefitIsAssigned(benefit.id);
+                    if (isAssigned === true) {
                         filteredBenefits.push(benefit);
                     }
                 } catch (error) {
