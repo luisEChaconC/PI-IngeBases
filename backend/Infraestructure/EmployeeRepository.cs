@@ -75,7 +75,9 @@ namespace backend.Infraestructure
                 INNER JOIN Persons p ON np.Id = p.Id
                 LEFT JOIN Supervisors s ON e.Id = s.Id
                 LEFT JOIN PayrollManagers pm ON e.Id = pm.Id
-                WHERE e.CompanyId = @CompanyId";
+                WHERE e.CompanyId = @CompanyId
+                AND e.IsDeleted = 0";
+
 
             using (var command = new SqlCommand(query, _connection))
             {
