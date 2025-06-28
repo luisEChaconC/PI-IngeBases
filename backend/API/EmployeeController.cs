@@ -1,5 +1,6 @@
 ﻿using backend.Domain;
 using backend.Domain.Requests;
+using backend.Application.Commands.Employee;
 using backend.Infraestructure;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -17,10 +18,13 @@ namespace backend.API
         private readonly UserController _userController;
         private readonly NaturalPersonController _naturalPersonController;
         private readonly ContactController _contactController;
+        private readonly IDeleteEmployeeCommand _deleteEmployeeCommand;
+
 
         public EmployeeController()
         {
             _employeeRepository = new EmployeeRepository();
+            _deleteEmployeeCommand = new DeleteEmployeeCommand(_employeeRepository);
             _supervisorController = new SupervisorController();
             _payrollManagerController = new PayrollManagerController();
             _personController = new PersonController();
@@ -162,19 +166,24 @@ namespace backend.API
             }
         }
 
-        [HttpDelete("{id}")]
-        public IActionResult DeleteEmployee(string id)
+[HttpDelete("{id}")]
+public IActionResult DeleteEmployee(string id)
 {
     try
     {
-        _employeeRepository.DeleteEmployee(id);
+        _deleteEmployeeCommand.Execute(id);
         return Ok(new { message = "Empleado eliminado correctamente." });
+    }
+    catch (ArgumentException ex)
+    {
+        return BadRequest(new { message = ex.Message });
     }
     catch (Exception ex)
     {
         return StatusCode(500, new { message = "Error al eliminar el empleado.", error = ex.Message });
     }
 }
+
 
 
     }
