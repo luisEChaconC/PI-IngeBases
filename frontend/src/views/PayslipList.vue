@@ -64,8 +64,8 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
-import axios from 'axios'
 import currentUserService from '@/services/currentUserService';
+import payslipService from '@/services/payslipService';
 
 
 const employeeId = currentUserService.getCurrentUserInformationFromLocalStorage().idNaturalPerson;
@@ -75,8 +75,8 @@ const payslips = ref([])
 
 const fetchPayslips = async () => {
   try {
-    const response = await axios.get(`https://localhost:5000/api/payslip/employee/${employeeId}`)
-    payslips.value = response.data
+    const response = await payslipService.getPayslipsByEmployeeId(employeeId);
+    payslips.value = response
     console.log(payslips.value)
   } catch (error) {
     console.error('Error al obtener colillas:', error)

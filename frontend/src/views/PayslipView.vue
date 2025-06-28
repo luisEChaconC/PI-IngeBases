@@ -68,8 +68,8 @@
 <script setup>
 import {ref, onMounted} from 'vue'
 import { useRoute } from 'vue-router'
-import axios from 'axios'
 import currentUserService from '@/services/currentUserService';
+import payslipService from '@/services/payslipService';
 
 const route = useRoute()
 const payslipDate = route.params.date
@@ -81,31 +81,22 @@ const employeeId = currentUserService.getCurrentUserInformationFromLocalStorage(
 
 const fetchPayslip = async () => {
   try {
-    console.log("hola")
-    // acá podés cambiar la lógica si el backend necesita otra info (por ejemplo startDate)
-    const url = `https://localhost:5000/api/payslip/employee/${employeeId}/by-start-date`
-    const response = await axios.get(url, {
-      params: { startDate: payslipDate }
-    })
-
-    payslipData.value = response.data
-    console.log(response.data)
+    const data = await payslipService.getPayslipByEmployeeIdAndDate(employeeId, payslipDate);
+    payslipData.value = data; 
   } catch (error) {
-  if (error.response) {
-    console.error('Respuesta del backend:', error.response.status, error.response.data)
-  } else {
-    console.error('Error de red u otro:', error.message)
+    console.error(error.message);
   }
-}
-}
+};
 
 const formatCurrency = (amount) => {
+  if (typeof amount !== 'number') return '₡0';
   return new Intl.NumberFormat('es-CR', {
     style: 'currency',
     currency: 'CRC',
     minimumFractionDigits: 0
   }).format(amount)
 }
+
 
 onMounted(fetchPayslip)
 </script>
