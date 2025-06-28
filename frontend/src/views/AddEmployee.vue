@@ -215,8 +215,7 @@
 </template>
 
 <script>
-import axios from "axios";
-import currentUserService from "@/services/currentUserService";
+import employeeService from "@/services/employeeService";
 
 export default {
     name: "AddEmployee",
@@ -383,25 +382,17 @@ export default {
             return Object.values(this.errors).some(error => error !== "");
         },
         async submitForm() {
-            this.validateAllFields();
-            if (this.hasErrors()) {
-                alert("Por favor, corrija los errores en el formulario.");
-                return;
-            }
-            this.formData.user.password = `${this.formData.naturalPerson.firstSurname}${this.formData.person.legalId.slice(-3)}`;
-            const currentUserInformation = currentUserService.getCurrentUserInformationFromLocalStorage();
-            this.formData.employee.companyId = currentUserInformation.companyId;
-            this.formData.person.legalId = this.formData.person.legalId.replace(/-/g, "");
-            try {
-                console.log(this.formData)
-                const response = await axios.post(
-                    "https://localhost:5000/api/Employee/CreateEmployeeWithDependencies",
-                    this.formData
-                );
+            try {      
+                this.validateAllFields();
+                if (this.hasErrors()) {
+                    alert("Por favor, corrija los errores en el formulario.");
+                    return;
+                }
+                
+                await employeeService.createEmployeeWithDependencies(this.formData);
+                
                 alert("Empleado agregado exitosamente");
-                console.log(response.data);
 
-                // Redirect to the employee-list view
                 this.$router.push({ name: "EmployeesList" });
             } catch (error) {
                 alert("Ocurrió un error al tratar de agregar el empleado.");

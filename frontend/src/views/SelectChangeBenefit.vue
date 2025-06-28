@@ -100,8 +100,11 @@
 
 <script>
 import { ref, computed, onMounted } from 'vue';
-import axios from 'axios';
 import { Modal } from 'bootstrap';
+import benefitService from '@/services/benefitService';
+import employeeService from '@/services/employeeService';
+import companyService from '@/services/companyService';
+import currentUserService from '@/services/currentUserService';
 
 export default {
   name: 'EmployeeBenefits',
@@ -122,8 +125,7 @@ export default {
 
     const getAllApis = async () => {
       try {
-        const response = await axios.get("https://localhost:5000/api/API");
-        allApis.value = response.data;
+        allApis.value = await benefitService.getAPIs();
       } catch (error) {
         console.error("Error obteniendo APIs:", error);
       }
@@ -157,19 +159,17 @@ export default {
       }
 
       try {
-        const response = await axios.get(`https://localhost:5000/api/API/${matchedApi.id}/parameters`);
-        const userDefinedParams = response.data.filter(p => p.type === 'UserDefined');
-        console.log(userDefinedParams);
+        const userDefinedParams = await benefitService.getAPIParameters(matchedApi.id);
+        const filteredParams = userDefinedParams.filter(p => p.type === 'UserDefined');
+        
         apiParametersByBenefitId.value[benefit.id] = {};
-        userDefinedParams.forEach(param => {
+        filteredParams.forEach(param => {
           apiParametersByBenefitId.value[benefit.id][param.name] = {
             id: param.id,
             value: '',
             type: tipoParametroPorNombre[param.name] || 'string' 
           };
         });
-
-        console.log(apiParametersByBenefitId)
 
         benefit.apiId = matchedApi.id;
 
@@ -179,36 +179,32 @@ export default {
       }
     };
 
-    const getCurrentUserInformationFromLocalStorage = () => {
-      const userInformation = localStorage.getItem('currentUserInformation'); 
-      return userInformation ? JSON.parse(userInformation) : null;
-    };
-
     const getBenefits = async () => {
       try {
-        const userInfo = getCurrentUserInformationFromLocalStorage();
-
+        const userInfo = currentUserService.getCurrentUserInformationFromLocalStorage();
         const companyId = userInfo?.companyId;
         const employeeId = userInfo?.idNaturalPerson;
-        const employee = await axios.get(`https://localhost:5000/api/EmployeeGetID/GetEmployeeById/${employeeId}`);
-        const contractType = employee?.data?.contractType;
-        console.log(contractType);
-        console.log(companyId);
+
         if (!companyId) {
           console.error('No se encontró companyId en localStorage.');
           return;
         }
+
+        if (!employeeId) {
+          console.error('No se encontró employeeId en localStorage.');
+          return;
+        }
+
+        const employee = await employeeService.getEmployeeById(employeeId);
+        const contractType = employee?.contractType;
 
         if (!contractType) {
           console.error('No se encontró contractType en localStorage.');
           return;
         }
 
-        const response = await axios.get("https://localhost:5000/api/benefit", {
-          params: { companyId }
-        });
-
-        allBenefits.value = response.data.filter(benefit =>
+        const benefits = await benefitService.getBenefitsByCompanyId(companyId);
+        allBenefits.value = benefits.filter(benefit =>
           benefit.eligibleEmployeeTypes &&
           benefit.eligibleEmployeeTypes.some(type =>
             type.trim().toLowerCase() === contractType.trim().toLowerCase()
@@ -220,7 +216,6 @@ export default {
         console.error('Error getting benefits:', error);
       }
     };
-
 
     const exceedsLimit = computed(() =>
       selectedBenefits.value.length + tempSelection.value.length > maxBenefits.value
@@ -256,16 +251,15 @@ export default {
 
     const getCompanyMaxBenefits = async () => {
       try {
-        const companyId = getCurrentUserInformationFromLocalStorage()?.companyId;
+        const companyId = currentUserService.getCurrentUserInformationFromLocalStorage()?.companyId;
         if (!companyId) {
           console.error("No se encontró companyId en localStorage.");
           return;
         }
 
-        const response = await axios.get(`https://localhost:5000/api/company/GetCompanyById/${companyId}`);
-
-        if (response.data?.maxBenefitsPerEmployee !== undefined) {
-          maxBenefits.value = response.data.maxBenefitsPerEmployee;
+        const company = await companyService.getCompanyById(companyId);
+        if (company?.maxBenefitsPerEmployee !== undefined) {
+          maxBenefits.value = company.maxBenefitsPerEmployee;
         }
       } catch (error) {
         console.error("Error obteniendo maxBenefitsPerEmployee:", error);
@@ -274,7 +268,7 @@ export default {
 
     const assignBenefits = async () => {
       try {
-        const employeeId = getCurrentUserInformationFromLocalStorage()?.idNaturalPerson;
+        const employeeId = currentUserService.getCurrentUserInformationFromLocalStorage()?.idNaturalPerson;
         const benefitIds = selectedBenefits.value.map(b => b.id);
 
         if (!employeeId || benefitIds.length === 0) {
@@ -282,17 +276,9 @@ export default {
           return;
         }
 
-        const payload = {
-          employeeId,
-          benefitIds
-        };
-
-        const response = await axios.post('https://localhost:5000/api/benefit/assign', payload);
-
-        if (response.status === 200) {
-          await saveParameterValues();
-          alert('Beneficios asignados exitosamente.');
-        }
+        await benefitService.assignBenefitsToEmployee(employeeId, benefitIds);
+        await saveParameterValues();
+        alert('Beneficios asignados exitosamente.');
       } catch (error) {
         console.error('Error asignando beneficios:', error);
       }
@@ -300,18 +286,13 @@ export default {
 
     const getAssignedBenefits = async () => {
       try {
-        const employeeId = getCurrentUserInformationFromLocalStorage()?.idNaturalPerson;
+        const employeeId = currentUserService.getCurrentUserInformationFromLocalStorage()?.idNaturalPerson;
         if (!employeeId) {
           console.error('No se encontró el ID del empleado en localStorage.');
           return;
         }
 
-        const response = await axios.get(`https://localhost:5000/api/benefit/assigned`, {
-          params: { employeeId }
-        });
-
-        // Cargar los beneficios asignados al estado
-        selectedBenefits.value = response.data;
+        selectedBenefits.value = await benefitService.getAssignedBenefits(employeeId);
       } catch (error) {
         console.error('Error recuperando los beneficios asignados:', error);
       }
@@ -323,7 +304,7 @@ export default {
           continue;
         }
 
-        const employeeId = getCurrentUserInformationFromLocalStorage()?.idNaturalPerson;
+        const employeeId = currentUserService.getCurrentUserInformationFromLocalStorage()?.idNaturalPerson;
         if (!employeeId) {
           return;
         }
@@ -334,8 +315,7 @@ export default {
 
         let parameters = [];
         try {
-          const response = await axios.get(`https://localhost:5000/api/API/${benefit.apiId}/parameters`);
-          parameters = response.data;
+          parameters = await benefitService.getAPIParameters(benefit.apiId);
         } catch (error) {
           continue;
         }
@@ -381,7 +361,7 @@ export default {
           console.log('Payload preparado:', payload);
 
           try {
-            await axios.post('https://localhost:5000/api/api/parameters/values', payload);
+            await benefitService.saveParameterValues(payload);
             console.log("✔ Parámetro guardado correctamente");
           } catch (error) {
             console.error('❌ Error guardando valor de parámetro:', error, payload);
