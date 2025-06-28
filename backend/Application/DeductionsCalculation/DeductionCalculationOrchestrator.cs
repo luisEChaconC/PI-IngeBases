@@ -145,6 +145,12 @@ namespace backend.Application.DeductionCalculation
                     DeductionType = "voluntary",
                     BenefitId = Guid.Parse(item.Benefit.Id)
                 });
+
+                if (item.Benefit.IsDeleted)
+                {
+                    _disableBenefitForEmployeeCommand.Execute(Guid.Parse(item.Benefit.Id), employeeId);
+                    continue;
+                }
             }
         }
     }

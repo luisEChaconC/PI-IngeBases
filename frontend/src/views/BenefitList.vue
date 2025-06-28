@@ -37,19 +37,26 @@
               </tr>
           </thead>
           <tbody class="text-center align-middle">
-              <tr v-for="(benefit, index) in benefits" :key="index">
-                  <td>{{ benefit.name }}</td>
-                  <td>{{ benefit.isActive ? 'Activo' : 'Inactivo' }}</td>
-                  <td>{{ translateType(benefit.type) }}</td>
-                  <td class="text-center align-middle">
-                      <router-link
-                          :to="`/benefit/${benefit.id}`"
-                          class="btn btn-dark"
-                      >
-                          +
-                      </router-link>
-                  </td>
-              </tr>
+            <tr
+                v-for="(benefit, index) in benefits"
+                :key="index"
+                :class="{ 'table-secondary': benefit.isDeleted }"
+                :style="benefit.isDeleted ? 'opacity: 0.6; pointer-events: none;' : ''"
+            >
+                <td>{{ benefit.name }}</td>
+                <td>{{ !benefit.isDeleted ? 'Activo' : 'Inactivo' }}</td>
+                <td>{{ translateType(benefit.type) }}</td>
+                <td class="text-center align-middle">
+                <router-link
+                    :to="`/benefit/${benefit.id}`"
+                    class="btn btn-dark"
+                    :disabled="benefit.isDeleted"
+                    tabindex="benefit.isDeleted ? -1 : 0"
+                >
+                    +
+                </router-link>
+                </td>
+            </tr>
           </tbody>
       </table>
   </div>
@@ -100,7 +107,6 @@ const getBenefits = async () => {
     try {
         console.log(getCurrentUserInformationFromLocalStorage())
         const companyId = getCurrentUserInformationFromLocalStorage()?.companyId;
-        
 
         if (!companyId) {
             console.error("No se encontró el ID de la empresa en el localStorage.");
@@ -108,7 +114,24 @@ const getBenefits = async () => {
         }
 
         const response = await axios.get(`https://localhost:5000/api/benefit?companyId=${companyId}`);
-        benefits.value = response.data;
+        const allBenefits = response.data;
+
+        const filteredBenefits = [];
+        for (const benefit of allBenefits) {
+            if (!benefit.isDeleted) {
+                filteredBenefits.push(benefit);
+            } else {
+                try {
+                    const res = await axios.get(`https://localhost:5000/api/benefit/benefits/${benefit.id}/is-assigned`);
+                    if (res.data === true) {
+                        filteredBenefits.push(benefit);
+                    }
+                } catch (error) {
+                    console.error(`Error verificando asignación para el beneficio ${benefit.id}:`, error);
+                }
+            }
+        }
+        benefits.value = filteredBenefits;
     } catch (error) {
         console.error("No se pudieron obtener los beneficios:", error);
     }

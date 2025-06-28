@@ -235,7 +235,7 @@
 
   const deleteBenefit = () => {
     Swal.fire({
-      title: '¿Estás seguro?',
+      title: '¿Está seguro?',
       text: "Esta acción eliminará el beneficio",
       icon: 'warning',
       showCancelButton: true,
@@ -243,9 +243,53 @@
       cancelButtonColor: '#6c757d',
       confirmButtonText: 'Sí, eliminar',
       cancelButtonText: 'Cancelar'
-    }).then((result) => {
+    }).then(async (result) => {
       if (result.isConfirmed) {
-        alert("eliminado")
+        try {
+          const response = await axios.delete(`https://localhost:5000/api/benefit?benefitId=${benefit.value.id}`);
+          const { resultCode, resultMessage } = response.data;
+
+          let mensaje = '';
+          switch (resultCode) {
+            case 'MarkedAsDeleted':
+              mensaje = 'El beneficio ha sido marcado como eliminado. Su visibilidad permanecerá activa hasta el siguiente periodo de pago para fines históricos.';
+              break;
+            case 'DeletedWithAssignments':
+              mensaje = 'Beneficio eliminado. Las asignaciones activas han sido removidas.';
+              break;
+            case 'Deleted':
+              mensaje = 'Beneficio eliminado correctamente.';
+              break;
+            case 'Error':
+              mensaje = 'Ocurrió un error al eliminar el beneficio: ' + (resultMessage || '');
+              break;
+            default:
+              mensaje = resultMessage || 'Resultado desconocido.';
+          }
+
+          Swal.fire({
+            icon: resultCode === 'Error' ? 'error' : 'success',
+            title: mensaje,
+          }).then(() => {
+            if (resultCode !== 'Error') {
+              window.location.href = '/benefits';
+            }
+          });
+
+        } catch (error) {
+          let mensaje = 'No se pudo conectar con el servidor. Intente de nuevo más tarde.';
+          if (error.response) {
+            if (error.response.status === 400) {
+              mensaje = error.response.data?.resultMessage || 'Solicitud inválida. El ID del beneficio es requerido.';
+            } else if (error.response.status === 500) {
+              mensaje = error.response.data?.resultMessage || 'Error interno del servidor al eliminar el beneficio.';
+            }
+          }
+          Swal.fire({
+            icon: 'error',
+            title: mensaje
+          });
+        }
       }
     });
   }

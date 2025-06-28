@@ -22,9 +22,18 @@
         <input type="number" class="form-control w-25" id="maxBenefits" v-model.number="maxBenefits" disabled />
       </div>
 
-      <div v-for="(benefit, index) in selectedBenefits" :key="index" class="d-flex justify-content-between align-items-center border p-2 mb-2 rounded">
-        <span>{{ benefit.name }}</span>
-        <button class="btn btn-dark btn-sm" @click="removeBenefit(index)">Eliminar</button>
+      <div
+        v-for="(benefit, index) in selectedBenefits"
+        :key="index"
+        class="d-flex justify-content-between align-items-center border p-2 mb-2 rounded"
+        :style="benefit.isDeleted ? 'background-color: #f0f0f0; color: #888;' : ''"
+      >
+        <span>
+          {{ benefit.name }} 
+          <span v-if="benefit.isDeleted" class="ms-2 fst-italic">
+            - Se eliminará el siguiente periodo de pago
+          </span>
+        </span>
       </div>
       <div class="d-flex justify-content-end mt-3">
         <button class="btn btn-success" @click="assignBenefits" :disabled="selectedBenefits.length === 0">
@@ -408,10 +417,6 @@ export default {
       }
     };
 
-    const removeBenefit = (index) => {
-      selectedBenefits.value.splice(index, 1);
-    };
-
     onMounted(() => {
       getBenefits();
       getAssignedBenefits();
@@ -440,7 +445,6 @@ export default {
       getAssignedBenefits,
       saveParameterValues,
       obtenerTipoInput,
-      removeBenefit
     };
   },
 };

@@ -3,6 +3,7 @@ using backend.Domain;
 using backend.Application.Benefits.Queries;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using backend.Application.DTOs;
 
 namespace backend.API
 {
@@ -68,7 +69,7 @@ namespace backend.API
         }
 
         [HttpDelete]
-        public ActionResult<bool> DeleteBenefit(Guid benefitId)
+        public ActionResult<DeleteBenefitDto> DeleteBenefit(Guid benefitId)
         {
             try
             {

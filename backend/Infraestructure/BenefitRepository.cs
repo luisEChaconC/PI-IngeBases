@@ -1,6 +1,7 @@
 using backend.Domain;
 using System.Data;
 using System.Data.SqlClient;
+using backend.Application.DTOs;
 
 namespace backend.Infraestructure
 {
@@ -92,7 +93,8 @@ namespace backend.Infraestructure
                     FixedPercentage = row["FixedPercentage"] != DBNull.Value ? Convert.ToInt32(row["FixedPercentage"]) : null,
                     FixedAmount = row["FixedAmount"] != DBNull.Value ? Convert.ToInt32(row["FixedAmount"]) : null,
                     RequiredMonthsWorked = Convert.ToInt32(row["RequiredMonthsWorked"]),
-                    EligibleEmployeeTypes = GetEmployeeTypesForBenefit(id)
+                    EligibleEmployeeTypes = GetEmployeeTypesForBenefit(id),
+                    IsDeleted = Convert.ToBoolean(row["IsDeleted"])
                 });
             }
 
@@ -172,7 +174,8 @@ namespace backend.Infraestructure
                     FixedPercentage = row["FixedPercentage"] != DBNull.Value ? Convert.ToInt32(row["FixedPercentage"]) : null,
                     FixedAmount = row["FixedAmount"] != DBNull.Value ? Convert.ToInt32(row["FixedAmount"]) : null,
                     RequiredMonthsWorked = Convert.ToInt32(row["RequiredMonthsWorked"]),
-                    EligibleEmployeeTypes = GetEmployeeTypesForBenefit(id)
+                    EligibleEmployeeTypes = GetEmployeeTypesForBenefit(id),
+                    IsDeleted = Convert.ToBoolean(row["IsDeleted"])
                 });
             }
 
@@ -304,18 +307,36 @@ namespace backend.Infraestructure
             return true;
         }
 
-        public bool DeleteBenefit(Guid benefitId)
+        public DeleteBenefitDto DeleteBenefit(Guid benefitId)
         {
+            var result = new DeleteBenefitDto();
+
             _connection.Open();
-            int rowsAffected = 0;
             using (var command = new SqlCommand("sp_DeleteBenefit", _connection))
             {
                 command.CommandType = CommandType.StoredProcedure;
                 command.Parameters.AddWithValue("@BenefitId", benefitId);
-                rowsAffected = command.ExecuteNonQuery();
+
+                var resultCodeParam = new SqlParameter("@ResultCode", SqlDbType.NVarChar, 32)
+                {
+                    Direction = ParameterDirection.Output
+                };
+                var resultMessageParam = new SqlParameter("@ResultMessage", SqlDbType.NVarChar, 255)
+                {
+                    Direction = ParameterDirection.Output
+                };
+
+                command.Parameters.Add(resultCodeParam);
+                command.Parameters.Add(resultMessageParam);
+
+                command.ExecuteNonQuery();
+
+                result.ResultCode = resultCodeParam.Value?.ToString();
+                result.ResultMessage = resultMessageParam.Value?.ToString();
             }
             _connection.Close();
-            return rowsAffected > 0;
+
+            return result;
         }
 
         public Benefit? GetBenefitById(Guid id)

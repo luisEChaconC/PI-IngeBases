@@ -1,5 +1,6 @@
 namespace backend.Application.Benefits.Commands
 {
+    using backend.Application.DTOs;
     using backend.Infraestructure;
 
     public class DeleteBenefitCommand
@@ -11,7 +12,7 @@ namespace backend.Application.Benefits.Commands
             _repository = repository;
         }
 
-        public bool Execute(Guid benefitId)
+        public DeleteBenefitDto Execute(Guid benefitId)
         {
             return _repository.DeleteBenefit(benefitId);
         }
