@@ -55,7 +55,7 @@
 </template>
 
 <script>
-import axios from 'axios'
+import employeeService from '@/services/employeeService';
 import currentUserService from "@/services/currentUserService";
 
 export default {
@@ -72,17 +72,13 @@ export default {
         const currentUserInformation = currentUserService.getCurrentUserInformationFromLocalStorage()
         const companyId = currentUserInformation.companyId
 
-        // Guardamos el tipo de empleado (para usarlo en el template)
         if (currentUserInformation?.position) {
           this.employeeType = currentUserInformation.position.replace(/\s/g, '')
         }
 
-        const response = await axios.get('https://localhost:5000/api/Employee/GetEmployeesByCompanyId', {
-          params: { companyId: companyId }
-        })
-
-        // Traducimos posiciones a español
-        this.employees = response.data.map(employee => ({
+        const employees = await employeeService.getEmployeesByCompanyId(companyId);
+        
+        this.employees = employees.map(employee => ({
           ...employee,
           position: this.translatePosition(employee.position)
         }))

@@ -274,7 +274,7 @@
 </template>
 
 <script>
-import axios from 'axios';
+import companyService from '@/services/companyService';
 export default {
     name: 'CompanyRegistration',
     data() {
@@ -336,10 +336,9 @@ export default {
         },
         async registerCompany() {
             try {
-                const payload = {
+                const companyData = {
                     person: {
-                        id: "",
-                        legalId: this.removeHyphens(this.company.legalEntityId),
+                        legalId: this.company.legalEntityId,
                         type: "Legal Entity",
                         province: this.company.direction.province,
                         canton: this.company.direction.canton,
@@ -349,60 +348,28 @@ export default {
                     },
                     contacts: [
                         {
-                            id: "",
                             type: "Email",
-                            phoneNumber: "",
-                            email: this.company.contact.email,
-                            personId: ""
+                            email: this.company.contact.email
                         },
                         {
-                            id: "",
                             type: "Phone Number",
-                            phoneNumber: this.removeHyphens(this.company.contact.phoneNumber),
-                            personId: ""
+                            phoneNumber: this.company.contact.phoneNumber
                         }
                     ],
                     company: {
-                        id: "",
                         name: this.company.name,
                         description: this.company.description,
                         paymentType: this.company.paymentType === "monthly" ? "Monthly" : 
                                    this.company.paymentType === "biweekly" ? "Biweekly" : "Weekly",
-                        employees: [],
-                        maxBenefitsPerEmployee: parseInt(this.company.maxBenefits),
-                        creationDate: new Date().toISOString(),
-                        creationAuthor: "system",
-                        lastModificationDate: new Date().toISOString(),
-                        lastModificationAuthor: "system"
+                        maxBenefitsPerEmployee: parseInt(this.company.maxBenefits)
                     }
                 };
                 
-                console.log("Sending data:", JSON.stringify(payload, null, 2));
-                
-                const response = await axios.post('https://localhost:5000/api/Company/CreateCompanyWithDependencies', payload);
-
-                if (response.status == 201) {
-                    this.company.id = response.data.personId;
-                    return true;
-                } else {
-                    return false;
-                }
+                const response = await companyService.createCompanyWithDependencies(companyData);
+                this.company.id = response.personId;
+                return true;
             } catch (error) {
-                console.error("Error details:", error);
-                if (error.response) {
-                    console.error("Response data:", error.response.data);
-                    console.error("Status:", error.response.status);
-                    if (error.response.data && error.response.data.errors) {
-                        console.error("Validation errors:", error.response.data.errors);
-                    }
-                } else if (error.request) {
-                    // The request was made but no response was received
-                    console.error("No response received:", error.request);
-                } else {
-                    // Something happened in setting up the request that triggered an error
-                    console.error("Error:", error.message);
-                }
-
+                console.error("Error creating company:", error);
                 return false;
             }
         },

@@ -1,24 +1,9 @@
-import axios from 'axios';
+import userService from '@/services/userService';
 
 class CurrentUserService {
-    constructor() {
-        this.apiBaseUrl = 'https://localhost:5000/api'; // Base URL for the API
-    }
-
-    /**
-     * Fetches the current user information by email, calls the API endpoint,
-     * and saves the information in localStorage.
-     * @param {string} email - The email address of the user.
-     * @returns {Promise<void>}
-     */
     async fetchAndSaveCurrentUserInformationToLocalStorage(email) {
         try {
-            const response = await axios.get(`${this.apiBaseUrl}/User/GetUserInformationByEmail`, {
-                params: { email }
-            });
-
-
-            const userInformation = response.data;
+            const userInformation = await userService.getUserInformationByEmail(email);
             console.log("User info recibido:", userInformation);
 
             localStorage.setItem('currentUserInformation', JSON.stringify(userInformation));
@@ -27,18 +12,11 @@ class CurrentUserService {
         }
     }
 
-    /**
-     * Retrieves the current user information from localStorage.
-     * @returns {object|null} The user information object or null if not found.
-     */
     getCurrentUserInformationFromLocalStorage() {
         const userInformation = localStorage.getItem('currentUserInformation');
         return userInformation ? JSON.parse(userInformation) : null;
     }
 
-    /**
-     * Removes the current user information from localStorage.
-     */
     removeCurrentUserInformationFromLocalStorage() {
         localStorage.removeItem('currentUserInformation');
     }
@@ -55,5 +33,4 @@ class CurrentUserService {
     }
 }
 
-// Export a pre-instantiated object of the service
 export default new CurrentUserService();
