@@ -162,5 +162,20 @@ namespace backend.API
             }
         }
 
+        [HttpDelete("{id}")]
+        public IActionResult DeleteEmployee(string id)
+{
+    try
+    {
+        _employeeRepository.DeleteEmployee(id);
+        return Ok(new { message = "Empleado eliminado correctamente." });
+    }
+    catch (Exception ex)
+    {
+        return StatusCode(500, new { message = "Error al eliminar el empleado.", error = ex.Message });
+    }
+}
+
+
     }
 }

@@ -28,6 +28,10 @@ namespace backend.Domain
         [Required(ErrorMessage = "HasToReportHours is required.")]
         public bool HasToReportHours { get; set; }
 
+        public DateTime? EndDate { get; set; }
+        public bool IsDeleted { get; set; } = false;
+
+
         public EmployeeModel()
         {
             Id = Guid.Empty;

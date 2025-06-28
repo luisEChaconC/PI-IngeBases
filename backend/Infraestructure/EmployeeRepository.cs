@@ -1,4 +1,5 @@
 ﻿using backend.Domain;
+using System.Data;
 using backend.Application.DTOs;
 using Microsoft.Data.SqlClient;
 
@@ -264,7 +265,8 @@ public bool HasPaymentRecords(string employeeId)
                     np.Gender
                 FROM Employees e
                 INNER JOIN NaturalPersons np ON e.Id = np.Id
-                WHERE e.CompanyId = @CompanyId";
+                WHERE e.CompanyId = @CompanyId
+                AND e.IsDeleted = 0";
 
             using (var connection = new SqlConnection(_connectionString))
             using (var command = new SqlCommand(query, connection))
@@ -297,5 +299,20 @@ public bool HasPaymentRecords(string employeeId)
 
             return employees;
         }
+
+        public void DeleteEmployee(string employeeId)
+        {
+    using (var connection = new SqlConnection(_connectionString))
+            {
+        connection.Open();
+        using (var command = new SqlCommand("sp_DeleteEmployee", connection))
+        {
+            command.CommandType = CommandType.StoredProcedure;
+            command.Parameters.AddWithValue("@EmployeeId", Guid.Parse(employeeId));
+            command.ExecuteNonQuery();
+        }
+         }
+        }
+
     }
 }
