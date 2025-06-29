@@ -9,5 +9,6 @@ namespace backend.Infraestructure
         List<CompanyModel> GetCompanies();
         CompanyModel GetCompanyById(string id);
         Task<string> GetPaymentTypeByIdAsync(Guid companyId);
+        public void DeleteCompany(string companyId);
     }
 }

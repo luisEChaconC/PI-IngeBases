@@ -112,6 +112,10 @@
                     <button v-if="isEditing" type="button" class="btn btn-outline-secondary px-4" @click="cancelEdit">
                       Cancelar
                     </button>
+
+                    <button type="button" class="btn btn-outline-danger px-4" @click="deleteCompany">
+                      Eliminar
+                    </button>
                   </div>
                 </div>
               </div>
@@ -126,6 +130,7 @@
 <script>
 import companyService from '@/services/companyService';
 import currentUserService from "@/services/currentUserService";
+import Swal from 'sweetalert2';
 
 export default {
   name: 'ViewCompanyInfo',
@@ -227,6 +232,45 @@ export default {
         }
         console.error("Error while updating company", error);
       }
+    },
+
+    deleteCompany() {
+      Swal.fire({
+        title: '¿Estás seguro?',
+        text: "Esta acción eliminará la empresa",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: 'Sí, eliminar',
+        cancelButtonText: 'Cancelar'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          const currentUserInformation = currentUserService.getCurrentUserInformationFromLocalStorage();
+
+          const companyId = currentUserInformation.position?.trim() === "SoftwareManager"
+            ? localStorage.getItem("selectedCompanyId")
+            : currentUserInformation.companyId;
+
+          companyService.deleteCompany(companyId)
+            .then(() => {
+              Swal.fire(
+                'Eliminado',
+                'La empresa ha sido eliminada exitosamente.',
+                'success'
+              );
+              this.$router.push("/view-companies-list");
+            })
+            .catch(error => {
+              Swal.fire(
+                'Error',
+                'Ocurrió un error al eliminar la empresa.',
+                'error'
+              );
+              console.error("Error al eliminar empresa:", error.response?.data || error);
+            });
+        }
+      });
     },
 
     handleBack() {
