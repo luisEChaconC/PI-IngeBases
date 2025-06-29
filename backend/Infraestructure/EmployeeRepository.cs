@@ -267,8 +267,7 @@ public bool HasPaymentRecords(string employeeId)
                     np.Gender
                 FROM Employees e
                 INNER JOIN NaturalPersons np ON e.Id = np.Id
-                WHERE e.CompanyId = @CompanyId
-                AND e.IsDeleted = 0";
+                WHERE e.CompanyId = @CompanyId";
 
             using (var connection = new SqlConnection(_connectionString))
             using (var command = new SqlCommand(query, connection))
