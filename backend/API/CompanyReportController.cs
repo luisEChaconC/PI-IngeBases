@@ -1,3 +1,4 @@
+using backend.Application.DTOs;
 using backend.Domain;
 using backend.Repositories;
 using Microsoft.AspNetCore.Mvc;
@@ -17,8 +18,19 @@ namespace backend.API
         [HttpGet]
         public async Task<IActionResult> Get([FromQuery] DateTime startDate, [FromQuery] DateTime endDate)
         {
-            var reports = await _getCompanyReportsQuery.ExecuteAsync(startDate, endDate);
-            return Ok(reports);
+            try
+            {
+                var reports = await _getCompanyReportsQuery.ExecuteAsync(startDate, endDate);
+
+                var tableReport = new CompanyReportDto().MapToTableReportDto(reports);
+
+                return Ok(tableReport);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    new { message = "Error al obtener el reporte de historial de pagos por empresa.", error = ex.Message });
+            }
         }
     }
 }
