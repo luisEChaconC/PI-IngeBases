@@ -24,6 +24,17 @@ class PayrollService {
             throw handleApiError(error, 'Error al obtener las planillas');
         }
     }
+
+    async createPayroll(payload) {
+        try {
+            const endpoint = API_CONFIG.ENDPOINTS.PAYROLL.CREATE;
+            const response = await axios.post(buildApiUrl(endpoint), payload);
+            return response.data;
+        } catch (error) {
+            console.error('Error creating payroll:', error);
+            throw handleApiError(error, 'Error al crear la planilla');
+        }
+    }
 }
 
 export default new PayrollService(); 

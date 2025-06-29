@@ -37,19 +37,26 @@
               </tr>
           </thead>
           <tbody class="text-center align-middle">
-              <tr v-for="(benefit, index) in benefits" :key="index">
-                  <td>{{ benefit.name }}</td>
-                  <td>{{ benefit.isActive ? 'Activo' : 'Inactivo' }}</td>
-                  <td>{{ translateType(benefit.type) }}</td>
-                  <td class="text-center align-middle">
-                      <router-link
-                          :to="`/benefit/${benefit.id}`"
-                          class="btn btn-dark"
-                      >
-                          +
-                      </router-link>
-                  </td>
-              </tr>
+            <tr
+                v-for="(benefit, index) in benefits"
+                :key="index"
+                :class="{ 'table-secondary': benefit.isDeleted }"
+                :style="benefit.isDeleted ? 'opacity: 0.6; pointer-events: none;' : ''"
+            >
+                <td>{{ benefit.name }}</td>
+                <td>{{ !benefit.isDeleted ? 'Activo' : 'Inactivo' }}</td>
+                <td>{{ translateType(benefit.type) }}</td>
+                <td class="text-center align-middle">
+                <router-link
+                    :to="`/benefit/${benefit.id}`"
+                    class="btn btn-dark"
+                    :disabled="benefit.isDeleted"
+                    tabindex="benefit.isDeleted ? -1 : 0"
+                >
+                    +
+                </router-link>
+                </td>
+            </tr>
           </tbody>
       </table>
   </div>
@@ -99,7 +106,26 @@ const getBenefits = async () => {
             return;
         }
 
-        benefits.value = await benefitService.getBenefitsByCompanyId(companyId);
+        // Usa el servicio para obtener los beneficios de la empresa
+        const allBenefits = await benefitService.getBenefitsByCompanyId(companyId);
+
+        const filteredBenefits = [];
+        for (const benefit of allBenefits) {
+            if (!benefit.isDeleted) {
+                filteredBenefits.push(benefit);
+            } else {
+                try {
+                    // Usa el servicio para verificar si el beneficio está asignado
+                    const isAssigned = await benefitService.benefitIsAssigned(benefit.id);
+                    if (isAssigned === true) {
+                        filteredBenefits.push(benefit);
+                    }
+                } catch (error) {
+                    console.error(`Error verificando asignación para el beneficio ${benefit.id}:`, error);
+                }
+            }
+        }
+        benefits.value = filteredBenefits;
     } catch (error) {
         console.error("No se pudieron obtener los beneficios:", error);
     }

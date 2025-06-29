@@ -124,6 +124,17 @@ class BenefitService {
             throw handleApiError(error, 'Error al guardar los valores de parámetros');
         }
     }
+
+    async deleteBenefit(benefitId) {
+        try {
+            const endpoint = API_CONFIG.ENDPOINTS.BENEFIT.DELETE(benefitId);
+            const response = await axios.delete(buildApiUrl(endpoint));
+            return response.data;
+        } catch (error) {
+            console.error('Error deleting benefit:', error);
+            throw handleApiError(error, 'Error al eliminar el beneficio');
+        }
+    }
 }
 
 export default new BenefitService();
