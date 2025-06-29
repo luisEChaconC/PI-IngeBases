@@ -260,6 +260,8 @@ public bool HasPaymentRecords(string employeeId)
                     e.ContractType,
                     e.GrossSalary,
                     e.HasToReportHours,
+                    e.EndDate,
+                    e.IsDeleted,
                     np.FirstName,
                     np.FirstSurname,
                     np.SecondSurname,
@@ -267,8 +269,7 @@ public bool HasPaymentRecords(string employeeId)
                     np.Gender
                 FROM Employees e
                 INNER JOIN NaturalPersons np ON e.Id = np.Id
-                WHERE e.CompanyId = @CompanyId
-                AND e.IsDeleted = 0";
+                WHERE e.CompanyId = @CompanyId";
 
             using (var connection = new SqlConnection(_connectionString))
             using (var command = new SqlCommand(query, connection))
@@ -286,6 +287,8 @@ public bool HasPaymentRecords(string employeeId)
                             WorkerId = reader["WorkerId"].ToString(),
                             CompanyId = reader.GetGuid(reader.GetOrdinal("CompanyId")),
                             EmployeeStartDate = reader.GetDateTime(reader.GetOrdinal("EmployeeStartDate")),
+                            EndDate = reader.IsDBNull(reader.GetOrdinal("EndDate")) ? (DateTime?)null : reader.GetDateTime(reader.GetOrdinal("EndDate")),
+                            IsDeleted = reader.GetBoolean(reader.GetOrdinal("IsDeleted")),
                             ContractType = reader["ContractType"].ToString(),
                             GrossSalary = reader.GetDecimal(reader.GetOrdinal("GrossSalary")),
                             HasToReportHours = reader.GetBoolean(reader.GetOrdinal("HasToReportHours")),
