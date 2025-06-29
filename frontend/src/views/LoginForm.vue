@@ -73,6 +73,9 @@
 
 <script>
 import userService from "@/services/userService";
+import companyService from "@/services/companyService";
+import currentUserService from "@/services/currentUserService";
+import Swal from 'sweetalert2'; 
 
 export default {
   name: "LoginForm", // Component name
@@ -89,6 +92,27 @@ export default {
 
       try {
         await userService.login(this.email, this.password);
+
+        const currentUserInformation = currentUserService.getCurrentUserInformationFromLocalStorage();
+        const companyId = currentUserInformation.companyId;
+        
+        let company = null;
+        
+        if(companyId) {
+          company = await companyService.getCompanyById(companyId);
+        }
+
+        if (((company && company.isDeleted) || companyId === null) && currentUserInformation.position != "SoftwareManager") {
+          await Swal.fire({
+            icon: 'error',
+            title: 'Empresa eliminada',
+            text: 'Su empresa ha sido eliminada del sistema. Por favor, contacte con el equipo de soporte.',
+            confirmButtonText: 'Entendido',
+            confirmButtonColor: '#d33'
+          });
+          return;
+        }
+
         this.$router.push({ name: "HomeView" });
       } catch (error) {
         this.errorMessage = error.message;
