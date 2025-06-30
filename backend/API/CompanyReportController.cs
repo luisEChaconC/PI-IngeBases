@@ -32,5 +32,21 @@ namespace backend.API
                     new { message = "Error al obtener el reporte de historial de pagos por empresa.", error = ex.Message });
             }
         }
+
+        [HttpGet("all")]
+        public async Task<IActionResult> GetAll()
+        {
+            try
+            {
+                var reports = await _getCompanyReportsQuery.ExecuteAllAsync();
+                var tableReport = new CompanyReportDto().MapToTableReportDto(reports);
+                return Ok(tableReport);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    new { message = "Error al obtener todos los reportes de historial de pagos por empresa.", error = ex.Message });
+            }
+        }
     }
 }

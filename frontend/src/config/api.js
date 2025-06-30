@@ -66,7 +66,12 @@ const API_CONFIG = {
             BASE: '/user',
             GET_BY_EMAIL: '/api/User/GetUserByEmail',
             GET_BY_EMAIL_DETAILED: '/api/User/GetUserInformationByEmail'
-        }
+        },
+
+        COMPANYREPORT: {
+            BASE: '/api/CompanyReport',
+            GET_ALL: '/api/CompanyReport/all',
+        },
     }
 };
 

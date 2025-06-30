@@ -1,6 +1,45 @@
 <template>
   <div class="p-4">
     <h1 class="text-2xl font-bold mb-4">Historial de pagos por empresa</h1>
+
+    <!-- Filtros de fecha -->
+    <div class="mb-4 bg-gray-300 p-6 rounded space-y-4">
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 items-center">
+        <!-- Fecha de inicio -->
+        <div class="flex flex-col">
+          <label for="startDate" class="mb-1 font-semibold">Fecha inicio:</label>
+          <input
+            type="date"
+            id="startDate"
+            v-model="startDate"
+            class="border rounded px-3 py-2"
+          />
+        </div>
+
+        <!-- Fecha de fin -->
+        <div class="flex flex-col">
+          <label for="endDate" class="mb-1 font-semibold">Fecha fin:</label>
+          <input
+            type="date"
+            id="endDate"
+            v-model="endDate"
+            class="border rounded px-3 py-2"
+          />
+        </div>
+
+        <!-- Botón de búsqueda -->
+        <div class="flex items-end">
+          <button
+            @click="searchByDate"
+            class="w-full bg-gray-500 text-black font-bold px-4 py-2 rounded hover:bg-gray-500 transition"
+            :disabled="loading"
+          >
+            Buscar
+          </button>
+        </div>
+      </div>
+    </div>
+
     <table class="min-w-full border border-gray-300">
       <thead class="bg-gray-200">
         <tr>
@@ -31,44 +70,87 @@
 </template>
 
 <script>
+import companyReportService from '@/services/companyReportService';
+
 export default {
   name: "TablaEmpresas",
   data() {
     return {
-      empresas: [
-        {
-          nombre: "Aron Corporation",
-          frecuenciaPago: "Quincenal",
-          periodoPago: "1 al 15",
-          fechaPago: "15/06/2025",
-          salarioBruto: 500000,
-          cargasSociales: 135000,
-          deducciones: 20000,
-          costoEmpleador: 635000,
-        },
-        {
-          nombre: "Italy S.A.",
-          frecuenciaPago: "Mensual",
-          periodoPago: "1 al 30",
-          fechaPago: "30/06/2025",
-          salarioBruto: 750000,
-          cargasSociales: 202500,
-          deducciones: 35000,
-          costoEmpleador: 952500,
-        },
-        {
-          nombre: "Games S.A.",
-          frecuenciaPago: "Semanal",
-          periodoPago: "17 al 23",
-          fechaPago: "23/06/2025",
-          salarioBruto: 250000,
-          cargasSociales: 67500,
-          deducciones: 10000,
-          costoEmpleador: 317500,
-        },
-      ],
+      empresas: [],
+      loading: false,
+      error: null,
+      startDate: '',
+      endDate: ''
     };
   },
+  mounted() {
+    this.fetchAllReports();
+  },
+  methods: {
+    translateFrecuenciaPago(value) {
+      switch (value) {
+        case "Monthly":
+          return "Mensual";
+        case "Biweekly":
+          return "Quincenal";
+        case "Weekly":
+          return "Semanal";
+        default:
+          return value;
+      }
+    },
+    async fetchAllReports() {
+      this.loading = true;
+      this.error = null;
+      try {
+        const data = await companyReportService.getAllCompanyReports();
+    
+        this.empresas = data.rows.map(row => ({
+          nombre: row[data.columns.indexOf("Nombre")],
+          frecuenciaPago: this.translateFrecuenciaPago(row[data.columns.indexOf("FrecuenciaPago")]),
+          periodoPago: row[data.columns.indexOf("PeriodoPago")],
+          fechaPago: row[data.columns.indexOf("FechaPago")],
+          salarioBruto: row[data.columns.indexOf("SalarioBruto")] ?? 0,
+          cargasSociales: row[data.columns.indexOf("CargasSociales")] ?? 0,
+          deducciones: row[data.columns.indexOf("DeduccionesVoluntarias")] ?? 0,
+          costoEmpleador: row[data.columns.indexOf("CostoEmpleador")] ?? 0,
+        }));
+      } catch (err) {
+        this.error = err.message || 'Error al cargar los reportes';
+      } finally {
+        this.loading = false;
+      }
+    },
+    async fetchReportsByDate(startDate, endDate) {
+      this.loading = true;
+      this.error = null;
+      try {
+        const data = await companyReportService.getCompanyReportsByDate(startDate, endDate);
+    
+        this.empresas = data.rows.map(row => ({
+          nombre: row[data.columns.indexOf("Nombre")],
+          frecuenciaPago: this.translateFrecuenciaPago(row[data.columns.indexOf("FrecuenciaPago")]),
+          periodoPago: row[data.columns.indexOf("PeriodoPago")],
+          fechaPago: row[data.columns.indexOf("FechaPago")],
+          salarioBruto: row[data.columns.indexOf("SalarioBruto")] ?? 0,
+          cargasSociales: row[data.columns.indexOf("CargasSociales")] ?? 0,
+          deducciones: row[data.columns.indexOf("DeduccionesVoluntarias")] ?? 0,
+          costoEmpleador: row[data.columns.indexOf("CostoEmpleador")] ?? 0,
+        }));
+      } catch (err) {
+        this.error = err.message || 'Error al cargar los reportes';
+      } finally {
+        this.loading = false;
+      }
+    },
+    searchByDate() {
+      if (!this.startDate || !this.endDate) {
+        this.error = "Por favor ingrese ambas fechas.";
+        return;
+      }
+      this.fetchReportsByDate(this.startDate, this.endDate);
+    }
+  }
 };
 </script>
 

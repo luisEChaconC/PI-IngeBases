@@ -4,6 +4,7 @@ using backend.Repositories;
 public interface IGetCompanyReportsQuery
 {
     Task<List<CompanyReportDto>> ExecuteAsync(DateTime startDate, DateTime endDate);
+    Task<List<CompanyReportDto>> ExecuteAllAsync();
 }
 
 public class GetCompanyReportsQuery : IGetCompanyReportsQuery
@@ -16,5 +17,10 @@ public class GetCompanyReportsQuery : IGetCompanyReportsQuery
     public async Task<List<CompanyReportDto>> ExecuteAsync(DateTime startDate, DateTime endDate)
     {
         return await _repository.GetCompanyReportsAsync(startDate, endDate);
+    }
+
+    public async Task<List<CompanyReportDto>> ExecuteAllAsync()
+    {
+        return await _repository.GetAllCompanyReportsAsync();
     }
 }
