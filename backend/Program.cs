@@ -21,6 +21,7 @@ using backend.Application.Queries.Payroll;
 using backend.Repositories;
 using backend.Application.Payslip.Queries;
 using backend.Application.Payslip.Services;
+using backend.Application.Queries.EmployerPayrollReport;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -113,6 +114,12 @@ builder.Services.AddScoped<IPayslipRepository, PayslipRepository>();
 builder.Services.AddScoped<GetPayslipsByEmployeeIdQuery>();
 builder.Services.AddScoped<GetPayslipByEmployeeIdAndStartDateQuery>();
 builder.Services.AddScoped<IBuildPayslipItems, BuildPayslipItems>();
+
+// Employer Payroll Report
+
+builder.Services.AddScoped<IEmployerPayrollReportRepository, EmployerPayrollReportRepository>();
+builder.Services.AddScoped<IGetEmployerEmployeePayrollReportQuery, GetEmployerEmployeePayrollReportQuery>();
+
 
 // Register Strategy Orchestrator
 builder.Services.AddScoped<GrossPaymentCalculationOrchestrator>();

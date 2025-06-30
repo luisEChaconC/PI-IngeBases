@@ -71,6 +71,10 @@ const API_CONFIG = {
             BASE: '/payslip',
             GET_BY_ID: (employeeId) => `/api/payslip/employee/${employeeId}`,
             GET_BY_ID_AND_DATE: (employeeId) => `/api/payslip/employee/${employeeId}/by-start-date`
+        },
+        EMPLOYER_REPORTS: {
+            BASE: '/employerPayrollReport',
+            GET_EMPLOYEE_PAYROLL_REPORT: (employerId, companyId) => `/api/employerPayrollReport/employee-payroll-report?employerId=${employerId}&companyId=${companyId}`,        
         }
     }
 };

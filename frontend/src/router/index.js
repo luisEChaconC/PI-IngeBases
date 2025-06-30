@@ -21,6 +21,7 @@ import UnauthorizedView from '@/views/UnauthorizedView.vue'
 import CurrentUserService from '@/services/currentUserService'
 import PayslipView from '@/views/PayslipView.vue'
 import PayslipList from '@/views/PayslipList.vue'
+import EmployerPayrollReportView from '@/views/EmployerPayrollReportView.vue'
 
 const routes = [
     { path: '/', redirect: '/login' },
@@ -50,8 +51,9 @@ const routes = [
             { path: '/timesheet-approvals', name: 'TimesheetApprovals', component: TimesheetApprovals, meta: {allowedPositions: ['Supervisor']} },
             { path: '/view-payslip', name: 'PayslipView', component: PayslipView, meta: {allowedPositions: ['Collaborator', 'Payroll Manager', 'Supervisor']}},
             { path: '/view-payslip-list', name: 'PayslipList', component: PayslipList, meta: {allowedPositions: ['Collaborator', 'Payroll Manager', 'Supervisor']}},
-            { path: '/view-payslip/:date', name: 'PayslipView', component: PayslipView, meta: {allowedPositions: ['Collaborator', 'Payroll Manager', 'Supervisor']}}
-        ],
+            { path: '/view-payslip/:date', name: 'PayslipView', component: PayslipView, meta: {allowedPositions: ['Collaborator', 'Payroll Manager', 'Supervisor']}},
+            { path: '/employee-payroll-payments', name: 'EmployerPayrollReportView', component: EmployerPayrollReportView, meta: { allowedPositions: ['Employer'] } }        
+          ],
     },
 ]
 
