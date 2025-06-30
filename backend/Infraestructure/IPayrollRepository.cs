@@ -8,5 +8,7 @@ namespace backend.Infraestructure
         Task<List<PayrollModel>> GetByCompanyIdAsync(Guid companyId);
         Task<List<PayrollSummaryDto>> GetSummaryByCompanyIdAsync(Guid companyId);
         Task<bool> CheckPayrollExistsAsync(Guid companyId, DateTime startDate, DateTime endDate);
+        decimal GetTotalGrossSalaryByPayrollId(Guid payrollId);
+
     }
 }

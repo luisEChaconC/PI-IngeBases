@@ -120,6 +120,12 @@ builder.Services.AddScoped<GrossPaymentCalculationOrchestrator>();
 builder.Services.AddScoped<ICalculateGrossPaymentQuery, CalculateGrossPaymentQuery>();
 builder.Services.AddScoped<IDisableBenefitForEmployeeCommand, DisableBenefitForEmployeeCommand>();
 
+// Employer Cost
+builder.Services.AddScoped<IEmployerCostRepository, EmployerCostRepository>();
+builder.Services.AddScoped<IEmployerCostStrategy, EmployerCostStrategy>();
+builder.Services.AddScoped<IEmployerCostFromPayrollCommand, EmployerCostFromPayrollCommand>();
+builder.Services.AddScoped<IGetEmployerCostQuery, GetEmployerCostQuery>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
