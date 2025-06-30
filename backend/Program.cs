@@ -19,6 +19,10 @@ using backend.Application.Orchestrators.Deduction;
 using backend.Application.Orchestrators.Payroll;
 using backend.Application.Queries.Payroll;
 using backend.Repositories;
+using backend.Application.Payslip.Queries;
+using backend.Application.Payslip.Services;
+using MediatR;
+using System.Reflection;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -39,6 +43,11 @@ builder.Services.AddControllers()
     {
         options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
     });
+
+builder.Services.AddMediatR(cfg =>
+{
+    cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly());
+});
 
 // Add services to the container.
 builder.Services.AddControllers();
@@ -104,6 +113,13 @@ builder.Services.AddScoped<IDeductionDetailRepository, DeductionDetailRepository
 builder.Services.AddScoped<IInsertDeductionDetailsCommand, InsertDeductionDetailsCommand>();
 
 
+//Payslip
+
+builder.Services.AddScoped<IPayslipRepository, PayslipRepository>();
+
+builder.Services.AddScoped<GetPayslipsByEmployeeIdQuery>();
+builder.Services.AddScoped<GetPayslipByEmployeeIdAndStartDateQuery>();
+builder.Services.AddScoped<IBuildPayslipItems, BuildPayslipItems>();
 builder.Services.AddScoped<ICompanyReportRepository, CompanyReportRepository>();
 builder.Services.AddScoped<IGetCompanyReportsQuery, GetCompanyReportsQuery>();
 

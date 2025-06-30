@@ -72,6 +72,12 @@ const API_CONFIG = {
             BASE: '/api/CompanyReport',
             GET_ALL: '/api/CompanyReport/all',
         },
+      
+        PAYSLIP: {
+            BASE: '/payslip',
+            GET_BY_ID: (employeeId) => `/api/payslip/employee/${employeeId}`,
+            GET_BY_ID_AND_DATE: (employeeId) => `/api/payslip/employee/${employeeId}/by-start-date`
+        }
     }
 };
 

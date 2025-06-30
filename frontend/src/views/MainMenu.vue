@@ -172,15 +172,15 @@ export default {
     reportsByRole() {
       const reports = {
         Collaborator: [
-          { name: "Desglose de pagos", route: "/current-payroll" }, 
+          { name: "Desglose de pagos", route: "/view-payslip-list" }, 
           { name: "Historial de pagos", route: "/payroll-history" },
         ],
         Supervisor: [
-          { name: "Desglose de pagos", route: "/current-payroll" },
+          { name: "Desglose de pagos", route: "/view-payslip-list" },
           { name: "Historial de pagos", route: "/payroll-history" },
         ],
         PayrollManager: [
-          { name: "Desglose de pagos", route: "/current-payroll" },
+          { name: "Desglose de pagos", route: "/view-payslip-list" },
           { name: "Historial de pagos", route: "/payroll-history" },
         ],
         Employer: [
