@@ -40,6 +40,14 @@
       </div>
     </div>
 
+    <button
+      @click="exportToExcel"
+      class="mb-4 bg-green-600 text-white font-bold px-4 py-2 rounded hover:bg-green-700 transition"
+      :disabled="loading"
+    >
+      Exportar a Excel
+    </button>
+
     <table class="min-w-full border border-gray-300">
       <thead class="bg-gray-200">
         <tr>
@@ -149,7 +157,57 @@ export default {
         return;
       }
       this.fetchReportsByDate(this.startDate, this.endDate);
-    }
+    },
+
+    async exportToExcel() {
+      this.loading = true;
+      this.error = null;
+      try {
+   
+        const columns = [
+          "Nombre", "FrecuenciaPago", "PeriodoPago", "FechaPago",
+          "SalarioBruto", "CargasSociales", "DeduccionesVoluntarias", "CostoEmpleador"
+        ];
+        const rows = this.empresas.map(e => [
+          e.nombre,
+          e.frecuenciaPago,
+          e.periodoPago,
+          e.fechaPago,
+          e.salarioBruto,
+          e.cargasSociales,
+          e.deducciones,
+          e.costoEmpleador
+        ]);
+        const payload = {
+          sheetName: "HistorialPagosEmpresa",
+          columns: columns,
+          rows: rows
+        };
+
+        const response = await fetch('https://localhost:5000/api/report/excel', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        if (!response.ok) throw new Error('Error al exportar el Excel');
+
+        const blob = await response.blob();
+        // Descarga el archivo
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', `${payload.sheetName}.xlsx`);
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        window.URL.revokeObjectURL(url);
+      } catch (err) {
+        this.error = err.message || 'Error al exportar el Excel';
+      } finally {
+        this.loading = false;
+      }
+    },
   }
 };
 </script>
