@@ -160,7 +160,6 @@ export default {
         "Deducciones voluntarias",
         "Costo empleador"
       ];
-      // Use filteredEmployees for export
       const rows = this.filteredEmployees.map(e => [
         e.employeeName,
         e.legalId,
@@ -187,7 +186,6 @@ export default {
       const companyRow = [`Empresa: ${this.companyName}`, ...Array(columns.length - 1).fill("")];
       const employerRow = [`Empleador: ${this.employerName}`, ...Array(columns.length - 1).fill("")];
 
-      // Final rows: columns, data, totals, blank, company, employer
       const excelRows = [...rows, blankRow, totalsRow, blankRow, companyRow, employerRow];
 
       const payload = {
