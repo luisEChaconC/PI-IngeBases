@@ -140,4 +140,18 @@ app.UseCors();
 app.UseAuthorization();
 app.MapControllers();
 
+// Send startup email
+using (var scope = app.Services.CreateScope())
+{
+    var emailCommand = scope.ServiceProvider.GetRequiredService<ISendEmailCommand>();
+    try
+    {
+        emailCommand.Execute("test@gmail.com", "Prueba de envío de correo", "Buenas tardes, este es un mensaje de prueba.");
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"Failed to send startup email: {ex.Message}");
+    }
+}
+
 app.Run();
