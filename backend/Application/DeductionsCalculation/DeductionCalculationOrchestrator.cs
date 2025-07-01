@@ -72,7 +72,15 @@ namespace backend.Application.DeductionCalculation
 
             foreach (var strategy in _strategies)
             {
-                var amount = strategy.CalculateDeduction(grossSalary, contractType, gender);
+            
+                var amount = strategy.CalculateDeduction(
+               grossSalary,
+               contractType,
+               gender,
+               benefit: null,
+               employeeId: null,
+               paymentDetailsId: paymentDetailsId);
+
                 if (amount > 0)
                 {
                     totalAmountDeduced += amount;
@@ -111,7 +119,7 @@ namespace backend.Application.DeductionCalculation
                 .Select(b => new
                 {
                     Benefit = b,
-                    Amount = _benefitStrategy.CalculateDeduction(grossSalary, contractType, gender, b, employeeId)
+                    Amount = _benefitStrategy.CalculateDeduction(grossSalary, contractType, gender, b, employeeId, paymentDetailsId)
                 })
                 .OrderBy(x => x.Amount)
                 .ToList();

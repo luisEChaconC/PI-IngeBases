@@ -1,10 +1,13 @@
 using System;
 using backend.Domain;
+using backend.Application.Commands; 
 
 namespace backend.Domain.Strategies
 {
     public class CcssDeductionStrategy : IDeductionCalculationStrategy
     {
+        private readonly IUpdateEmployerChargesCommand _updateEmployerChargesCommand;
+
         private const decimal WorkerSemRate = 0.0550m;
         private const decimal WorkerIvmRate = 0.0417m;
         private const decimal EmployerSemRate = 0.0925m;
@@ -23,14 +26,34 @@ namespace backend.Domain.Strategies
         private const decimal MinBaseSem = 341227m;
         private const decimal MinBaseIvm = 319384m;
 
+        
+        public CcssDeductionStrategy(IUpdateEmployerChargesCommand updateEmployerChargesCommand)
+        {
+            _updateEmployerChargesCommand = updateEmployerChargesCommand;
+        }
+
+        
         public decimal CalculateDeduction(
             decimal grossSalary,
             string contractType,
             string gender,
             Benefit? benefit = null,
-            Guid? employeeId = null)
+            Guid? employeeId = null,
+            Guid? paymentDetailsId = null)   
         {
-            return CalculateFullDeduction(grossSalary, contractType, gender, benefit, employeeId).WorkerDeduction;
+            var result = CalculateFullDeduction(grossSalary, contractType, gender, benefit, employeeId);
+
+            
+            if (paymentDetailsId.HasValue)
+            {
+                
+                _updateEmployerChargesCommand
+                    .ExecuteAsync(paymentDetailsId.Value, result.EmployerDeduction)
+                    .GetAwaiter()
+                    .GetResult();
+            }
+
+            return result.WorkerDeduction;
         }
 
         public (decimal WorkerDeduction, decimal EmployerDeduction) CalculateFullDeduction(
@@ -62,7 +85,16 @@ namespace backend.Domain.Strategies
             decimal opc = Math.Round(grossSalary * OpcRate, 2);
             decimal ins = Math.Round(grossSalary * InsRate, 2);
 
-            decimal totalEmployer = semEmployer + ivmEmployer + bpopEmployer + bpopLpt + familyAllocations + imas + ina + fcl + opc + ins;
+            decimal totalEmployer = semEmployer
+                                  + ivmEmployer
+                                  + bpopEmployer
+                                  + bpopLpt
+                                  + familyAllocations
+                                  + imas
+                                  + ina
+                                  + fcl
+                                  + opc
+                                  + ins;
 
             return (totalWorker, totalEmployer);
         }

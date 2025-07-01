@@ -18,15 +18,16 @@ namespace backend.Infraestructure
             var id = Guid.NewGuid();
 
             using var connection = new SqlConnection(_connectionString);
-            var command = new SqlCommand(@"
-                INSERT INTO PaymentDetails (Id, PayrollId, EmployeeId, GrossSalary, IssueDate)
-                VALUES (@Id, @PayrollId, @EmployeeId, @GrossSalary, @IssueDate)", connection);
+                var command = new SqlCommand(@"
+            INSERT INTO PaymentDetails (Id, PayrollId, EmployeeId, GrossSalary, IssueDate, EmployerCharges)
+            VALUES (@Id, @PayrollId, @EmployeeId, @GrossSalary, @IssueDate, @EmployerCharges)", connection);
 
             command.Parameters.AddWithValue("@Id", id);
             command.Parameters.AddWithValue("@PayrollId", (object?)model.PayrollId ?? DBNull.Value);
             command.Parameters.AddWithValue("@EmployeeId", model.EmployeeId);
             command.Parameters.AddWithValue("@GrossSalary", model.GrossSalary);
             command.Parameters.AddWithValue("@IssueDate", model.IssueDate);
+            command.Parameters.AddWithValue("@EmployerCharges", (object?)model.EmployerCharges ?? DBNull.Value);
 
             await connection.OpenAsync();
             await command.ExecuteNonQueryAsync();
@@ -102,8 +103,27 @@ namespace backend.Infraestructure
                 PayrollId = reader["PayrollId"] != DBNull.Value ? reader.GetGuid(reader.GetOrdinal("PayrollId")) : null,
                 EmployeeId = reader.GetGuid(reader.GetOrdinal("EmployeeId")),
                 GrossSalary = reader.GetDecimal(reader.GetOrdinal("GrossSalary")),
-                IssueDate = reader.GetDateTime(reader.GetOrdinal("IssueDate"))
+                IssueDate = reader.GetDateTime(reader.GetOrdinal("IssueDate")),
+                 EmployerCharges = reader["EmployerCharges"] != DBNull.Value
+                ? reader.GetDecimal(reader.GetOrdinal("EmployerCharges"))
+                : (decimal?)null
             };
         }
+
+         public async Task UpdateEmployerChargesAsync(Guid paymentDetailsId, decimal employerCharges)
+            {
+                using var connection = new SqlConnection(_connectionString);
+                var command = new SqlCommand(@"
+                    UPDATE PaymentDetails
+                    SET EmployerCharges = @EmployerCharges
+                    WHERE Id = @Id", connection);
+
+                command.Parameters.AddWithValue("@EmployerCharges", employerCharges);
+                command.Parameters.AddWithValue("@Id", paymentDetailsId);
+
+                await connection.OpenAsync();
+                await command.ExecuteNonQueryAsync();
+            }
+
     }
 }
