@@ -5,23 +5,25 @@ namespace backend.Application.Commands.Payroll
 {
     public class EmployerCostFromPayrollCommand : IEmployerCostFromPayrollCommand
     {
-        private readonly IPayrollRepository _payrollRepository;
+        private readonly IGetGrossSalaryByPayrollIdQuery _grossSalaryQuery;
         private readonly IEmployerCostRepository _employerCostRepository;
         private readonly IEmployerCostStrategy _strategy;
 
         public EmployerCostFromPayrollCommand(
-            IPayrollRepository payrollRepository,
+            IGetGrossSalaryByPayrollIdQuery grossSalaryQuery,
             IEmployerCostRepository employerCostRepository,
             IEmployerCostStrategy strategy)
         {
-            _payrollRepository = payrollRepository;
+            _grossSalaryQuery = grossSalaryQuery;
             _employerCostRepository = employerCostRepository;
             _strategy = strategy;
         }
 
+
+
         public void Execute(Guid payrollId)
         {
-            var grossSalary = _payrollRepository.GetTotalGrossSalaryByPayrollId(payrollId);
+            var grossSalary = _grossSalaryQuery.Execute(payrollId);
             var costModel = _strategy.Calculate(payrollId, grossSalary);
             _employerCostRepository.Insert(costModel);
         }

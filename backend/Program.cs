@@ -125,6 +125,7 @@ builder.Services.AddScoped<IEmployerCostRepository, EmployerCostRepository>();
 builder.Services.AddScoped<IEmployerCostStrategy, EmployerCostStrategy>();
 builder.Services.AddScoped<IEmployerCostFromPayrollCommand, EmployerCostFromPayrollCommand>();
 builder.Services.AddScoped<IGetEmployerCostQuery, GetEmployerCostQuery>();
+builder.Services.AddScoped<IGetGrossSalaryByPayrollIdQuery, GetGrossSalaryByPayrollIdQuery>();
 
 var app = builder.Build();
 
