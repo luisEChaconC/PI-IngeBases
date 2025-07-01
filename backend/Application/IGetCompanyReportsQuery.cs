@@ -16,8 +16,11 @@ public class GetCompanyReportsQuery : IGetCompanyReportsQuery
     }
     public async Task<List<CompanyReportDto>> ExecuteAsync(DateTime startDate, DateTime endDate)
     {
+        if (startDate > endDate)
+            throw new ArgumentException("La fecha de inicio no puede ser posterior a la fecha de fin.");
         return await _repository.GetCompanyReportsAsync(startDate, endDate);
     }
+
 
     public async Task<List<CompanyReportDto>> ExecuteAllAsync()
     {

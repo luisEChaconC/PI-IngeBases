@@ -2,53 +2,34 @@
   <div class="p-4">
     <h1 class="text-2xl font-bold mb-4">Historial de pagos por empresa</h1>
 
-    <!-- Filtros de fecha -->
-    <div class="mb-4 bg-gray-300 p-6 rounded space-y-4">
-      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 items-center">
-        <!-- Fecha de inicio -->
-        <div class="flex flex-col">
-          <label for="startDate" class="mb-1 font-semibold">Fecha inicio:</label>
-          <input
-            type="date"
-            id="startDate"
-            v-model="startDate"
-            class="border rounded px-3 py-2"
-          />
-        </div>
+    <!-- Sección de filtros de fechas -->
+    <div class="contenedor-fechas">
+      <div class="filtro-fecha">
+        <label for="startDate">📅 Fecha inicio:</label>
+        <input type="date" id="startDate" v-model="startDate" />
+      </div>
 
-        <!-- Fecha de fin -->
-        <div class="flex flex-col">
-          <label for="endDate" class="mb-1 font-semibold">Fecha fin:</label>
-          <input
-            type="date"
-            id="endDate"
-            v-model="endDate"
-            class="border rounded px-3 py-2"
-          />
-        </div>
+      <div class="filtro-fecha">
+        <label for="endDate">📅 Fecha fin:</label>
+        <input type="date" id="endDate" v-model="endDate" />
+      </div>
 
-        <!-- Botón de búsqueda -->
-        <div class="flex items-end">
-          <button
-            @click="searchByDate"
-            class="w-full bg-gray-500 text-black font-bold px-4 py-2 rounded hover:bg-gray-500 transition"
-            :disabled="loading"
-          >
-            Buscar
-          </button>
-        </div>
+      <div class="filtro-fecha" style="justify-content: end;">
+        <button @click="searchByDate" class="bg-blue-600 text-black font-semibold px-4 py-2 rounded-lg hover:bg-blue-700 transition disabled:opacity-50 w-full" :disabled="loading">
+          🔍 Buscar
+        </button>
       </div>
     </div>
 
-    <button
-      @click="exportToExcel"
-      class="mb-4 bg-green-600 text-white font-bold px-4 py-2 rounded hover:bg-green-700 transition"
-      :disabled="loading"
-    >
-      Exportar a Excel
-    </button>
+    <!-- Botón separado para exportar -->
+    <div class="mb-4 flex justify-end">
+      <button @click="exportToExcel" class="flex items-center gap-2 bg-green-600 text-black font-semibold px-4 py-2 rounded-lg hover:bg-green-700 transition disabled:opacity-50" :disabled="loading">
+        📤 Exportar a Excel
+      </button>
+    </div>
 
-    <table class="min-w-full border border-gray-300">
+    <!-- Tabla solo si hay datos -->
+    <table v-if="empresas.length > 0" class="min-w-full border border-gray-300">
       <thead class="bg-gray-200">
         <tr>
           <th class="border px-4 py-2">Nombre de la empresa</th>
@@ -74,6 +55,13 @@
         </tr>
       </tbody>
     </table>
+
+   <div v-if="!loading && empresas.length === 0" class="sin-planillas">
+      <span class="emoji">📂</span>
+      <h2>No hay planillas en el rango seleccionado</h2>
+      <p>Intenta con un rango de fechas diferente o muestra todos los registros</p>
+      <button @click="fetchAllReports" class="boton-ver-todos">🔄 Ver todos los registros</button>
+    </div>
   </div>
 </template>
 
@@ -225,4 +213,91 @@ td {
 th {
   background-color: #f3f4f6;
 }
+
+.sin-planillas {
+  background-color: #fff9db; 
+  color: #5c4400; 
+  text-align: center;
+  padding: 3rem 2rem;
+  border-radius: 12px;
+  font-size: 1.2rem;
+  border: 1px solid #ffe8a1;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.05);
+  max-width: 600px;
+  margin: 2rem auto;
+  animation: fadeIn 0.6s ease-in-out;
+}
+
+.sin-planillas .emoji {
+  font-size: 2.5rem;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.sin-planillas h2 {
+  font-size: 1.8rem;
+  margin-bottom: 0.5rem;
+}
+
+.sin-planillas p {
+  font-size: 1rem;
+  color: #7a6200;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.filtro-fecha {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin-bottom: 1rem;
+  max-width: 250px;
+}
+
+
+.filtro-fecha label {
+  font-weight: 600;
+  color: #333;
+  font-size: 0.95rem;
+}
+
+
+.filtro-fecha input[type="date"] {
+  padding: 0.6rem 1rem;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  font-size: 1rem;
+  outline: none;
+  transition: border-color 0.3s ease;
+}
+
+.filtro-fecha input[type="date"]:focus {
+  border-color: #2563eb; 
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+}
+
+.contenedor-fechas {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: left;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+@media (min-width: 640px) {
+  .contenedor-fechas {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+
 </style>
