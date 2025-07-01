@@ -87,6 +87,7 @@ builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
 builder.Services.AddScoped<GetBenefitsQuery>();
 builder.Services.AddScoped<GetBenefitByIdQuery>();
 builder.Services.AddScoped<CreateBenefitCommand>();
+builder.Services.AddScoped<DeleteBenefitCommand>();
 builder.Services.AddScoped<AssignBenefitsToEmployeeCommand>();
 builder.Services.AddScoped<GetAssignedBenefitsQuery>();
 builder.Services.AddScoped<UpdateBenefitCommand>();
@@ -122,6 +123,7 @@ builder.Services.AddScoped<GetPayslipByEmployeeIdAndStartDateQuery>();
 builder.Services.AddScoped<IBuildPayslipItems, BuildPayslipItems>();
 builder.Services.AddScoped<ICompanyReportRepository, CompanyReportRepository>();
 builder.Services.AddScoped<IGetCompanyReportsQuery, GetCompanyReportsQuery>();
+
 
 
 // Register Strategy Orchestrator

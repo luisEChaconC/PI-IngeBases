@@ -16,8 +16,8 @@ namespace backend.Infraestructure
         public void InsertDeductionDetail(DeductionDetailModel detail)
         {
             const string query = @"
-                INSERT INTO DeductionDetails (Id, Name, AmountDeduced, PaymentDetailsId, DeductionType)
-                VALUES (@Id, @Name, @AmountDeduced, @PaymentDetailsId, @DeductionType)";
+                INSERT INTO DeductionDetails (Id, Name, AmountDeduced, PaymentDetailsId, DeductionType, BenefitId)
+                VALUES (@Id, @Name, @AmountDeduced, @PaymentDetailsId, @DeductionType, @BenefitId)";
 
             using var connection = new SqlConnection(_connectionString);
             using var command = new SqlCommand(query, connection);
@@ -27,6 +27,7 @@ namespace backend.Infraestructure
             command.Parameters.AddWithValue("@AmountDeduced", detail.AmountDeduced);
             command.Parameters.AddWithValue("@PaymentDetailsId", detail.PaymentDetailsId);
             command.Parameters.AddWithValue("@DeductionType", detail.DeductionType);
+            command.Parameters.AddWithValue("@BenefitId", (object)detail.BenefitId ?? DBNull.Value);
 
             connection.Open();
             command.ExecuteNonQuery();
