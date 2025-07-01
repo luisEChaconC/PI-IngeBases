@@ -34,6 +34,16 @@ namespace backend.Infraestructure.service
 
         public void SendEmail(string to, string subject, string body, string? attachmentBase64 = null, string? attachmentFilename = null, string? attachmentMimeType = null)
         {
+            if (string.IsNullOrWhiteSpace(to))
+            {
+                throw new ArgumentException("Email recipient cannot be null or empty", nameof(to));
+            }
+
+            if (string.IsNullOrWhiteSpace(subject))
+            {
+                throw new ArgumentException("Email subject cannot be null or empty", nameof(subject));
+            }
+
             try
             {
                 using (var mailMessage = new MailMessage())
@@ -65,6 +75,16 @@ namespace backend.Infraestructure.service
 
         public void SendEmailBatch(List<string> to, string subject, string body)
         {
+            if (to == null || !to.Any())
+            {
+                throw new ArgumentException("Recipient list cannot be null or empty", nameof(to));
+            }
+
+            if (string.IsNullOrWhiteSpace(subject))
+            {
+                throw new ArgumentException("Email subject cannot be null or empty", nameof(subject));
+            }
+
             try
             {
                 using (var mailMessage = new MailMessage())
