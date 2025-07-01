@@ -21,6 +21,8 @@ using backend.Application.Queries.Payroll;
 using backend.Repositories;
 using backend.Application.Payslip.Queries;
 using backend.Application.Payslip.Services;
+using MediatR;
+using System.Reflection;
 using backend.Application.Queries.EmployerPayrollReport;
 
 
@@ -42,6 +44,16 @@ builder.Services.AddControllers()
     {
         options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
     });
+
+builder.Services.AddMediatR(cfg =>
+{
+    cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly());
+});
+
+builder.Services.AddMediatR(cfg =>
+{
+    cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly());
+});
 
 // Add services to the container.
 builder.Services.AddControllers();
@@ -81,6 +93,7 @@ builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
 builder.Services.AddScoped<GetBenefitsQuery>();
 builder.Services.AddScoped<GetBenefitByIdQuery>();
 builder.Services.AddScoped<CreateBenefitCommand>();
+builder.Services.AddScoped<DeleteBenefitCommand>();
 builder.Services.AddScoped<AssignBenefitsToEmployeeCommand>();
 builder.Services.AddScoped<GetAssignedBenefitsQuery>();
 builder.Services.AddScoped<UpdateBenefitCommand>();
@@ -119,6 +132,7 @@ builder.Services.AddScoped<IBuildPayslipItems, BuildPayslipItems>();
 
 builder.Services.AddScoped<IEmployerPayrollReportRepository, EmployerPayrollReportRepository>();
 builder.Services.AddScoped<IGetEmployerEmployeePayrollReportQuery, GetEmployerEmployeePayrollReportQuery>();
+
 
 
 // Register Strategy Orchestrator
