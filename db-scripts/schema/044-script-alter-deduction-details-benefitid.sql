@@ -1,0 +1,6 @@
+ALTER TABLE DeductionDetails
+ADD BenefitId UNIQUEIDENTIFIER NULL;
+
+ALTER TABLE DeductionDetails
+ADD CONSTRAINT FK_DeductionDetails_BenefitId
+FOREIGN KEY (BenefitId) REFERENCES Benefits(Id) ON DELETE NO ACTION;
