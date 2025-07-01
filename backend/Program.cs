@@ -21,6 +21,8 @@ using backend.Application.Queries.Payroll;
 using backend.Repositories;
 using backend.Application.Payslip.Queries;
 using backend.Application.Payslip.Services;
+using backend.Infraestructure.service;
+using backend.Application.Services;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -119,6 +121,10 @@ builder.Services.AddScoped<GrossPaymentCalculationOrchestrator>();
 
 builder.Services.AddScoped<ICalculateGrossPaymentQuery, CalculateGrossPaymentQuery>();
 builder.Services.AddScoped<IDisableBenefitForEmployeeCommand, DisableBenefitForEmployeeCommand>();
+
+// Email service
+builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddScoped<ISendEmailCommand, SendEmailCommand>();
 
 var app = builder.Build();
 
