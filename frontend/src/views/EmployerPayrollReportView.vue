@@ -1,5 +1,4 @@
 <template>
-
   <div class="position-relative">
     <router-link
       to="/login"
@@ -19,8 +18,9 @@
           class="form-control me-2"
           placeholder="Filtrar campos..."
           style="height: 60px;"
+          v-model="search"
         >
-        <button class="btn btn-outline-primary px-4" style="height: 60px;">
+        <button class="btn btn-outline-primary px-4" style="height: 60px;" @click="generateExcel">
           Generar Excel
         </button>
       </div>
@@ -46,7 +46,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="(row, idx) in employees" :key="idx">
+        <tr v-for="(row, idx) in filteredEmployees" :key="idx">
           <td>{{ row.employeeName }}</td>
           <td>{{ row.legalId }}</td>
           <td>{{ translateEmployeeType(row.employeeType) }}</td>
@@ -73,6 +73,7 @@
 
 <script>
 import EmployerReportsService from '@/services/employerReportsService';
+import ExcelService from '@/services/excelService';
 import currentUserService from "@/services/currentUserService";
 
 export default {
@@ -82,20 +83,36 @@ export default {
       companyName: '',
       employerName: '',
       employees: [],
+      search: ''
     }
   },
   computed: {
+    filteredEmployees() {
+      if (!this.search) return this.employees;
+      const searchLower = this.search.toLowerCase();
+      return this.employees.filter(e =>
+        (e.employeeName && e.employeeName.toLowerCase().includes(searchLower)) ||
+        (e.legalId && e.legalId.toLowerCase().includes(searchLower)) ||
+        (e.employeeType && this.translateEmployeeType(e.employeeType).toLowerCase().includes(searchLower)) ||
+        (e.paymentPeriod && e.paymentPeriod.toLowerCase().includes(searchLower)) ||
+        (e.paymentDate && e.paymentDate.toLowerCase().includes(searchLower)) ||
+        (e.grossSalary && this.formatCurrency(e.grossSalary).toLowerCase().includes(searchLower)) ||
+        (e.employerSocialCharges && this.formatCurrency(e.employerSocialCharges).toLowerCase().includes(searchLower)) ||
+        (e.voluntaryDeductions && this.formatCurrency(e.voluntaryDeductions).toLowerCase().includes(searchLower)) ||
+        (e.employerCost && this.formatCurrency(e.employerCost).toLowerCase().includes(searchLower))
+      );
+    },
     totalGrossSalary() {
-      return this.formatCurrency(this.employees.reduce((sum, r) => sum + (r.grossSalary || 0), 0));
+      return this.formatCurrency(this.filteredEmployees.reduce((sum, r) => sum + (r.grossSalary || 0), 0));
     },
     totalEmployerSocialCharges() {
-      return this.formatCurrency(this.employees.reduce((sum, r) => sum + (r.employerSocialCharges || 0), 0));
+      return this.formatCurrency(this.filteredEmployees.reduce((sum, r) => sum + (r.employerSocialCharges || 0), 0));
     },
     totalVoluntaryDeductions() {
-      return this.formatCurrency(this.employees.reduce((sum, r) => sum + (r.voluntaryDeductions || 0), 0));
+      return this.formatCurrency(this.filteredEmployees.reduce((sum, r) => sum + (r.voluntaryDeductions || 0), 0));
     },
     totalEmployerCost() {
-      return this.formatCurrency(this.employees.reduce((sum, r) => sum + (r.employerCost || 0), 0));
+      return this.formatCurrency(this.filteredEmployees.reduce((sum, r) => sum + (r.employerCost || 0), 0));
     }
   },
   methods: {
@@ -129,6 +146,70 @@ export default {
         this.companyName = '';
         this.employerName = '';
         this.employees = [];
+      }
+    },
+    async generateExcel() {
+      const columns = [
+        "Nombre empleado",
+        "Cédula",
+        "Tipo de empleado",
+        "Periodo de pago",
+        "Fecha de pago",
+        "Salario Bruto",
+        "Cargas sociales empleador",
+        "Deducciones voluntarias",
+        "Costo empleador"
+      ];
+      // Use filteredEmployees for export
+      const rows = this.filteredEmployees.map(e => [
+        e.employeeName,
+        e.legalId,
+        this.translateEmployeeType(e.employeeType),
+        e.paymentPeriod,
+        e.paymentDate,
+        this.formatCurrency(e.grossSalary),
+        this.formatCurrency(e.employerSocialCharges),
+        this.formatCurrency(e.voluntaryDeductions),
+        this.formatCurrency(e.employerCost)
+      ]);
+      const totalsRow = [
+        "Totales",
+        "",
+        "",
+        "",
+        "",
+        this.totalGrossSalary,
+        this.totalEmployerSocialCharges,
+        this.totalVoluntaryDeductions,
+        this.totalEmployerCost
+      ];
+      const blankRow = Array(columns.length).fill("");
+      const companyRow = [`Empresa: ${this.companyName}`, ...Array(columns.length - 1).fill("")];
+      const employerRow = [`Empleador: ${this.employerName}`, ...Array(columns.length - 1).fill("")];
+
+      // Final rows: columns, data, totals, blank, company, employer
+      const excelRows = [...rows, blankRow, totalsRow, blankRow, companyRow, employerRow];
+
+      const payload = {
+        sheetName: "ReportePagosEmpleados",
+        columns: columns,
+        rows: excelRows
+      };
+      try {
+        const blobData = await ExcelService.generateExcel(payload);
+        const blob = new Blob([blobData], {
+          type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        });
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.setAttribute("download", "ReportePagosEmpleados.xlsx");
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      } catch (error) {
+        console.error("Error exportando:", error);
+        alert("Ocurrió un error al generar el Excel.");
       }
     }
   },
