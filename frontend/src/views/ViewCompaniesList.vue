@@ -12,7 +12,7 @@
       <div class="card shadow">
         <div class="card-body">
           <h2 class="card-title mb-4">Empresas</h2>
-          <div class="table-responsive" style="max-height: 600px; overflow-y: auto;">
+          <div class="table-responsive" id="table-to-export" style="max-height: 600px; overflow-y: auto;">
             <table class="table table-striped table-bordered">
               <thead class="table-dark">
                 <tr>
@@ -38,16 +38,21 @@
               </tbody>
             </table>
           </div>
+          <div class="mt-3 text-end">
+            <button class="btn btn-primary" @click="exportToPdf">Exportar a PDF</button>
+          </div>
         </div>
       </div>
     </div>
   </div>
+  
 </template>
 
 <script>
 import companyService from '@/services/companyService';
 import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
+import { generatePdfFromElement } from '@/utils/fileUtils';
 
 export default {
   name: 'ViewCompaniesList',
@@ -68,13 +73,29 @@ export default {
       router.push('/view-company-info'); 
     };
 
+    const exportToPdf = async () => {
+      try {
+        const tableElement = document.getElementById('table-to-export');
+        if (!tableElement) {
+          console.error("Table element not found!");
+          return;
+        }
+        console.log("Table element found:", tableElement);
+        const pdf = await generatePdfFromElement(tableElement, 'empresas.pdf');
+        pdf.triggerUserDownload();
+      } catch (error) {
+        console.error("Error exporting to PDF:", error);
+      }
+    };
+
     onMounted(() => {
       getCompanies();
     });
 
     return {
       companies,
-      verEmpresa, 
+      verEmpresa,
+      exportToPdf,
     };
   },
 };
