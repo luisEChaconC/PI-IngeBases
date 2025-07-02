@@ -20,5 +20,7 @@ namespace backend.Domain
 
         [Required]
         public DateTime IssueDate { get; set; }
+        
+        public decimal? EmployerCharges { get; set; }
     }
 }
