@@ -19,9 +19,7 @@
 
       <table>
         <tbody>
-          <tr><td>Salario empleados por horas</td><td>₡ -</td></tr>
-          <tr><td>Salario tiempo completo</td><td>₡ -</td></tr>
-          <tr><td>Salario servicios profesionales</td><td>₡ -</td></tr>
+          
 
           <tr class="bold">
             <td>Total salarios</td>
