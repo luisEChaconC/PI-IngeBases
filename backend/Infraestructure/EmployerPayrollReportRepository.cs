@@ -38,18 +38,38 @@ namespace backend.Infraestructure
                         report.CompanyName ??= reader.GetString(reader.GetOrdinal("CompanyName"));
                         report.EmployerName ??= reader.GetString(reader.GetOrdinal("EmployerName"));
 
-                        report.Employees.Add(new EmployeePayrollInfoDto
+                        // Read employee fields
+                        var employeeName = reader.GetString(reader.GetOrdinal("EmployeeName"));
+                        var legalId = reader.GetString(reader.GetOrdinal("LegalId"));
+                        var employeeType = reader.GetString(reader.GetOrdinal("EmployeeType"));
+                        var paymentPeriod = reader.GetString(reader.GetOrdinal("PaymentPeriod"));
+                        var paymentDate = reader.GetString(reader.GetOrdinal("PaymentDate"));
+                        var grossSalary = reader.GetDecimal(reader.GetOrdinal("GrossSalary"));
+                        var employerSocialCharges = Convert.ToDecimal(reader["EmployerSocialCharges"]);
+                        var voluntaryDeductions = Convert.ToDecimal(reader["VoluntaryDeductions"]);
+                        var employerCost = Convert.ToDecimal(reader["EmployerCost"]);
+
+                        // Only add if there is real employee data
+                        if (!string.IsNullOrWhiteSpace(employeeName) 
+                            || !string.IsNullOrWhiteSpace(legalId) 
+                            || grossSalary > 0 
+                            || employerSocialCharges > 0 
+                            || voluntaryDeductions > 0 
+                            || employerCost > 0)
                         {
-                            EmployeeName = reader.GetString(reader.GetOrdinal("EmployeeName")),
-                            LegalId = reader.GetString(reader.GetOrdinal("LegalId")),
-                            EmployeeType = reader.GetString(reader.GetOrdinal("EmployeeType")),
-                            PaymentPeriod = reader.GetString(reader.GetOrdinal("PaymentPeriod")),
-                            PaymentDate = reader.GetString(reader.GetOrdinal("PaymentDate")),
-                            GrossSalary = reader.GetDecimal(reader.GetOrdinal("GrossSalary")),
-                            EmployerSocialCharges = Convert.ToDecimal(reader["EmployerSocialCharges"]),
-                            VoluntaryDeductions = Convert.ToDecimal(reader["VoluntaryDeductions"]),
-                            EmployerCost = Convert.ToDecimal(reader["EmployerCost"])
-                        });
+                            report.Employees.Add(new EmployeePayrollInfoDto
+                            {
+                                EmployeeName = employeeName,
+                                LegalId = legalId,
+                                EmployeeType = employeeType,
+                                PaymentPeriod = paymentPeriod,
+                                PaymentDate = paymentDate,
+                                GrossSalary = grossSalary,
+                                EmployerSocialCharges = employerSocialCharges,
+                                VoluntaryDeductions = voluntaryDeductions,
+                                EmployerCost = employerCost
+                            });
+                        }
                     }
                 }
             }
