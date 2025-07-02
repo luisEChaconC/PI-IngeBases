@@ -15,7 +15,10 @@ const API_CONFIG = {
             GET_BY_ID: (employeeId) => `/api/EmployeeGetID/GetEmployeeById/${employeeId}`,
             UPDATE: '/api/Employee/UpdateEmployee',
             UPDATE_AS_EMPLOYER: '/api/Employer/UpdateEmployee',
-            HAS_PAYMENTS: (employeeId) => `/api/Employer/HasPayments/${employeeId}`
+            HAS_PAYMENTS: (employeeId) => `/api/Employer/HasPayments/${employeeId}`,
+            DELETE: (employeeId) => `/api/Employee/${employeeId}`
+
+
         },
         EMPLOYER: {
             BASE: '/employer',
