@@ -5,9 +5,13 @@
     <div v-if="loading" class="loading">Cargando...</div>
     <div v-else>
       <!-- Botón PDF -->
-      <div class="text-end mb-3">
-        <button class="btn btn-outline-primary" @click="exportToPdf">Descargar PDF</button>
-      </div>
+      <div class="mt-3 text-end">
+          <ExportDropdown 
+            element-id="employer-cost-report"
+            filename="costo-empleador.pdf"
+            email-subject="Costo Empleador"
+          />
+        </div>
 
       <div id="employer-cost-report">
         <p><strong class="blue">Nombre de la empresa:</strong> {{ company?.name || '-' }}</p>
@@ -64,7 +68,7 @@ import payrollService from '@/services/payrollService'
 import currentUserService from '@/services/currentUserService'
 import employerService from '@/services/employerService'
 import companyService from '@/services/companyService'
-import { generatePdfFromElement } from '@/utils/fileUtils'
+import ExportDropdown from '@/components/ExportDropdown.vue'
 
 const report = ref({})
 const payrolls = ref([])
@@ -94,20 +98,6 @@ function formatDateRange(start, end) {
 const getSelectedPayroll = computed(() =>
   payrolls.value.find(p => p.id === selectedPayrollId.value)
 )
-
-const exportToPdf = async () => {
-  try {
-    const element = document.getElementById('employer-cost-report')
-    if (!element) {
-      console.error('No se encontró el contenedor del reporte')
-      return
-    }
-    const pdf = await generatePdfFromElement(element, 'reporte-costos-empleador.pdf')
-    pdf.triggerUserDownload()
-  } catch (error) {
-    console.error('Error al exportar a PDF:', error)
-  }
-}
 
 onMounted(async () => {
   try {
