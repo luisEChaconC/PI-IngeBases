@@ -11,7 +11,7 @@
     </div>
 
   <div v-if="payslipData" class="d-flex justify-content-center align-items-center">
-    <div class="card shadow-sm p-4 rounded-4" style="width: 500px;">
+    <div class="card shadow-sm p-4 rounded-4" style="width: 500px;" id="payslip-to-export">
       <h5 class="fw-bold text-primary mb-1">
         PAGO – {{ payslipData.periodType }} ({{ payslipData.dateRange }})
       </h5>
@@ -58,7 +58,7 @@
 
       <div class="text-center">
         <button class="btn btn-outline-primary me-2">Enviar por correo</button>
-        <button class="btn btn-outline-primary">Descargar PDF</button>
+        <button class="btn btn-outline-primary" @click="exportToPdf">Descargar PDF</button>
       </div>
     </div>
   </div>
@@ -70,6 +70,7 @@ import {ref, onMounted} from 'vue'
 import { useRoute } from 'vue-router'
 import currentUserService from '@/services/currentUserService';
 import payslipService from '@/services/payslipService';
+import { generatePdfFromElement } from '@/utils/fileUtils';
 
 const route = useRoute()
 const payslipDate = route.params.date
@@ -97,6 +98,20 @@ const formatCurrency = (amount) => {
   }).format(amount)
 }
 
+const exportToPdf = async () => {
+  try {
+    const element = document.getElementById('payslip-to-export');
+    if (!element) {
+      console.error('No se encontró el contenedor de la colilla');
+      return;
+    }
+
+    const pdf = await generatePdfFromElement(element, 'colilla.pdf');
+    pdf.triggerUserDownload();
+  } catch (error) {
+    console.error('Error al exportar a PDF:', error);
+  }
+};
 
 onMounted(fetchPayslip)
 </script>
