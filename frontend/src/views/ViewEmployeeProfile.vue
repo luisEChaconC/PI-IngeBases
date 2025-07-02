@@ -84,10 +84,10 @@
 </template>
 
 <script>
-import axios from 'axios';
+import employeeService from '@/services/employeeService';
+import employerService from '@/services/employerService';
 import { ref, onMounted } from 'vue';
 import { computed } from 'vue';
-//import { useRoute } from 'vue-router';
 import currentUserService from "@/services/currentUserService";
 
 export default {
@@ -112,27 +112,27 @@ export default {
 
         const currentUserInformation = currentUserService.getCurrentUserInformationFromLocalStorage();
         userPosition.value = currentUserInformation.position;
-        let response;
+        let data;
 
         if (currentUserInformation.position == 'Employer') {
-          response = await axios.get(`https://localhost:5000/api/EmployerGetID/GetEmployerById/${currentUserInformation.idNaturalPerson}`);
+          data = await employerService.getEmployerById(currentUserInformation.idNaturalPerson);
         } else {
-          response = await axios.get(`https://localhost:5000/api/EmployeeGetID/GetEmployeeById/${currentUserInformation.idNaturalPerson}`);
+          data = await employeeService.getEmployeeById(currentUserInformation.idNaturalPerson);
         }
 
         employee.value = {
-          id: response.data.id || '',
-          firstName: response.data.firstName || '',
-          firstLastName: response.data.firstSurname || '',
-          secondLastName: response.data.secondSurname || '',
-          identityCard: response.data.cedula || '',
-          workerId: response.data.workerId || '',
+          id: data.id || '',
+          firstName: data.firstName || '',
+          firstLastName: data.firstSurname || '',
+          secondLastName: data.secondSurname || '',
+          identityCard: data.cedula || '',
+          workerId: data.workerId || '',
           role: currentUserInformation.position,
-          contractType: response.data.contractType || '',
-          grossSalary: response.data.grossSalary || 0,
-          email: response.data.email || '',
-          phone: response.data.phoneNumber || '',
-          gender: response.data.gender || ''
+          contractType: data.contractType || '',
+          grossSalary: data.grossSalary || 0,
+          email: data.email || '',
+          phone: data.phoneNumber || '',
+          gender: data.gender || ''
         };
 
       } catch (err) {

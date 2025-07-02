@@ -61,7 +61,6 @@ namespace backend.Application.Orchestrators.Payroll
             bool payrollExistsForPeriod = await _checkPayrollExistsQuery.ExecuteAsync(model.StartDate, model.EndDate, model.CompanyId);
             if (payrollExistsForPeriod) throw new PayrollException("AlreadyExists", "A payroll already exists for the given period.");
 
-
             var employees = await _getEmployeesByCompanyIdQuery.ExecuteAsync(model.CompanyId);
             if (employees.Count == 0) throw new PayrollException("NoEmployees", "No employees found for the given company.");
 
@@ -73,19 +72,26 @@ namespace backend.Application.Orchestrators.Payroll
 
             foreach (var employee in employees)
             {
+                if (employee.EmployeeStartDate > model.EndDate) continue;
                 // This is required cause an employee can start working after the payroll start date
+                if (employee.EmployeeStartDate > model.EndDate) continue;
+                if (employee.EndDate != null && employee.EndDate <= model.StartDate) continue;
+
                 var startDate = employee.EmployeeStartDate > model.StartDate ? employee.EmployeeStartDate : model.StartDate;
+                var endDate = employee.EndDate != null && employee.EndDate < model.EndDate
+                    ? employee.EndDate.Value
+                    : model.EndDate;                
 
-                _updatePayrollIdInTimesheetsCommand.Execute(payrollId, employee.Id, startDate, model.EndDate);
+                _updatePayrollIdInTimesheetsCommand.Execute(payrollId, employee.Id, startDate, endDate);
 
-                var employeeHoursWorked = _getEmployeeHoursInPeriodQuery.Execute(employee.Id, startDate, model.EndDate);
+                var employeeHoursWorked = _getEmployeeHoursInPeriodQuery.Execute(employee.Id, startDate, endDate);
 
                 var grossPaymentDto = new CalculateGrossPaymentDto
                 {
                     EmployeeTypePayment = companyPaymentTypeEnum,
                     BaseSalary = employee.GrossSalary,
                     StartDate = startDate,
-                    EndDate = model.EndDate,
+                    EndDate = endDate,
                     WorkedHours = employeeHoursWorked
                 };
 
@@ -111,8 +117,8 @@ namespace backend.Application.Orchestrators.Payroll
                 };
 
                 _deductionOrchestrator.CalculateDeductions(deductionsDto);
-
-                if (companyPaymentType == "Weekly") {
+                
+                if (!employee.IsDeleted && companyPaymentType == "Weekly") {
                     _insertTimesheetsForPeriodCommand.Execute(model.StartDate + TimeSpan.FromDays(7), model.EndDate + TimeSpan.FromDays(7), employee.Id, payrollId);
                 }
             }

@@ -57,21 +57,28 @@
             <a v-else href="#" class="nav-link">Beneficios</a>
           </li>
 
-          <li v-if="showOption('viewReportsPayments')" class="nav-item">
-            <a class="nav-link" href="#">Reportes y Pagos</a>
-          </li>
           <!--<li v-if="showOption('viewRoleAssignment')" class="nav-item">
             <a class="nav-link" href="#">Asignación de Roles</a>
           </li> -->
           <li v-if="showOption('viewCompanyManagement')" class="nav-item">
             <router-link class="nav-link" to="/view-companies-list">Gestión de Empresas</router-link>
           </li>
-          <li v-if="showOption('viewReports')" class="nav-item">
-            <a class="nav-link" href="#">Reportes</a>
-          </li>
+          
           <li v-if="showOption('viewPayrolls')" class="nav-item">
             <router-link to="/payrolls-list" class="nav-link">Planillas</router-link>
           </li>
+
+          <li v-if="showOption('viewReports')" class="nav-item dropdown" @mouseover="showReportsDropdown = true" @mouseleave="showReportsDropdown = false">
+            <a class="nav-link " href="#" role="button">
+              Reportes
+            </a>
+            <ul class="dropdown-menu show" v-if="showReportsDropdown">
+              <li v-for="report in reportsByRole" :key="report.name">
+                <router-link class="dropdown-item" :to="report.route">{{ report.name }}</router-link>
+              </li>
+            </ul>
+          </li>
+
         </ul>
 
         <!-- Botón de cerrar sesión -->
@@ -93,6 +100,7 @@ export default {
   data() {
     return {
       employeeType: "",
+      showReportsDropdown: false,
     };
   },
   methods: {
@@ -104,6 +112,7 @@ export default {
           "viewWorkedHours", 
           "viewBenefits",
           "timesheet",
+          "viewReports",
         ],
         Employer: [
           "viewProfile",
@@ -112,6 +121,7 @@ export default {
           "viewBenefits",
           "viewReportsPayments",
           "viewRoleAssignment",
+          "viewReports",
         ],
         Supervisor: [
           "viewProfile",
@@ -121,6 +131,7 @@ export default {
           "viewHours",
           "timesheet",
           "timesheetApprovals",
+          "viewReports",
         ],
         SoftwareManager: [
           "viewCompanyManagement",
@@ -136,6 +147,7 @@ export default {
           "viewBenefitsPayrollM",
           "viewEmployees",
           "timesheet",
+          "viewReports",
         ],
       };
       return permissions[this.employeeType]?.includes(option);
@@ -154,6 +166,33 @@ export default {
       this.employeeType = currentUserInformation.position.replace(/\s/g, '');
     }
     console.log("Rol del usuario:", this.employeeType);
+  },
+
+  computed: {
+    reportsByRole() {
+      const reports = {
+        Collaborator: [
+          { name: "Desglose de pagos", route: "/view-payslip-list" }, 
+          { name: "Historial de pagos", route: "/payroll-history" },
+        ],
+        Supervisor: [
+          { name: "Desglose de pagos", route: "/view-payslip-list" },
+          { name: "Historial de pagos", route: "/payroll-history" },
+        ],
+        PayrollManager: [
+          { name: "Desglose de pagos", route: "/view-payslip-list" },
+          { name: "Historial de pagos", route: "/payroll-history" },
+        ],
+        Employer: [
+          { name: "Costos de planilla", route: "/payroll-total-cost" },
+          { name: "Pagos de planilla por empleado", route: "/employee-payroll-payments" },
+        ],
+        SoftwareManager: [
+          { name: "Historial de pagos de planilla por empresa", route: "/company-payroll-history" },
+        ]
+      };
+      return reports[this.employeeType] || [];
+    }
   }
 };
 </script>

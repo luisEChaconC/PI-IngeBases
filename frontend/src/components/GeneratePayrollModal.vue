@@ -33,9 +33,10 @@
 </template>
 
 <script>
-import axios from "axios";
 import currentUserService from "@/services/currentUserService";
 import DatePicker from '@vuepic/vue-datepicker';
+import companyService from "@/services/companyService";
+import payrollService from "@/services/payrollService";
 import '@vuepic/vue-datepicker/dist/main.css';
 
 // --- Utility functions ---
@@ -92,56 +93,57 @@ export default {
     try {
       const currentUserInformation = currentUserService.getCurrentUserInformationFromLocalStorage();
       const companyId = currentUserInformation.companyId;
-      const response = await axios.get(`https://localhost:5000/api/Company/GetCompanyById/${companyId}`);
-      this.paymentType = response.data && response.data.paymentType
-        ? response.data.paymentType.toLowerCase()
-        : 'weekly'
+      // Usa companyService en vez de axios directamente
+      const company = await companyService.getCompanyById(companyId);
+      this.paymentType = company && company.paymentType
+        ? company.paymentType.toLowerCase()
+        : 'weekly';
     } catch (e) {
       this.errorMessage = 'Error al obtener el tipo de pago de la empresa';
       this.paymentType = 'weekly';
     }
   },
   methods: {
-    async handleGenerate() {
-      this.errorMessage = '';
-      if (!this.startDate || !this.endDate) {
-        this.errorMessage = 'Debe seleccionar un periodo válido para la planilla.';
-        return;
+  async handleGenerate() {
+    this.errorMessage = '';
+    if (!this.startDate || !this.endDate) {
+      this.errorMessage = 'Debe seleccionar un periodo válido para la planilla.';
+      return;
+    }
+
+    const currentUserInformation = currentUserService.getCurrentUserInformationFromLocalStorage();
+    const companyId = currentUserInformation.companyId;
+    const payrollManagerId = currentUserInformation.idPerson;
+
+    // Prepare the payload
+    const payload = {
+      startDate: this.startDate,
+      endDate: this.endDate,
+      companyId: companyId,
+      payrollManagerId: payrollManagerId
+    };
+
+    try {
+      await payrollService.createPayroll(payload);
+      this.$emit('payroll-generated'); // Emit event for parent to refresh
+      this.$emit('close');
+    } catch (error) {
+      // Default message
+      let message = 'Error al generar la planilla';
+
+      // If backend sends errorType, show a specific message
+      const errorType = error.response?.data?.errorType;
+      if (errorType === 'AlreadyExists') {
+        message = 'Ya existe una planilla para el periodo seleccionado.';
+      } else if (errorType === 'NoEmployees') {
+        message = 'No hay empleados registrados en la empresa.';
+      } else if (errorType === 'InvalidPaymentType') {
+        message = 'El tipo de pago definido no coincide con el pago de la empresa.';
       }
 
-      const currentUserInformation = currentUserService.getCurrentUserInformationFromLocalStorage();
-      const companyId = currentUserInformation.companyId;
-      const payrollManagerId = currentUserInformation.idPerson;
-
-      // Prepare the payload
-      const payload = {
-        startDate: this.startDate,
-        endDate: this.endDate,
-        companyId: companyId,
-        payrollManagerId: payrollManagerId
-      };
-
-      try {
-        await axios.post('https://localhost:5000/api/Payroll', payload);
-        this.$emit('payroll-generated'); // Emit event for parent to refresh
-        this.$emit('close');
-      } catch (error) {
-        // Default message
-        let message = 'Error al generar la planilla';
-
-        // If backend sends errorType, show a specific message
-        const errorType = error.response?.data?.errorType;
-        if (errorType === 'AlreadyExists') {
-          message = 'Ya existe una planilla para el periodo seleccionado.';
-        } else if (errorType === 'NoEmployees') {
-          message = 'No hay empleados registrados en la empresa.';
-        } else if (errorType === 'InvalidPaymentType') {
-          message = 'El tipo de pago definido no coincide con el pago de la empresa.';
-        }
-
-        this.errorMessage = message;
-      }
-    },
+      this.errorMessage = message;
+    }
+  },
     async handleDayChange(date) {
       const type = this.paymentType;
       const days = type === 'biweekly' ? 15 : type === 'monthly' ? 30 : 7;

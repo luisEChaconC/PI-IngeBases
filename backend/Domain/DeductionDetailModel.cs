@@ -10,5 +10,6 @@ namespace backend.Domain
         public decimal EmployerAmount { get; set; }
         public Guid PaymentDetailsId { get; set; }
         public string DeductionType { get; set; } 
+        public Guid? BenefitId { get; set; }
     }
 }

@@ -124,7 +124,7 @@
           <button v-if="editMode" type="button" class="btn btn-primary" @click="submitEdit" :disabled="!formValid">
             Guardar cambios
           </button>
-          <button type="button" class="btn btn-danger" @click="openModal">Eliminar</button>
+         <button type="button" class="btn btn-danger" @click="deleteEmployee">Eliminar</button>
         </div>
       </div>
     </div>
@@ -149,10 +149,11 @@
 
 
 <script>
-import axios from 'axios';
 import { ref, onMounted, computed } from 'vue';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
+import Swal from 'sweetalert2';
 import { Modal } from 'bootstrap';
+import employeeService from '@/services/employeeService';
 
 export default {
   name: 'ViewEmployeeProfile',
@@ -237,25 +238,23 @@ const filteredLeftFields = computed(() =>
     const getEmployee = async () => {
       try {
         const id = route.params.id;
-        const response = await axios.get(`https://localhost:5000/api/EmployeeGetID/GetEmployeeById/${id}`);
-        console.log("Datos del empleado:", response.data);
+        const data = await employeeService.getEmployeeById(id);
         employee.value = {
-          id: response.data.id,
-          firstName: response.data.firstName,
-          firstSurname: response.data.firstSurname,
-          secondSurname: response.data.secondSurname,
-          gender: response.data.gender,
-          legalId: response.data.cedula,
-          workerId: response.data.workerId,
-          role: response.data.role,
-          contractType: response.data.contractType,
-          grossSalary: response.data.grossSalary,
-          email: response.data.email,
-          phoneNumber: response.data.phoneNumber
+          id: data.id,
+          firstName: data.firstName,
+          firstSurname: data.firstSurname,
+          secondSurname: data.secondSurname,
+          gender: data.gender,
+          legalId: data.cedula,
+          workerId: data.workerId,
+          role: data.role,
+          contractType: data.contractType,
+          grossSalary: data.grossSalary,
+          email: data.email,
+          phoneNumber: data.phoneNumber
         };
         Object.keys(employee.value).forEach(validateField);
-        const paymentCheck = await axios.get(`https://localhost:5000/api/Employer/HasPayments/${employee.value.id}`);
-    hasPayments.value = paymentCheck.data.hasPayments;
+        hasPayments.value = await employeeService.checkEmployeeHasPayments(employee.value.id);
       } catch (err) {
         error.value = "Error loading employee data.";
       } finally {
@@ -289,7 +288,7 @@ const filteredLeftFields = computed(() =>
           Email: employee.value.email,
           PhoneNumber: employee.value.phoneNumber
         };
-        await axios.patch('https://localhost:5000/api/Employer/UpdateEmployee', payload);
+        await employeeService.updateEmployeeAsEmployer(payload);
         editMode.value = false;
         await getEmployee();
       } catch (err) {
@@ -311,6 +310,50 @@ const filteredLeftFields = computed(() =>
         console.error(err);
       }
     };
+
+    const router = useRouter();
+
+const deleteEmployee = () => {
+  const warningText = `
+    ${hasPayments.value
+      ? '<div style="color:red; font-weight:bold;">Este empleado tiene registros de planilla asignados.</div>'
+      : ''}
+    <div style="color:red; margin-top:6px;">Esta acción eliminará al empleado.</div>
+    <div style="margin-top:12px; color:#495057; font-size:0.9rem;">
+      <i>Información histórica del empleado permanecerá registrada.</i>
+    </div>
+  `;
+
+  Swal.fire({
+    title: '¿Estás seguro?',
+    html: warningText,
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#d33',
+    cancelButtonColor: '#6c757d',
+    confirmButtonText: 'Sí, eliminar',
+    cancelButtonText: 'Cancelar'
+  }).then(async (result) => {
+    if (result.isConfirmed) {
+      try {
+        await employeeService.deleteEmployee(employee.value.id);
+        Swal.fire(
+          'Eliminado',
+          'El empleado ha sido eliminado exitosamente.',
+          'success'
+        );
+        router.push('/employees-list');
+      } catch (error) {
+        Swal.fire(
+          'Error',
+          'Ocurrió un error al eliminar el empleado.',
+          'error'
+        );
+        console.error("Error al eliminar empleado:", error.response?.data || error);
+      }
+    }
+  });
+};
 
     const openModal = () => {
       if (!deleteInstance) deleteInstance = new Modal(deleteModal.value);
@@ -343,6 +386,7 @@ const filteredLeftFields = computed(() =>
       rightFields,
       validateField,
       hasPayments,
+      deleteEmployee,
       onInputChange,
       filteredLeftFields
     };

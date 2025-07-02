@@ -24,7 +24,7 @@
                 </tr>
               </thead>
               <tbody>
-                <tr v-for="(company, index) in companies" :key="index">
+                <tr v-for="(company, index) in companies.filter(c => !c.isDeleted)" :key="index">
                   <td>{{ company.name }}</td>
                   <td>{{ company.creationAuthor }}</td>
                   <td>{{ company.legalId }}</td>
@@ -45,7 +45,7 @@
 </template>
 
 <script>
-import axios from 'axios';
+import companyService from '@/services/companyService';
 import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 
@@ -57,8 +57,7 @@ export default {
 
     const getCompanies = async () => {
       try {
-        const response = await axios.get('https://localhost:5000/api/Company/GetCompanies');
-        companies.value = response.data;
+        companies.value = await companyService.getAllCompanies();
       } catch (error) {
         console.error("Error fetching companies:", error);
       }
