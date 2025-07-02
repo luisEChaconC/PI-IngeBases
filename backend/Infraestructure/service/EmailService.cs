@@ -11,6 +11,7 @@ namespace backend.Infraestructure.service
 {
     public class EmailService : IEmailService
     {
+        private const string ATTACHMENT_MIME_TYPE = "application/octet-stream";
         private const int SMTP_TIMEOUT_MILLISECONDS = 30000;
 
         private readonly string _smtpHost;
@@ -32,7 +33,7 @@ namespace backend.Infraestructure.service
             _fromName = GetRequiredConfiguration(configuration, "Smtp:FromName");
         }
 
-        public void SendEmail(string to, string subject, string body, string? attachmentBase64 = null, string? attachmentFilename = null, string? attachmentMimeType = null)
+        public void SendEmail(string to, string subject, string body, string? attachmentBase64 = null, string? attachmentFilename = null)
         {
             if (string.IsNullOrWhiteSpace(to))
             {
@@ -60,7 +61,7 @@ namespace backend.Infraestructure.service
                         var attachmentStream = new MemoryStream(attachmentBytes);
                         var attachment = new Attachment(attachmentStream,
                                                         attachmentFilename,
-                                                        string.IsNullOrWhiteSpace(attachmentMimeType) ? "application/octet-stream" : attachmentMimeType);
+                                                        ATTACHMENT_MIME_TYPE);
                         mailMessage.Attachments.Add(attachment);
                     }
 
@@ -70,45 +71,6 @@ namespace backend.Infraestructure.service
             catch (Exception ex)
             {
                 throw new InvalidOperationException($"Failed to send email to {to}: {ex.Message}", ex);
-            }
-        }
-
-        public void SendEmailBatch(List<string> to, string subject, string body)
-        {
-            if (to == null || !to.Any())
-            {
-                throw new ArgumentException("Recipient list cannot be null or empty", nameof(to));
-            }
-
-            if (string.IsNullOrWhiteSpace(subject))
-            {
-                throw new ArgumentException("Email subject cannot be null or empty", nameof(subject));
-            }
-
-            try
-            {
-                using (var mailMessage = new MailMessage())
-                {
-                    mailMessage.From = new MailAddress(_fromEmail, _fromName);
-
-                    foreach (var recipient in to)
-                    {
-                        if (!string.IsNullOrWhiteSpace(recipient))
-                        {
-                            mailMessage.To.Add(recipient);
-                        }
-                    }
-
-                    mailMessage.Subject = subject;
-                    mailMessage.Body = body;
-                    mailMessage.IsBodyHtml = false;
-
-                    DeliverEmailMessage(mailMessage);
-                }
-            }
-            catch (Exception ex)
-            {
-                throw new InvalidOperationException($"Failed to send batch email to {to.Count} recipients: {ex.Message}", ex);
             }
         }
 
