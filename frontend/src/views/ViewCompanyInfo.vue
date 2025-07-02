@@ -259,7 +259,12 @@ export default {
                 'La empresa ha sido eliminada exitosamente.',
                 'success'
               );
-              this.$router.push("/view-companies-list");
+              if(currentUserInformation.position?.trim() === "SoftwareManager") {    
+                this.$router.push("/view-companies-list");  
+              } else {    
+                localStorage.removeItem("currentUserInformation");    
+                this.$router.push("/login");  
+              }
             })
             .catch(error => {
               Swal.fire(
