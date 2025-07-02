@@ -8,6 +8,7 @@ namespace backend.Infraestructure
         Task<PaymentDetailModel?> GetByIdAsync(Guid id);
         Task<List<PaymentDetailModel>> GetByEmployeeIdAsync(Guid employeeId);
         Task<List<PaymentDetailModel>> GetByCompanyIdAsync(Guid companyId);
+        Task UpdateEmployerChargesAsync(Guid paymentDetailsId, decimal employerCharges);
     }
 }
 
