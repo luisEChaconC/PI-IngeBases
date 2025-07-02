@@ -7,6 +7,7 @@ namespace backend.Domain
         public Guid Id { get; set; }
         public string Name { get; set; }
         public decimal AmountDeduced { get; set; }
+        public decimal EmployerAmount { get; set; }
         public Guid PaymentDetailsId { get; set; }
         public string DeductionType { get; set; } 
         public Guid? BenefitId { get; set; }

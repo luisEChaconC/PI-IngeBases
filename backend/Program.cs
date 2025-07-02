@@ -112,6 +112,8 @@ builder.Services.AddHttpClient<BenefitDeductionStrategy>();
 
 builder.Services.AddScoped<IDeductionDetailRepository, DeductionDetailRepository>();
 builder.Services.AddScoped<IInsertDeductionDetailsCommand, InsertDeductionDetailsCommand>();
+builder.Services.AddScoped<IUpdateEmployerChargesCommand, UpdateEmployerChargesCommand>();
+
 
 
 //Payslip
