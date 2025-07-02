@@ -2,7 +2,14 @@
   <div class="home">
     <div v-if="role === 'Employer'" class="iframe-wrapper">
       <iframe
-        :src="iframeUrl"
+        :src="iframeUrlEmployer"
+        frameborder="0"
+        class="metabase-iframe"
+      ></iframe>
+    </div>
+    <div v-else-if="['Collaborator', 'Supervisor', 'Payroll Manager'].includes(role)" class="iframe-wrapper">
+      <iframe
+        :src="iframeUrlEmployee"
         frameborder="0"
         class="metabase-iframe"
       ></iframe>
@@ -12,19 +19,25 @@
     </div>
   </div>
 </template>
-
-
 <script setup>
-import {computed } from 'vue'
-import currentUserService from "@/services/currentUserService";
+import { computed } from 'vue'
+import currentUserService from "@/services/currentUserService"
 
-const currentUserInformation = currentUserService.getCurrentUserInformationFromLocalStorage();
-const companyId = currentUserInformation?.companyId;
-const role = currentUserInformation.position;
+const currentUserInformation = currentUserService.getCurrentUserInformationFromLocalStorage()
+const companyId = currentUserInformation?.companyId
+const role = currentUserInformation.position
+const employeeId = currentUserInformation?.idNaturalPerson
+console.log(employeeId)
 console.log(role)
 
-const iframeUrl = computed(() =>
+// URL para el rol "Employer"
+const iframeUrlEmployer = computed(() =>
   `http://localhost:3000/public/dashboard/7c408b10-a984-48d2-a354-654d12146274?company_id=${companyId}`
+)
+
+// URL para el rol "Employee"
+const iframeUrlEmployee = computed(() =>
+  `http://localhost:3000/public/dashboard/72917f73-273a-48a5-875b-ffb4accb486b?id=${employeeId}`
 )
 </script>
 
@@ -45,4 +58,3 @@ const iframeUrl = computed(() =>
   height: 935px; 
 }
 </style>
-
