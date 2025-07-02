@@ -21,6 +21,11 @@ import UnauthorizedView from '@/views/UnauthorizedView.vue'
 import CurrentUserService from '@/services/currentUserService'
 import PayslipView from '@/views/PayslipView.vue'
 import PayslipList from '@/views/PayslipList.vue'
+import ViewCompaniesListPdf from '@/pdfTest/ViewCompaniesListPdf.vue'
+import ExportExcelForm from '@/TestUX/TestExcel/ExportExcelForm.vue'
+import CompaniesReport from '@/views/CompaniesReport.vue'
+import EmployerCostReport from '@/views/EmployerCostReport.vue'
+
 
 const routes = [
     { path: '/', redirect: '/login' },
@@ -29,6 +34,7 @@ const routes = [
     { path: '/employer-registration/:companyId', name: 'EmployerRegistration', component: EmployerRegistration, props: true },
     { path: '/employer-registration', redirect: '/login' },
     { path: '/unauthorized', name: 'UnauthorizedView', component: UnauthorizedView },
+    { path: '/testExcel', name: 'TestExcel', component: ExportExcelForm },
     {
         path: '/',
         component: MainLayout,
@@ -50,7 +56,10 @@ const routes = [
             { path: '/timesheet-approvals', name: 'TimesheetApprovals', component: TimesheetApprovals, meta: {allowedPositions: ['Supervisor']} },
             { path: '/view-payslip', name: 'PayslipView', component: PayslipView, meta: {allowedPositions: ['Collaborator', 'Payroll Manager', 'Supervisor']}},
             { path: '/view-payslip-list', name: 'PayslipList', component: PayslipList, meta: {allowedPositions: ['Collaborator', 'Payroll Manager', 'Supervisor']}},
-            { path: '/view-payslip/:date', name: 'PayslipView', component: PayslipView, meta: {allowedPositions: ['Collaborator', 'Payroll Manager', 'Supervisor']}}
+            { path: '/view-payslip/:date', name: 'PayslipView', component: PayslipView, meta: {allowedPositions: ['Collaborator', 'Payroll Manager', 'Supervisor']}},
+            { path: '/view-companies-list-pdf', name: 'ViewCompaniesListPdf', component: ViewCompaniesListPdf, meta: {allowedPositions: ['Employer', 'Collaborator', 'Payroll Manager', 'Supervisor']}},
+            { path: '/employer-cost-report', name: 'EmployerCostReport', component: EmployerCostReport, meta: { allowedPositions: ['Employer']}},
+            { path: '/companies-report', name: 'CompaniesReport', component: CompaniesReport, meta: {allowedPositions: ['SoftwareManager']} }
         ],
     },
 ]

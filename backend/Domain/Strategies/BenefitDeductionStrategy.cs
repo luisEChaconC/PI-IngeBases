@@ -21,7 +21,7 @@ namespace backend.Domain.Strategies
         {
         }
 
-        public decimal CalculateDeduction(decimal grossSalary, string contractType, string gender, Benefit? benefit = null, Guid? employeeId = null)
+        public decimal CalculateDeduction(decimal grossSalary, string contractType, string gender, Benefit? benefit = null, Guid? employeeId = null, Guid? paymentDetailsId = null)
         {
             if (benefit == null) return 0;
 
