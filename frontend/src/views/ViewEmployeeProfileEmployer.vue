@@ -314,9 +314,19 @@ const filteredLeftFields = computed(() =>
     const router = useRouter();
 
 const deleteEmployee = () => {
+  const warningText = `
+    ${hasPayments.value
+      ? '<div style="color:red; font-weight:bold;">Este empleado tiene registros de planilla asignados.</div>'
+      : ''}
+    <div style="color:red; margin-top:6px;">Esta acción eliminará al empleado.</div>
+    <div style="margin-top:12px; color:#495057; font-size:0.9rem;">
+      <i>Información histórica del empleado permanecerá registrada.</i>
+    </div>
+  `;
+
   Swal.fire({
     title: '¿Estás seguro?',
-    text: 'Esta acción eliminará al empleado',
+    html: warningText,
     icon: 'warning',
     showCancelButton: true,
     confirmButtonColor: '#d33',

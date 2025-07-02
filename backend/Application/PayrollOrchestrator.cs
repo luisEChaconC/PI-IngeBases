@@ -72,6 +72,7 @@ namespace backend.Application.Orchestrators.Payroll
 
             foreach (var employee in employees)
             {
+                if (employee.EmployeeStartDate > model.EndDate) continue;
                 // This is required cause an employee can start working after the payroll start date
                 if (employee.EmployeeStartDate > model.EndDate) continue;
                 if (employee.EndDate != null && employee.EndDate <= model.StartDate) continue;
