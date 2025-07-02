@@ -23,6 +23,7 @@ using backend.Application.Payslip.Queries;
 using backend.Application.Payslip.Services;
 using MediatR;
 using System.Reflection;
+using backend.Application.Queries.EmployerPayrollReport;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -43,6 +44,11 @@ builder.Services.AddControllers()
     {
         options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
     });
+
+builder.Services.AddMediatR(cfg =>
+{
+    cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly());
+});
 
 builder.Services.AddMediatR(cfg =>
 {
@@ -125,6 +131,12 @@ builder.Services.AddScoped<GetPayslipByEmployeeIdAndStartDateQuery>();
 builder.Services.AddScoped<IBuildPayslipItems, BuildPayslipItems>();
 builder.Services.AddScoped<ICompanyReportRepository, CompanyReportRepository>();
 builder.Services.AddScoped<IGetCompanyReportsQuery, GetCompanyReportsQuery>();
+
+
+// Employer Payroll Report
+
+builder.Services.AddScoped<IEmployerPayrollReportRepository, EmployerPayrollReportRepository>();
+builder.Services.AddScoped<IGetEmployerEmployeePayrollReportQuery, GetEmployerEmployeePayrollReportQuery>();
 
 
 
