@@ -123,6 +123,9 @@ builder.Services.AddScoped<IPayslipRepository, PayslipRepository>();
 builder.Services.AddScoped<GetPayslipsByEmployeeIdQuery>();
 builder.Services.AddScoped<GetPayslipByEmployeeIdAndStartDateQuery>();
 builder.Services.AddScoped<IBuildPayslipItems, BuildPayslipItems>();
+builder.Services.AddScoped<ICompanyReportRepository, CompanyReportRepository>();
+builder.Services.AddScoped<IGetCompanyReportsQuery, GetCompanyReportsQuery>();
+
 
 
 // Register Strategy Orchestrator
