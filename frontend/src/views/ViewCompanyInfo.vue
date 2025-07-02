@@ -130,6 +130,8 @@
 <script>
 import companyService from '@/services/companyService';
 import currentUserService from "@/services/currentUserService";
+import employeeService from '@/services/employeeService';
+import EmailService from '@/services/EmailService';
 import Swal from 'sweetalert2';
 
 export default {
@@ -234,6 +236,46 @@ export default {
       }
     },
 
+    async sendEmailToAllEmployeesBeforeDelete() {
+      try {
+        const currentUserInformation = currentUserService.getCurrentUserInformationFromLocalStorage();
+        const companyId = currentUserInformation.position?.trim() === "SoftwareManager"
+          ? localStorage.getItem("selectedCompanyId")
+          : currentUserInformation.companyId;
+
+        const employees = await employeeService.getEmployeesByCompanyId(companyId);
+
+        const employeeDetails = await Promise.all(
+          employees.map(emp => employeeService.getEmployeeById(emp.idEmployee))
+        );
+
+        // Extraer emails de empleados
+        const emails = employeeDetails
+          .map(emp => emp?.email)
+          .filter(email => !!email);
+        
+        // Correo del empleador
+        if (currentUserInformation.email && !emails.includes(currentUserInformation.email)) {
+          emails.push(currentUserInformation.email);
+        }
+
+        const emailPromises = emails.map(email => {
+          const emailData = {
+            to: email,
+            subject: 'Notificación de eliminación de empresa',
+            body: 'La empresa será eliminada del sistema de planillas. En caso de dudas, contacte al administrador.'
+          };
+          return EmailService.sendEmail(emailData);
+        });
+
+        await Promise.all(emailPromises);
+        alert('Correos enviados a todos los empleados.');
+      } catch (error) {
+        alert('Error al enviar correos a los empleados.');
+        console.error(error);
+      }
+    },
+
     deleteCompany() {
       Swal.fire({
         title: '¿Estás seguro?',
@@ -251,7 +293,7 @@ export default {
           const companyId = currentUserInformation.position?.trim() === "SoftwareManager"
             ? localStorage.getItem("selectedCompanyId")
             : currentUserInformation.companyId;
-
+          this.sendEmailToAllEmployeesBeforeDelete();
           companyService.deleteCompany(companyId)
             .then(() => {
               Swal.fire(
