@@ -31,5 +31,16 @@ namespace backend.API
                 return StatusCode(500, new { message = "Error al obtener el costo patronal.", error = ex.Message });
             }
         }
+
+        [HttpGet("{payrollId}")]
+        public ActionResult<EmployerCostModel> GetEmployerCostByPayroll(Guid payrollId)
+        {
+            var result = _getEmployerCostQuery.Execute(payrollId);
+            if (result == null)
+                return NotFound();
+
+            return Ok(result);
+        }
+
     }
 }

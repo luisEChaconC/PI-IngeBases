@@ -22,6 +22,9 @@ const API_CONFIG = {
             CREATE_WITH_DEPENDENCIES: '/api/Employer/CreateEmployerWithDependencies',
             GET_BY_ID: (employerId) => `/api/EmployerGetID/GetEmployerById/${employerId}`,
         },
+         EMPLOYER_COST: {
+      GET_BY_PAYROLL: (payrollId) => `/api/EmployerCost/GetByPayrollId/${payrollId}`
+    },
         COMPANY: {
             BASE: '/company',
             CREATE_WITH_DEPENDENCIES: '/api/Company/CreateCompanyWithDependencies',

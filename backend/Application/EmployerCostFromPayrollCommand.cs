@@ -25,6 +25,8 @@ namespace backend.Application.Commands.Payroll
         {
             var grossSalary = _grossSalaryQuery.Execute(payrollId);
             var costModel = _strategy.Calculate(payrollId, grossSalary);
+            costModel.TotalEmployerCost = costModel.LegalDeductionsTotal + grossSalary;
+            costModel.PrivateInsurance = grossSalary;
             _employerCostRepository.Insert(costModel);
         }
     }
