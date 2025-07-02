@@ -57,7 +57,7 @@ const routes = [
             { path: '/view-payslip', name: 'PayslipView', component: PayslipView, meta: {allowedPositions: ['Collaborator', 'Payroll Manager', 'Supervisor']}},
             { path: '/view-payslip-list', name: 'PayslipList', component: PayslipList, meta: {allowedPositions: ['Collaborator', 'Payroll Manager', 'Supervisor']}},
             { path: '/view-payslip/:date', name: 'PayslipView', component: PayslipView, meta: {allowedPositions: ['Collaborator', 'Payroll Manager', 'Supervisor']}},
-            { path: '/employee-payroll-payments', name: 'EmployerPayrollReportView', component: EmployerPayrollReportView, meta: { allowedPositions: ['Employer'] } }        
+            { path: '/employee-payroll-payments', name: 'EmployerPayrollReportView', component: EmployerPayrollReportView, meta: { allowedPositions: ['Employer'] } },      
             { path: '/view-companies-list-pdf', name: 'ViewCompaniesListPdf', component: ViewCompaniesListPdf, meta: {allowedPositions: ['Employer', 'Collaborator', 'Payroll Manager', 'Supervisor']}},
             { path: '/employer-cost-report', name: 'EmployerCostReport', component: EmployerCostReport, meta: { allowedPositions: ['Employer']}},
             { path: '/companies-report', name: 'CompaniesReport', component: CompaniesReport, meta: {allowedPositions: ['SoftwareManager']} }
