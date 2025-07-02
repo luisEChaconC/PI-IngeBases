@@ -225,15 +225,21 @@ export default {
         this.company.id = companyId;
 
         await companyService.updateCompany(companyId, this.company);
-        alert("Company updated successfully");
-      } catch (error) {
-        if (error.status === 409) {
-          alert("There's a register with this data already.");
-        } else {
-          alert("An error occurred while updating the company.");
+        Swal.fire({
+            icon: 'success',
+            title: '¡Empresa actualizada!',
+            text: 'La información se guardó correctamente.',
+            confirmButtonColor: '#3085d6',
+            confirmButtonText: 'Entendido'
+          });
+        } catch (error) {
+          if (error.status === 409) {
+            alert("There's a register with this data already.");
+          } else {
+            alert("An error occurred while updating the company.");
+          }
+          console.error("Error while updating company", error);
         }
-        console.error("Error while updating company", error);
-      }
     },
 
     async sendEmailToAllEmployeesBeforeDelete() {
