@@ -188,7 +188,7 @@ export default {
           { name: "Pagos de planilla por empleado", route: "/employee-payroll-payments" },
         ],
         SoftwareManager: [
-          { name: "Historial de pagos de planilla por empresa", route: "/company-payroll-history" },
+          { name: "Historial de pagos de planilla por empresa", route: "/companies-report" },
         ]
       };
       return reports[this.employeeType] || [];
