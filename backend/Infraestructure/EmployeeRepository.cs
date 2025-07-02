@@ -1,4 +1,5 @@
 ﻿using backend.Domain;
+using System.Data;
 using backend.Application.DTOs;
 using Microsoft.Data.SqlClient;
 
@@ -74,7 +75,9 @@ namespace backend.Infraestructure
                 INNER JOIN Persons p ON np.Id = p.Id
                 LEFT JOIN Supervisors s ON e.Id = s.Id
                 LEFT JOIN PayrollManagers pm ON e.Id = pm.Id
-                WHERE e.CompanyId = @CompanyId";
+                WHERE e.CompanyId = @CompanyId
+                AND e.IsDeleted = 0";
+
 
             using (var command = new SqlCommand(query, _connection))
             {
@@ -297,5 +300,20 @@ public bool HasPaymentRecords(string employeeId)
 
             return employees;
         }
+
+        public void DeleteEmployee(string employeeId)
+        {
+    using (var connection = new SqlConnection(_connectionString))
+            {
+        connection.Open();
+        using (var command = new SqlCommand("sp_DeleteEmployee", connection))
+        {
+            command.CommandType = CommandType.StoredProcedure;
+            command.Parameters.AddWithValue("@EmployeeId", Guid.Parse(employeeId));
+            command.ExecuteNonQuery();
+        }
+         }
+        }
+
     }
 }

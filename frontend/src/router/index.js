@@ -22,6 +22,7 @@ import CurrentUserService from '@/services/currentUserService'
 import PayslipView from '@/views/PayslipView.vue'
 import PayslipList from '@/views/PayslipList.vue'
 import ViewCompaniesListPdf from '@/pdfTest/ViewCompaniesListPdf.vue'
+import ExportExcelForm from '@/TestUX/TestExcel/ExportExcelForm.vue'
 
 const routes = [
     { path: '/', redirect: '/login' },
@@ -30,6 +31,7 @@ const routes = [
     { path: '/employer-registration/:companyId', name: 'EmployerRegistration', component: EmployerRegistration, props: true },
     { path: '/employer-registration', redirect: '/login' },
     { path: '/unauthorized', name: 'UnauthorizedView', component: UnauthorizedView },
+    { path: '/testExcel', name: 'TestExcel', component: ExportExcelForm },
     {
         path: '/',
         component: MainLayout,
