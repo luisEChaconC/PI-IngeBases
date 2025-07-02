@@ -15,13 +15,19 @@ const API_CONFIG = {
             GET_BY_ID: (employeeId) => `/api/EmployeeGetID/GetEmployeeById/${employeeId}`,
             UPDATE: '/api/Employee/UpdateEmployee',
             UPDATE_AS_EMPLOYER: '/api/Employer/UpdateEmployee',
-            HAS_PAYMENTS: (employeeId) => `/api/Employer/HasPayments/${employeeId}`
+            HAS_PAYMENTS: (employeeId) => `/api/Employer/HasPayments/${employeeId}`,
+            DELETE: (employeeId) => `/api/Employee/${employeeId}`
+
+
         },
         EMPLOYER: {
             BASE: '/employer',
             CREATE_WITH_DEPENDENCIES: '/api/Employer/CreateEmployerWithDependencies',
             GET_BY_ID: (employerId) => `/api/EmployerGetID/GetEmployerById/${employerId}`,
         },
+         EMPLOYER_COST: {
+      GET_BY_PAYROLL: (payrollId) => `/api/EmployerCost/GetByPayrollId/${payrollId}`
+    },
         COMPANY: {
             BASE: '/company',
             CREATE_WITH_DEPENDENCIES: '/api/Company/CreateCompanyWithDependencies',
@@ -68,6 +74,12 @@ const API_CONFIG = {
             GET_BY_EMAIL: '/api/User/GetUserByEmail',
             GET_BY_EMAIL_DETAILED: '/api/User/GetUserInformationByEmail'
         },
+
+        COMPANYREPORT: {
+            BASE: '/api/CompanyReport',
+            GET_ALL: '/api/CompanyReport/all',
+        },
+      
         PAYSLIP: {
             BASE: '/payslip',
             GET_BY_ID: (employeeId) => `/api/payslip/employee/${employeeId}`,

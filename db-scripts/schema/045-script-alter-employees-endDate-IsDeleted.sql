@@ -1,0 +1,5 @@
+
+ALTER TABLE Employees
+ADD 
+    EndDate DATETIME NULL,
+    IsDeleted BIT NOT NULL DEFAULT 0;

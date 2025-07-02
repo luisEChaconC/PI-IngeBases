@@ -184,11 +184,11 @@ export default {
           { name: "Historial de pagos", route: "/payroll-history" },
         ],
         Employer: [
-          { name: "Costos de planilla", route: "/payroll-total-cost" },
+          { name: "Costos de planilla", route: "/employer-cost-report" },
           { name: "Pagos de planilla por empleado", route: "/employee-payroll-payments" },
         ],
         SoftwareManager: [
-          { name: "Historial de pagos de planilla por empresa", route: "/company-payroll-history" },
+          { name: "Historial de pagos de planilla por empresa", route: "/companies-report" },
         ]
       };
       return reports[this.employeeType] || [];

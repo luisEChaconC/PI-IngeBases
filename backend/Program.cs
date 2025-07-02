@@ -129,6 +129,9 @@ builder.Services.AddScoped<IPayslipRepository, PayslipRepository>();
 builder.Services.AddScoped<GetPayslipsByEmployeeIdQuery>();
 builder.Services.AddScoped<GetPayslipByEmployeeIdAndStartDateQuery>();
 builder.Services.AddScoped<IBuildPayslipItems, BuildPayslipItems>();
+builder.Services.AddScoped<ICompanyReportRepository, CompanyReportRepository>();
+builder.Services.AddScoped<IGetCompanyReportsQuery, GetCompanyReportsQuery>();
+
 
 // Employer Payroll Report
 
@@ -142,6 +145,13 @@ builder.Services.AddScoped<GrossPaymentCalculationOrchestrator>();
 
 builder.Services.AddScoped<ICalculateGrossPaymentQuery, CalculateGrossPaymentQuery>();
 builder.Services.AddScoped<IDisableBenefitForEmployeeCommand, DisableBenefitForEmployeeCommand>();
+
+// Employer Cost
+builder.Services.AddScoped<IEmployerCostRepository, EmployerCostRepository>();
+builder.Services.AddScoped<IEmployerCostStrategy, EmployerCostStrategy>();
+builder.Services.AddScoped<IEmployerCostFromPayrollCommand, EmployerCostFromPayrollCommand>();
+builder.Services.AddScoped<IGetEmployerCostQuery, GetEmployerCostQuery>();
+builder.Services.AddScoped<IGetGrossSalaryByPayrollIdQuery, GetGrossSalaryByPayrollIdQuery>();
 
 var app = builder.Build();
 

@@ -6,6 +6,7 @@ namespace backend.Application.DTOs
         public string WorkerId { get; set; }
         public Guid CompanyId { get; set; }
         public DateTime EmployeeStartDate { get; set; }
+        public DateTime? EndDate { get; set; }
         public string ContractType { get; set; }
         public decimal GrossSalary { get; set; }
         public bool HasToReportHours { get; set; }
@@ -14,5 +15,7 @@ namespace backend.Application.DTOs
         public string SecondSurname { get; set; }
         public string? UserId { get; set; }
         public string Gender { get; set; }
+        public bool IsDeleted { get; set; } = false;
+
     }
 }
