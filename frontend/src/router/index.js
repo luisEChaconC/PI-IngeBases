@@ -23,9 +23,9 @@ import PayslipView from '@/views/PayslipView.vue'
 import PayslipList from '@/views/PayslipList.vue'
 import ViewCompaniesListPdf from '@/pdfTest/ViewCompaniesListPdf.vue'
 import ExportExcelForm from '@/TestUX/TestExcel/ExportExcelForm.vue'
+import EmployerPayrollReportView from '@/views/EmployerPayrollReportView.vue'
 import CompaniesReport from '@/views/CompaniesReport.vue'
 import EmployerCostReport from '@/views/EmployerCostReport.vue'
-
 
 const routes = [
     { path: '/', redirect: '/login' },
@@ -57,6 +57,7 @@ const routes = [
             { path: '/view-payslip', name: 'PayslipView', component: PayslipView, meta: {allowedPositions: ['Collaborator', 'Payroll Manager', 'Supervisor']}},
             { path: '/view-payslip-list', name: 'PayslipList', component: PayslipList, meta: {allowedPositions: ['Collaborator', 'Payroll Manager', 'Supervisor']}},
             { path: '/view-payslip/:date', name: 'PayslipView', component: PayslipView, meta: {allowedPositions: ['Collaborator', 'Payroll Manager', 'Supervisor']}},
+            { path: '/employee-payroll-payments', name: 'EmployerPayrollReportView', component: EmployerPayrollReportView, meta: { allowedPositions: ['Employer'] } },      
             { path: '/view-companies-list-pdf', name: 'ViewCompaniesListPdf', component: ViewCompaniesListPdf, meta: {allowedPositions: ['Employer', 'Collaborator', 'Payroll Manager', 'Supervisor']}},
             { path: '/employer-cost-report', name: 'EmployerCostReport', component: EmployerCostReport, meta: { allowedPositions: ['Employer']}},
             { path: '/companies-report', name: 'CompaniesReport', component: CompaniesReport, meta: {allowedPositions: ['SoftwareManager']} }
