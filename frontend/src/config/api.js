@@ -1,5 +1,5 @@
 const API_CONFIG = {
-    BASE_URL: 'https://localhost:5000',
+    BASE_URL: 'https://backend20250701205915-afg8cyhmbxfsarg0.canadacentral-01.azurewebsites.net/',
 
     ENDPOINTS: {
         TIMESHEET: {
