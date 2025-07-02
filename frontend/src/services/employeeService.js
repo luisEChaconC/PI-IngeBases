@@ -111,6 +111,22 @@ class EmployeeService {
             employeeRole: formData.employeeRole
         };
     }
+
+    async deleteEmployee(employeeId) {
+    try {
+        if (!employeeId) {
+            throw new Error('Employee ID is required');
+        }
+
+        const endpoint = API_CONFIG.ENDPOINTS.EMPLOYEE.DELETE(employeeId);
+        const response = await axios.delete(buildApiUrl(endpoint));
+        return response.data;
+    } catch (error) {
+        console.error('Error deleting employee:', error);
+        throw handleApiError(error, 'Error al eliminar el empleado');
+    }
+}
+
 }
 
 export default new EmployeeService(); 
