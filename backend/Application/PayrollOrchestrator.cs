@@ -31,6 +31,10 @@ namespace backend.Application.Orchestrators.Payroll
         private readonly IUpdatePayrollIdInTimesheetsCommand _updatePayrollIdInTimesheetsCommand;
         private readonly IInsertTimesheetsForPeriodCommand _insertTimesheetsForPeriodCommand;
         private readonly IDeductionOrchestrator _deductionOrchestrator;
+        private readonly IEmployerCostFromPayrollCommand _employerCostFromPayrollCommand;
+
+
+
 
         public PayrollOrchestrator(
             ICheckPayrollExistsQuery checkPayrollExistsQuery,
@@ -42,7 +46,8 @@ namespace backend.Application.Orchestrators.Payroll
             ICreatePaymentDetailCommand createPaymentDetailCommand,
             IUpdatePayrollIdInTimesheetsCommand updatePayrollIdInTimesheetsCommand,
             IInsertTimesheetsForPeriodCommand insertTimesheetsForPeriodCommand,
-            IDeductionOrchestrator deductionOrchestrator)
+            IDeductionOrchestrator deductionOrchestrator,
+            IEmployerCostFromPayrollCommand employerCostFromPayrollCommand)
         {
             _checkPayrollExistsQuery = checkPayrollExistsQuery;
             _getEmployeesByCompanyIdQuery = getEmployeesByCompanyIdQuery;
@@ -54,6 +59,7 @@ namespace backend.Application.Orchestrators.Payroll
             _updatePayrollIdInTimesheetsCommand = updatePayrollIdInTimesheetsCommand;
             _insertTimesheetsForPeriodCommand = insertTimesheetsForPeriodCommand;
             _deductionOrchestrator = deductionOrchestrator;
+            _employerCostFromPayrollCommand = employerCostFromPayrollCommand;
         }
 
         public async Task<Guid> GeneratePayroll(PayrollModel model)
@@ -122,7 +128,15 @@ namespace backend.Application.Orchestrators.Payroll
                     _insertTimesheetsForPeriodCommand.Execute(model.StartDate + TimeSpan.FromDays(7), model.EndDate + TimeSpan.FromDays(7), employee.Id, payrollId);
                 }
             }
-
+             try
+            {
+                _employerCostFromPayrollCommand.Execute(payrollId);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Error al calcular el costo patronal: " + ex.Message);
+                throw; // o loguealo según cómo manejes errores
+         }
             return payrollId;
         }
     }
