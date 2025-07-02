@@ -86,6 +86,14 @@ const API_CONFIG = {
         EMAIL: {
             BASE: '/email',
             SEND: '/api/email/send'
+        },
+        EMPLOYER_REPORTS: {
+            BASE: '/employerPayrollReport',
+            GET_EMPLOYEE_PAYROLL_REPORT: (employerId, companyId) => `/api/employerPayrollReport/employee-payroll-report?employerId=${employerId}&companyId=${companyId}`,        
+        },
+        EXCEL: {
+            BASE: '/excel',
+            GENERATE_EXCEL: '/api/report/excel',
         }
 
     }
