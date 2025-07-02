@@ -30,11 +30,11 @@
 
           <tr><td>SEM (Seguro Enfermedad/Maternidad)</td><td>₡{{ format(report.sem) }}</td></tr>
           <tr><td>IVM (Invalidez, Vejez y Muerte)</td><td>₡{{ format(report.ivm) }}</td></tr>
-          <tr><td>Cuota Patronal Banco Popular (0.25%)</td><td>₡{{ format(report.bpop_OtherInstitutions) }}</td></tr>
+          <tr><td>Cuota Patronal Banco Popular (0.25%)</td><td>₡{{ format(report.bpoP_OtherInstitutions) }}</td></tr>
           <tr><td>Asignaciones Familiares (5.00%)</td><td>₡{{ format(report.familyAllocations) }}</td></tr>
           <tr><td>IMAS (0.50%)</td><td>₡{{ format(report.imas) }}</td></tr>
           <tr><td>INA (1.50%)</td><td>₡{{ format(report.ina) }}</td></tr>
-          <tr><td>Aporte Banco Popular (0.25%)</td><td>₡{{ format(report.bpop_LPT) }}</td></tr>
+          <tr><td>Aporte Banco Popular (0.25%)</td><td>₡{{ format(report.bpoP_LPT) }}</td></tr>
           <tr><td>FCL - Fondo Capitalización Laboral (1.50%)</td><td>₡{{ format(report.fcl) }}</td></tr>
           <tr><td>Fondo Pensiones Complementarias (2.00%)</td><td>₡{{ format(report.opc) }}</td></tr>
           <tr><td>INS (1.00%)</td><td>₡{{ format(report.ins) }}</td></tr>
