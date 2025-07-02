@@ -4,50 +4,55 @@
 
     <div v-if="loading" class="loading">Cargando...</div>
     <div v-else>
-      <p><strong class="blue">Nombre de la empresa:</strong> {{ company?.name || '-' }}</p>
-      <p><strong class="blue">Nombre del empleador:</strong> {{ employer?.firstName || '-' }} {{ employer?.firstSurname || '' }}</p>
-      <p><strong class="blue">Fecha de pago / período de pago:</strong>
-        {{ selectedPayrollId ? formatDateRange(getSelectedPayroll?.startDate, getSelectedPayroll?.endDate) : '-' }}
-      </p>
+      <!-- Botón PDF -->
+      <div class="text-end mb-3">
+        <button class="btn btn-outline-primary" @click="exportToPdf">Descargar PDF</button>
+      </div>
 
-      <label for="payrollSelect" class="form-label mt-3">Seleccione una planilla:</label>
-      <select v-model="selectedPayrollId" id="payrollSelect" class="form-select mb-4">
-        <option v-for="payroll in payrolls" :key="payroll.id" :value="payroll.id">
-          {{ formatDateRange(payroll.startDate, payroll.endDate) }}
-        </option>
-      </select>
+      <div id="employer-cost-report">
+        <p><strong class="blue">Nombre de la empresa:</strong> {{ company?.name || '-' }}</p>
+        <p><strong class="blue">Nombre del empleador:</strong> {{ employer?.firstName || '-' }} {{ employer?.firstSurname || '' }}</p>
+        <p><strong class="blue">Fecha de pago / período de pago:</strong>
+          {{ selectedPayrollId ? formatDateRange(getSelectedPayroll?.startDate, getSelectedPayroll?.endDate) : '-' }}
+        </p>
 
-      <table>
-        <tbody>
-          
+        <label for="payrollSelect" class="form-label mt-3">Seleccione una planilla:</label>
+        <select v-model="selectedPayrollId" id="payrollSelect" class="form-select mb-4">
+          <option v-for="payroll in payrolls" :key="payroll.id" :value="payroll.id">
+            {{ formatDateRange(payroll.startDate, payroll.endDate) }}
+          </option>
+        </select>
 
-          <tr class="bold">
-            <td>Total salarios</td>
-            <td>₡{{ format(report.privateInsurance) }}</td>
-          </tr>
+        <table>
+          <tbody>
+            <tr class="bold">
+              <td>Total salarios</td>
+              <td>₡{{ format(report.privateInsurance) }}</td>
+            </tr>
 
-          <tr><td>SEM (Seguro Enfermedad/Maternidad)</td><td>₡{{ format(report.sem) }}</td></tr>
-          <tr><td>IVM (Invalidez, Vejez y Muerte)</td><td>₡{{ format(report.ivm) }}</td></tr>
-          <tr><td>Cuota Patronal Banco Popular (0.25%)</td><td>₡{{ format(report.bpoP_OtherInstitutions) }}</td></tr>
-          <tr><td>Asignaciones Familiares (5.00%)</td><td>₡{{ format(report.familyAllocations) }}</td></tr>
-          <tr><td>IMAS (0.50%)</td><td>₡{{ format(report.imas) }}</td></tr>
-          <tr><td>INA (1.50%)</td><td>₡{{ format(report.ina) }}</td></tr>
-          <tr><td>Aporte Banco Popular (0.25%)</td><td>₡{{ format(report.bpoP_LPT) }}</td></tr>
-          <tr><td>FCL - Fondo Capitalización Laboral (1.50%)</td><td>₡{{ format(report.fcl) }}</td></tr>
-          <tr><td>Fondo Pensiones Complementarias (2.00%)</td><td>₡{{ format(report.opc) }}</td></tr>
-          <tr><td>INS (1.00%)</td><td>₡{{ format(report.ins) }}</td></tr>
+            <tr><td>SEM (Seguro Enfermedad/Maternidad)</td><td>₡{{ format(report.sem) }}</td></tr>
+            <tr><td>IVM (Invalidez, Vejez y Muerte)</td><td>₡{{ format(report.ivm) }}</td></tr>
+            <tr><td>Cuota Patronal Banco Popular (0.25%)</td><td>₡{{ format(report.bpoP_OtherInstitutions) }}</td></tr>
+            <tr><td>Asignaciones Familiares (5.00%)</td><td>₡{{ format(report.familyAllocations) }}</td></tr>
+            <tr><td>IMAS (0.50%)</td><td>₡{{ format(report.imas) }}</td></tr>
+            <tr><td>INA (1.50%)</td><td>₡{{ format(report.ina) }}</td></tr>
+            <tr><td>Aporte Banco Popular (0.25%)</td><td>₡{{ format(report.bpoP_LPT) }}</td></tr>
+            <tr><td>FCL - Fondo Capitalización Laboral (1.50%)</td><td>₡{{ format(report.fcl) }}</td></tr>
+            <tr><td>Fondo Pensiones Complementarias (2.00%)</td><td>₡{{ format(report.opc) }}</td></tr>
+            <tr><td>INS (1.00%)</td><td>₡{{ format(report.ins) }}</td></tr>
 
-          <tr class="highlight">
-            <td><strong>Total pagos de ley</strong></td>
-            <td><strong>₡{{ format(report.legalDeductionsTotal) }}</strong></td>
-          </tr>
+            <tr class="highlight">
+              <td><strong>Total pagos de ley</strong></td>
+              <td><strong>₡{{ format(report.legalDeductionsTotal) }}</strong></td>
+            </tr>
 
-          <tr class="total">
-            <td><strong>Costo total empleador</strong></td>
-            <td><strong>₡{{ format(report.totalEmployerCost) }}</strong></td>
-          </tr>
-        </tbody>
-      </table>
+            <tr class="total">
+              <td><strong>Costo total empleador</strong></td>
+              <td><strong>₡{{ format(report.totalEmployerCost) }}</strong></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
   </div>
 </template>
@@ -59,6 +64,7 @@ import payrollService from '@/services/payrollService'
 import currentUserService from '@/services/currentUserService'
 import employerService from '@/services/employerService'
 import companyService from '@/services/companyService'
+import { generatePdfFromElement } from '@/utils/fileUtils'
 
 const report = ref({})
 const payrolls = ref([])
@@ -88,6 +94,20 @@ function formatDateRange(start, end) {
 const getSelectedPayroll = computed(() =>
   payrolls.value.find(p => p.id === selectedPayrollId.value)
 )
+
+const exportToPdf = async () => {
+  try {
+    const element = document.getElementById('employer-cost-report')
+    if (!element) {
+      console.error('No se encontró el contenedor del reporte')
+      return
+    }
+    const pdf = await generatePdfFromElement(element, 'reporte-costos-empleador.pdf')
+    pdf.triggerUserDownload()
+  } catch (error) {
+    console.error('Error al exportar a PDF:', error)
+  }
+}
 
 onMounted(async () => {
   try {
@@ -121,11 +141,6 @@ watch(selectedPayrollId, async (payrollId) => {
   margin: auto;
   font-family: 'Segoe UI', sans-serif;
   padding: 2rem;
-}
-
-.note {
-  font-size: 0.9rem;
-  color: #555;
 }
 
 .blue {
