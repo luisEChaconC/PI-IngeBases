@@ -1,8 +1,9 @@
-using AutoFixture;
+﻿using AutoFixture;
 using backend.Application.Commands;
 using backend.Application.Commands.PaymentDetails;
 using backend.Application.Commands.Payroll;
 using backend.Application.DTOs;
+using backend.Application.Exceptions;
 using backend.Application.GrossPaymentCalculation;
 using backend.Application.Orchestrators.Deduction;
 using backend.Application.Orchestrators.Payroll;
@@ -10,11 +11,9 @@ using backend.Application.Queries;
 using backend.Application.Queries.Company;
 using backend.Application.Queries.Employees;
 using backend.Application.Queries.Payroll;
-using backend.Application.Exceptions;
 using backend.Domain;
 using Moq;
 using NUnit.Framework;
-
 
 namespace TestPayrollSystem
 {
@@ -31,6 +30,8 @@ namespace TestPayrollSystem
         private Mock<IUpdatePayrollIdInTimesheetsCommand> _updatePayrollIdInTimesheetsCommand;
         private Mock<IInsertTimesheetsForPeriodCommand> _insertTimesheetsForPeriodCommand;
         private Mock<IDeductionOrchestrator> _deductionOrchestrator;
+        private Mock<IEmployerCostFromPayrollCommand> _employerCostFromPayrollCommand;
+
         private PayrollOrchestrator _sut;
         private Fixture _fixture;
 
@@ -47,6 +48,8 @@ namespace TestPayrollSystem
             _updatePayrollIdInTimesheetsCommand = new Mock<IUpdatePayrollIdInTimesheetsCommand>();
             _insertTimesheetsForPeriodCommand = new Mock<IInsertTimesheetsForPeriodCommand>();
             _deductionOrchestrator = new Mock<IDeductionOrchestrator>();
+            _employerCostFromPayrollCommand = new Mock<IEmployerCostFromPayrollCommand>();
+
             _sut = new PayrollOrchestrator(
                 _checkPayrollExistsQuery.Object,
                 _getEmployeesByCompanyIdQuery.Object,
@@ -57,8 +60,10 @@ namespace TestPayrollSystem
                 _createPaymentDetailCommand.Object,
                 _updatePayrollIdInTimesheetsCommand.Object,
                 _insertTimesheetsForPeriodCommand.Object,
-                _deductionOrchestrator.Object
+                _deductionOrchestrator.Object,
+                _employerCostFromPayrollCommand.Object // ← nuevo parámetro agregado aquí
             );
+
             _fixture = new Fixture();
         }
 

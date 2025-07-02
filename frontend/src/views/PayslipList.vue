@@ -27,8 +27,16 @@
       </div>
     </div>
 
+    <div class="mb-3 text-end">
+      <ExportDropdown 
+        element-id="payslip-list"
+        filename="colillas-de-pago.pdf"
+        email-subject="Colillas de pago"
+      />
+    </div>
+
     <!-- Si hay colillas, muestra la tabla -->
-<table v-if="filteredPayslips.length > 0" class="table table-bordered">
+<table v-if="filteredPayslips.length > 0" class="table table-bordered" id="payslip-list">
   <thead class="table-light">
     <tr class="text-center align-middle">
       <th>Tipo de reporte</th>
@@ -66,6 +74,7 @@
 import { ref, computed, onMounted } from 'vue'
 import currentUserService from '@/services/currentUserService';
 import payslipService from '@/services/payslipService';
+import ExportDropdown from '@/components/ExportDropdown.vue'
 
 
 const employeeId = currentUserService.getCurrentUserInformationFromLocalStorage().idNaturalPerson;
