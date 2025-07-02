@@ -15,7 +15,10 @@ const API_CONFIG = {
             GET_BY_ID: (employeeId) => `/api/EmployeeGetID/GetEmployeeById/${employeeId}`,
             UPDATE: '/api/Employee/UpdateEmployee',
             UPDATE_AS_EMPLOYER: '/api/Employer/UpdateEmployee',
-            HAS_PAYMENTS: (employeeId) => `/api/Employer/HasPayments/${employeeId}`
+            HAS_PAYMENTS: (employeeId) => `/api/Employer/HasPayments/${employeeId}`,
+            DELETE: (employeeId) => `/api/Employee/${employeeId}`
+
+
         },
         EMPLOYER: {
             BASE: '/employer',
@@ -43,13 +46,14 @@ const API_CONFIG = {
             ASSIGN: '/api/benefit/assign',
             GET_ASSIGNED: (employeeId) => `/api/benefit/assigned?employeeId=${employeeId}`,
             DISABLE: '/api/benefit/disable',
-            IS_ASSIGNED: (benefitId) => `/api/benefit/benefits/${benefitId}/is-assigned`
+            IS_ASSIGNED: (benefitId) => `/api/benefit/benefits/${benefitId}/is-assigned`,
+            DELETE: (benefitId) => `/api/benefit?benefitId=${benefitId}`
         },
         PAYROLL: {
             BASE: '/payroll',
+            CREATE: '/api/Payroll',
             GET_BY_COMPANY_ID: (companyId) => `/api/payroll/company/${companyId}`,
             GET_SUMMARY_BY_COMPANY_ID: (companyId) => `/api/payroll/company/${companyId}/summary`,
-            CREATE: '/api/payroll',
             UPDATE: (payrollId) => `/api/payroll/${payrollId}`
         },
         API: {
