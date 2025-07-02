@@ -1,4 +1,5 @@
 using backend.Application.Services;
+using backend.Application.DTOs;
 
 namespace backend.Application.Commands
 {
@@ -11,9 +12,23 @@ namespace backend.Application.Commands
             _emailService = emailService;
         }
 
-        public void Execute(string to, string subject, string body, string? attachmentBase64 = null, string? attachmentFilename = null, string? attachmentMimeType = null)
+        public void Execute(string to, string subject, string body, string? attachmentBase64 = null, string? attachmentFilename = null)
         {
-            _emailService.SendEmail(to, subject, body, attachmentBase64, attachmentFilename, attachmentMimeType);
+            if (!string.IsNullOrWhiteSpace(attachmentBase64))
+            {
+                if (attachmentFilename == null)
+                    throw new ArgumentNullException(nameof(attachmentFilename), "Attachment filename is required when attachment data is provided");
+
+                if (string.IsNullOrWhiteSpace(attachmentFilename))
+                    throw new ArgumentException("Attachment filename cannot be empty", nameof(attachmentFilename));
+            }
+
+            _emailService.SendEmail(
+                to,
+                subject,
+                body,
+                attachmentBase64,
+                attachmentFilename);
         }
     }
 }
