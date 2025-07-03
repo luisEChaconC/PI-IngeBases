@@ -130,6 +130,8 @@
 <script>
 import companyService from '@/services/companyService';
 import currentUserService from "@/services/currentUserService";
+import employeeService from '@/services/employeeService';
+import EmailService from '@/services/EmailService';
 import Swal from 'sweetalert2';
 
 export default {
@@ -223,14 +225,60 @@ export default {
         this.company.id = companyId;
 
         await companyService.updateCompany(companyId, this.company);
-        alert("Company updated successfully");
-      } catch (error) {
-        if (error.status === 409) {
-          alert("There's a register with this data already.");
-        } else {
-          alert("An error occurred while updating the company.");
+        Swal.fire({
+            icon: 'success',
+            title: '¡Empresa actualizada!',
+            text: 'La información se guardó correctamente.',
+            confirmButtonColor: '#3085d6',
+            confirmButtonText: 'Entendido'
+          });
+        } catch (error) {
+          if (error.status === 409) {
+            alert("There's a register with this data already.");
+          } else {
+            alert("An error occurred while updating the company.");
+          }
+          console.error("Error while updating company", error);
         }
-        console.error("Error while updating company", error);
+    },
+
+    async sendEmailToAllEmployeesBeforeDelete() {
+      try {
+        const currentUserInformation = currentUserService.getCurrentUserInformationFromLocalStorage();
+        const companyId = currentUserInformation.position?.trim() === "SoftwareManager"
+          ? localStorage.getItem("selectedCompanyId")
+          : currentUserInformation.companyId;
+
+        const employees = await employeeService.getEmployeesByCompanyId(companyId);
+
+        const employeeDetails = await Promise.all(
+          employees.map(emp => employeeService.getEmployeeById(emp.idEmployee))
+        );
+
+        // Extraer emails de empleados
+        const emails = employeeDetails
+          .map(emp => emp?.email)
+          .filter(email => !!email);
+        
+        // Correo del empleador
+        if (currentUserInformation.email && !emails.includes(currentUserInformation.email)) {
+          emails.push(currentUserInformation.email);
+        }
+
+        const emailPromises = emails.map(email => {
+          const emailData = {
+            to: email,
+            subject: 'Notificación de eliminación de empresa',
+            body: 'La empresa será eliminada del sistema de planillas. En caso de dudas, contacte al administrador.'
+          };
+          return EmailService.sendEmail(emailData);
+        });
+
+        await Promise.all(emailPromises);
+        alert('Correos enviados a todos los empleados.');
+      } catch (error) {
+        alert('Error al enviar correos a los empleados.');
+        console.error(error);
       }
     },
 
@@ -251,7 +299,7 @@ export default {
           const companyId = currentUserInformation.position?.trim() === "SoftwareManager"
             ? localStorage.getItem("selectedCompanyId")
             : currentUserInformation.companyId;
-
+          this.sendEmailToAllEmployeesBeforeDelete();
           companyService.deleteCompany(companyId)
             .then(() => {
               Swal.fire(

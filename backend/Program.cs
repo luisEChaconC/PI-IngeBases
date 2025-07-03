@@ -21,6 +21,8 @@ using backend.Application.Queries.Payroll;
 using backend.Repositories;
 using backend.Application.Payslip.Queries;
 using backend.Application.Payslip.Services;
+using backend.Infraestructure.service;
+using backend.Application.Services;
 using MediatR;
 using System.Reflection;
 using backend.Application.Queries.EmployerPayrollReport;
@@ -146,6 +148,9 @@ builder.Services.AddScoped<GrossPaymentCalculationOrchestrator>();
 builder.Services.AddScoped<ICalculateGrossPaymentQuery, CalculateGrossPaymentQuery>();
 builder.Services.AddScoped<IDisableBenefitForEmployeeCommand, DisableBenefitForEmployeeCommand>();
 
+// Email service
+builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddScoped<ISendEmailCommand, SendEmailCommand>();
 // Employer Cost
 builder.Services.AddScoped<IEmployerCostRepository, EmployerCostRepository>();
 builder.Services.AddScoped<IEmployerCostStrategy, EmployerCostStrategy>();

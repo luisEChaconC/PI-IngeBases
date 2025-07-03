@@ -38,8 +38,12 @@
               </tbody>
             </table>
           </div>
-          <div class="mt-3 text-end">
-            <button class="btn btn-primary" @click="exportToPdf">Exportar a PDF</button>
+          <div class="mt-3">
+            <ExportDropdown 
+              element-id="table-to-export"
+              filename="empresas.pdf"
+              email-subject="Lista de Empresas"
+            />
           </div>
         </div>
       </div>
@@ -50,53 +54,33 @@
 
 <script>
 import companyService from '@/services/companyService';
-import { ref, onMounted } from 'vue';
-import { useRouter } from 'vue-router';
-import { generatePdfFromElement } from '@/utils/fileUtils';
+import ExportDropdown from '@/components/ExportDropdown.vue';
 
 export default {
   name: 'ViewCompaniesListPdf',
-  setup() {
-    const companies = ref([]);
-    const router = useRouter(); 
-
-    const getCompanies = async () => {
+  components: {
+    ExportDropdown,
+  },
+  data() {
+    return {
+      companies: [],
+    };
+  },
+  methods: {
+    async getCompanies() {
       try {
-        companies.value = await companyService.getAllCompanies();
+        this.companies = await companyService.getAllCompanies();
       } catch (error) {
         console.error("Error fetching companies:", error);
       }
-    };
-
-    const verEmpresa = (companyId) => {
-      localStorage.setItem("selectedCompanyId", companyId); 
-      router.push('/view-company-info'); 
-    };
-
-    const exportToPdf = async () => {
-      try {
-        const tableElement = document.getElementById('table-to-export');
-        if (!tableElement) {
-          console.error("Table element not found!");
-          return;
-        }
-        console.log("Table element found:", tableElement);
-        const pdf = await generatePdfFromElement(tableElement, 'empresas.pdf');
-        pdf.triggerUserDownload();
-      } catch (error) {
-        console.error("Error exporting to PDF:", error);
-      }
-    };
-
-    onMounted(() => {
-      getCompanies();
-    });
-
-    return {
-      companies,
-      verEmpresa,
-      exportToPdf,
-    };
+    },
+    verEmpresa(companyId) {
+      localStorage.setItem("selectedCompanyId", companyId);
+      this.$router.push('/view-company-info');
+    },
+  },
+  mounted() {
+    this.getCompanies();
   },
 };
 </script>
