@@ -8,7 +8,7 @@ using System.Threading;
 
 namespace UIAutomationTests
 {
-    public class SeleniumTests
+    public class EditEmployeeTests
     {
         private IWebDriver _driver;
         private WebDriverWait _wait;
