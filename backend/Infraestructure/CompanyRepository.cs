@@ -99,11 +99,14 @@ namespace backend.Infraestructure
             List<CompanyModel> companies = new List<CompanyModel>();
             var query = @"
         SELECT c.Id, c.Name, c.Description, c.PaymentType, c.MaxBenefitsPerEmployee, 
-               c.CreationDate, c.CreationAuthor, c.LastModificationDate, c.LastModificationAuthor,
+               c.CreationDate, c.CreationAuthor, c.LastModificationDate, c.LastModificationAuthor, c.isDeleted,
                p.Province, p.Canton, p.Neighborhood, p.AdditionalDirectionDetails, p.LegalId,
-               (SELECT COUNT(*) FROM Employees e WHERE e.CompanyId = c.Id) AS EmployeeCount
+               (SELECT COUNT(*) FROM Employees e WHERE e.CompanyId = c.Id) AS EmployeeCount,
+               np.FirstName + ' ' + np.FirstSurname + ' ' + ISNULL(np.SecondSurname, '') AS EmployerFullName
         FROM Companies c
         INNER JOIN Persons p ON c.Id = p.Id
+        INNER JOIN Employers e ON c.Id = e.CompanyId
+        INNER JOIN NaturalPersons np ON e.Id = np.Id
         ORDER BY c.Name";
 
             using (var connection = new SqlConnection(_connectionString))
@@ -126,12 +129,13 @@ namespace backend.Infraestructure
                                     PaymentType = reader["PaymentType"].ToString(),
                                     MaxBenefitsPerEmployee = reader["MaxBenefitsPerEmployee"] != DBNull.Value ? (int?)reader["MaxBenefitsPerEmployee"] : null,
                                     CreationDate = (DateTime)reader["CreationDate"],
-                                    CreationAuthor = reader["CreationAuthor"] != DBNull.Value ? reader["CreationAuthor"].ToString() : null,
+                                    CreationAuthor = reader["EmployerFullName"] != DBNull.Value ? reader["EmployerFullName"].ToString() : null,
                                     LastModificationDate = reader["LastModificationDate"] != DBNull.Value ? (DateTime?)reader["LastModificationDate"] : null,
                                     LastModificationAuthor = reader["LastModificationAuthor"] != DBNull.Value ? reader["LastModificationAuthor"].ToString() : null,
                                     Employees = new List<EmployeeModel>(),
                                     EmployeeCount = Convert.ToInt32(reader["EmployeeCount"]),
-                                    LegalId = reader["LegalId"].ToString()
+                                    LegalId = reader["LegalId"].ToString(),
+                                    IsDeleted = reader["isDeleted"] != DBNull.Value && (bool)reader["isDeleted"],
                                 };
 
                                 companies.Add(company);
@@ -162,7 +166,7 @@ namespace backend.Infraestructure
             // SQL query to select a company by ID
             var query = @"
                 SELECT c.Id, c.Name, c.Description, c.PaymentType, c.MaxBenefitsPerEmployee, 
-                       c.CreationDate, c.CreationAuthor, c.LastModificationDate, c.LastModificationAuthor,
+                       c.CreationDate, c.CreationAuthor, c.LastModificationDate, c.LastModificationAuthor, c.isDeleted,
                        p.Province, p.Canton, p.Neighborhood, p.AdditionalDirectionDetails
                 FROM Companies c
                 INNER JOIN Persons p ON c.Id = p.Id
@@ -201,7 +205,8 @@ namespace backend.Infraestructure
                                     LastModificationAuthor = reader["LastModificationAuthor"] != DBNull.Value ? reader["LastModificationAuthor"].ToString() : null,
                                     Person = _personRepository.GetPersonById(reader["Id"].ToString()),
                                     Contact = _contactRepository.GetContactsById(reader["Id"].ToString()),
-                                    EmployeesDynamic = _employeeRepository.GetEmployeesByCompanyId(reader["Id"].ToString())
+                                    EmployeesDynamic = _employeeRepository.GetEmployeesByCompanyId(reader["Id"].ToString()),
+                                    IsDeleted = reader["isDeleted"] != DBNull.Value && Convert.ToBoolean(reader["isDeleted"]),
                                 };
                             }
                         }
@@ -220,7 +225,7 @@ namespace backend.Infraestructure
             // Return the company (or null if not found)
             return company;
         }
-        
+
         public async Task<string> GetPaymentTypeByIdAsync(Guid companyId)
         {
             string paymentType = null;
@@ -285,11 +290,11 @@ namespace backend.Infraestructure
                 cmd.CommandType = CommandType.StoredProcedure;
                 cmd.Parameters.AddWithValue("@Email", email);
                 cmd.Parameters.AddWithValue("@PersonId", personId);
-                cmd.ExecuteNonQuery(); 
+                cmd.ExecuteNonQuery();
             }
         }
 
-    	public void UpdateCompany(UpdateCompanyModel company)
+        public void UpdateCompany(UpdateCompanyModel company)
         {
             using (var connection = new SqlConnection(_connectionString))
             {
@@ -342,6 +347,20 @@ namespace backend.Infraestructure
                     command.Parameters.AddWithValue("@Email", company.Contact.Email);
                     command.Parameters.AddWithValue("@MaxBenefitsPerEmployee", company.MaxBenefits);
 
+                    command.ExecuteNonQuery();
+                }
+            }
+        }
+        
+        public void DeleteCompany(string companyId)
+        {
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                connection.Open();
+                using (var command = new SqlCommand("sp_DeleteCompany", connection))
+                {
+                    command.CommandType = CommandType.StoredProcedure;
+                    command.Parameters.AddWithValue("@CompanyId", Guid.Parse(companyId));
                     command.ExecuteNonQuery();
                 }
             }

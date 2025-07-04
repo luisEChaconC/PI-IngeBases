@@ -19,6 +19,13 @@ using backend.Application.Orchestrators.Deduction;
 using backend.Application.Orchestrators.Payroll;
 using backend.Application.Queries.Payroll;
 using backend.Repositories;
+using backend.Application.Payslip.Queries;
+using backend.Application.Payslip.Services;
+using backend.Infraestructure.service;
+using backend.Application.Services;
+using MediatR;
+using System.Reflection;
+using backend.Application.Queries.EmployerPayrollReport;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -39,6 +46,16 @@ builder.Services.AddControllers()
     {
         options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
     });
+
+builder.Services.AddMediatR(cfg =>
+{
+    cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly());
+});
+
+builder.Services.AddMediatR(cfg =>
+{
+    cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly());
+});
 
 // Add services to the container.
 builder.Services.AddControllers();
@@ -78,6 +95,7 @@ builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
 builder.Services.AddScoped<GetBenefitsQuery>();
 builder.Services.AddScoped<GetBenefitByIdQuery>();
 builder.Services.AddScoped<CreateBenefitCommand>();
+builder.Services.AddScoped<DeleteBenefitCommand>();
 builder.Services.AddScoped<AssignBenefitsToEmployeeCommand>();
 builder.Services.AddScoped<GetAssignedBenefitsQuery>();
 builder.Services.AddScoped<UpdateBenefitCommand>();
@@ -102,8 +120,25 @@ builder.Services.AddHttpClient<BenefitDeductionStrategy>();
 
 builder.Services.AddScoped<IDeductionDetailRepository, DeductionDetailRepository>();
 builder.Services.AddScoped<IInsertDeductionDetailsCommand, InsertDeductionDetailsCommand>();
+builder.Services.AddScoped<IUpdateEmployerChargesCommand, UpdateEmployerChargesCommand>();
 
 
+
+//Payslip
+
+builder.Services.AddScoped<IPayslipRepository, PayslipRepository>();
+
+builder.Services.AddScoped<GetPayslipsByEmployeeIdQuery>();
+builder.Services.AddScoped<GetPayslipByEmployeeIdAndStartDateQuery>();
+builder.Services.AddScoped<IBuildPayslipItems, BuildPayslipItems>();
+builder.Services.AddScoped<ICompanyReportRepository, CompanyReportRepository>();
+builder.Services.AddScoped<IGetCompanyReportsQuery, GetCompanyReportsQuery>();
+
+
+// Employer Payroll Report
+
+builder.Services.AddScoped<IEmployerPayrollReportRepository, EmployerPayrollReportRepository>();
+builder.Services.AddScoped<IGetEmployerEmployeePayrollReportQuery, GetEmployerEmployeePayrollReportQuery>();
 
 
 
@@ -112,6 +147,16 @@ builder.Services.AddScoped<GrossPaymentCalculationOrchestrator>();
 
 builder.Services.AddScoped<ICalculateGrossPaymentQuery, CalculateGrossPaymentQuery>();
 builder.Services.AddScoped<IDisableBenefitForEmployeeCommand, DisableBenefitForEmployeeCommand>();
+
+// Email service
+builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddScoped<ISendEmailCommand, SendEmailCommand>();
+// Employer Cost
+builder.Services.AddScoped<IEmployerCostRepository, EmployerCostRepository>();
+builder.Services.AddScoped<IEmployerCostStrategy, EmployerCostStrategy>();
+builder.Services.AddScoped<IEmployerCostFromPayrollCommand, EmployerCostFromPayrollCommand>();
+builder.Services.AddScoped<IGetEmployerCostQuery, GetEmployerCostQuery>();
+builder.Services.AddScoped<IGetGrossSalaryByPayrollIdQuery, GetGrossSalaryByPayrollIdQuery>();
 
 var app = builder.Build();
 

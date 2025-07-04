@@ -112,6 +112,10 @@
                     <button v-if="isEditing" type="button" class="btn btn-outline-secondary px-4" @click="cancelEdit">
                       Cancelar
                     </button>
+
+                    <button type="button" class="btn btn-outline-danger px-4" @click="deleteCompany">
+                      Eliminar
+                    </button>
                   </div>
                 </div>
               </div>
@@ -124,8 +128,12 @@
 </template>
 
 <script>
-import axios from 'axios';
+import companyService from '@/services/companyService';
 import currentUserService from "@/services/currentUserService";
+import employeeService from '@/services/employeeService';
+import EmailService from '@/services/EmailService';
+import Swal from 'sweetalert2';
+
 export default {
   name: 'ViewCompanyInfo',
   data() {
@@ -159,28 +167,20 @@ export default {
   methods: {
     async getCompanyById(companyId) {
       try {
- 
-        const companyResponse = await axios.get(`https://localhost:5000/api/Company/GetCompanyById/${companyId}`);
-        this.company = companyResponse.data;
-        this.company.employeesCount = companyResponse.data.employeesDynamic.length;
+        const companyData = await companyService.getCompanyById(companyId);
+        this.company = companyData;
+        this.company.employeesCount = companyData.employeesDynamic.length;
         
-        const contactsList = companyResponse.data.contact; 
+        const contactsList = companyData.contact; 
 
         this.company.contact = {
           phoneNumber: contactsList.find(c => c.phoneNumber)?.phoneNumber || "",
           email: contactsList.find(c => c.email)?.email || ""
         };
 
-        this.company.maxBenefits = companyResponse.data.maxBenefitsPerEmployee;
+        this.company.maxBenefits = companyData.maxBenefitsPerEmployee;
 
-        try {
-          // verifica si la empresa tiene planilla
-          const payrollResponse = await axios.get(`https://localhost:5000/api/Payroll/company/${companyId}`);
-          this.hasPayroll = payrollResponse.data && payrollResponse.data.length > 0;
-        } catch (payrollError) {
-       
-          this.hasPayroll = false;
-        }
+        this.hasPayroll = await companyService.checkCompanyHasPayrolls(companyId);
       } catch (error) {
         console.error("Error retrieving company:", error);
       }
@@ -197,7 +197,7 @@ export default {
       this.isEditing = !this.isEditing;
     }, 
 
-   updateCompany() {
+   async updateCompany() {
  
       if (this.isEditingEmail && !this.emailHasValidFormat()) {
         alert("El correo no tiene un formato válido.");
@@ -215,30 +215,116 @@ export default {
         return;
       }
 
-      const currentUserInformation = currentUserService.getCurrentUserInformationFromLocalStorage();
+      try {
+        const currentUserInformation = currentUserService.getCurrentUserInformationFromLocalStorage();
 
-      const companyId = currentUserInformation.position?.trim() === "SoftwareManager"
-        ? localStorage.getItem("selectedCompanyId")
-        : currentUserInformation.companyId;
+        const companyId = currentUserInformation.position?.trim() === "SoftwareManager"
+          ? localStorage.getItem("selectedCompanyId")
+          : currentUserInformation.companyId;
 
-      this.company.id = companyId;
-      this.company.person.legalId = this.company.person.legalId.replace(/-/g, '');
-      this.company.contact.phoneNumber = this.company.contact.phoneNumber.replace(/-/g, '');
-      axios.put(`https://localhost:5000/api/Company/${companyId}`, this.company)
-        .then(() => {
-          alert("Company updated successfully");
-        })
-        .catch((error) => {
-          if (error.response && error.response.status === 409) {
-            alert(error.response.data.message || "There's a register with this data already.");
+        this.company.id = companyId;
+
+        await companyService.updateCompany(companyId, this.company);
+        Swal.fire({
+            icon: 'success',
+            title: '¡Empresa actualizada!',
+            text: 'La información se guardó correctamente.',
+            confirmButtonColor: '#3085d6',
+            confirmButtonText: 'Entendido'
+          });
+        } catch (error) {
+          if (error.status === 409) {
+            alert("There's a register with this data already.");
           } else {
             alert("An error occurred while updating the company.");
           }
-          console.error("Data sent:", this.company);
-          console.error("Error while updating company", error.response?.data);
-        });
+          console.error("Error while updating company", error);
+        }
     },
 
+    async sendEmailToAllEmployeesBeforeDelete() {
+      try {
+        const currentUserInformation = currentUserService.getCurrentUserInformationFromLocalStorage();
+        const companyId = currentUserInformation.position?.trim() === "SoftwareManager"
+          ? localStorage.getItem("selectedCompanyId")
+          : currentUserInformation.companyId;
+
+        const employees = await employeeService.getEmployeesByCompanyId(companyId);
+
+        const employeeDetails = await Promise.all(
+          employees.map(emp => employeeService.getEmployeeById(emp.idEmployee))
+        );
+
+        // Extraer emails de empleados
+        const emails = employeeDetails
+          .map(emp => emp?.email)
+          .filter(email => !!email);
+        
+        // Correo del empleador
+        if (currentUserInformation.email && !emails.includes(currentUserInformation.email)) {
+          emails.push(currentUserInformation.email);
+        }
+
+        const emailPromises = emails.map(email => {
+          const emailData = {
+            to: email,
+            subject: 'Notificación de eliminación de empresa',
+            body: 'La empresa será eliminada del sistema de planillas. En caso de dudas, contacte al administrador.'
+          };
+          return EmailService.sendEmail(emailData);
+        });
+
+        await Promise.all(emailPromises);
+        alert('Correos enviados a todos los empleados.');
+      } catch (error) {
+        alert('Error al enviar correos a los empleados.');
+        console.error(error);
+      }
+    },
+
+    deleteCompany() {
+      Swal.fire({
+        title: '¿Estás seguro?',
+        text: "Esta acción eliminará la empresa",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: 'Sí, eliminar',
+        cancelButtonText: 'Cancelar'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          const currentUserInformation = currentUserService.getCurrentUserInformationFromLocalStorage();
+
+          const companyId = currentUserInformation.position?.trim() === "SoftwareManager"
+            ? localStorage.getItem("selectedCompanyId")
+            : currentUserInformation.companyId;
+          this.sendEmailToAllEmployeesBeforeDelete();
+          companyService.deleteCompany(companyId)
+            .then(() => {
+              Swal.fire(
+                'Eliminado',
+                'La empresa ha sido eliminada exitosamente.',
+                'success'
+              );
+              if(currentUserInformation.position?.trim() === "SoftwareManager") {    
+                this.$router.push("/view-companies-list");  
+              } else {    
+                localStorage.removeItem("currentUserInformation");    
+                this.$router.push("/login");  
+              }
+            })
+            .catch(error => {
+              Swal.fire(
+                'Error',
+                'Ocurrió un error al eliminar la empresa.',
+                'error'
+              );
+              console.error("Error al eliminar empresa:", error.response?.data || error);
+            });
+        }
+      });
+    },
 
     handleBack() {
       const raw = localStorage.getItem("currentUserInformation");

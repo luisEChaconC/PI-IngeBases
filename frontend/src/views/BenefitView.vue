@@ -1,15 +1,14 @@
 <template>
-  <h3 class="fw-bold mb-4 text-center">Beneficio</h3>
-  <div class="container d-flex justify-content-center align-items-center mt-5">
-    <router-link
-      to="/benefits"
-      class="btn btn-outline-secondary position-absolute top-0 start-0 m-3"
-      title="Volver a la lista de beneficios"
-    >
-      ← Volver
-    </router-link>
-
-    <div class="card shadow-sm p-4 rounded-4" style="width: 400px;">
+  <router-link
+    to="/benefits"
+    class="btn btn-outline-secondary ms-5 mt-3"
+    title="Volver a la lista de beneficios"
+    style="z-index: 10;"
+  >
+    ← Volver
+  </router-link>
+  <div class="container d-flex flex-column justify-content-center align-items-center" >
+    <div class="card shadow-sm p-4 rounded-4 my-5" style="width: 400px;">
       <h3 class="fw-bold mb-4">Beneficio</h3>
 
       <div class="mb-3">
@@ -109,23 +108,29 @@
         </ul>
       </div>
 
-      <div class="text-center mt-4">
-        <button v-if="!isEditable" class="btn btn-dark" @click="handleEditClick">
-          Editar beneficio
+      <div class="d-flex justify-content-center align-items-center mt-4">
+        <div class="text-center me-2">
+          <button v-if="!isEditable" class="btn btn-dark" @click="handleEditClick">
+            Editar
+          </button>
+
+          <div v-else>
+            <button class="btn btn-success me-2" @click="guardarCambios">
+              Guardar Cambios
+            </button>
+            <button class="btn btn-outline-secondary" @click="cancelarEdicion">
+              Cancelar
+            </button>
+          </div>
+
+          <div v-if="showApiEditWarning" class="alert alert-warning mt-3" role="alert">
+            El beneficio tiene parámetros y ya ha sido seleccionado
+          </div>
+        </div>
+
+        <button v-if="!isEditable" class="btn btn-danger" @click="deleteBenefit">
+          Eliminar
         </button>
-
-        <div v-else>
-          <button class="btn btn-success me-2" @click="guardarCambios">
-            Guardar Cambios
-          </button>
-          <button class="btn btn-outline-secondary" @click="cancelarEdicion">
-            Cancelar
-          </button>
-        </div>
-
-        <div v-if="showApiEditWarning" class="alert alert-warning mt-3" role="alert">
-          El beneficio tiene parámetros y ya ha sido seleccionado
-        </div>
       </div>
     </div>
   </div>
@@ -137,8 +142,9 @@
   
   import { computed, onMounted, ref } from 'vue'
   import { useRoute } from 'vue-router'
-  import axios from 'axios'
-  
+  import benefitService from '@/services/benefitService'
+  import Swal from 'sweetalert2'
+
   const route = useRoute()
   const benefitId = route.params.id
   const benefit = ref({})
@@ -207,8 +213,7 @@
   const handleEditClick = async () => {
     try {
       const isApiType = benefit.value.type === 'API'
-      const response = await axios.get(`https://localhost:5000/api/benefit/benefits/${benefit.value.id}/is-assigned`)
-      assigned.value = response.data
+      assigned.value = await benefitService.benefitIsAssigned(benefit.value.id)
 
       if (isApiType && assigned.value) {
         showApiEditWarning.value = true
@@ -227,6 +232,68 @@
     }
   }
 
+  const deleteBenefit = () => {
+    Swal.fire({
+      title: '¿Está seguro?',
+      text: "Esta acción eliminará el beneficio",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#6c757d',
+      confirmButtonText: 'Sí, eliminar',
+      cancelButtonText: 'Cancelar'
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          // Usa el servicio en vez de axios directamente
+          const response = await benefitService.deleteBenefit(benefit.value.id);
+          const { resultCode, resultMessage } = response;
+
+          let mensaje = '';
+          switch (resultCode) {
+            case 'MarkedAsDeleted':
+              mensaje = 'El beneficio ha sido marcado como eliminado. Su visibilidad permanecerá activa hasta el siguiente periodo de pago para fines históricos.';
+              break;
+            case 'DeletedWithAssignments':
+              mensaje = 'Beneficio eliminado. Las asignaciones activas han sido removidas.';
+              break;
+            case 'Deleted':
+              mensaje = 'Beneficio eliminado correctamente.';
+              break;
+            case 'Error':
+              mensaje = 'Ocurrió un error al eliminar el beneficio: ' + (resultMessage || '');
+              break;
+            default:
+              mensaje = resultMessage || 'Resultado desconocido.';
+          }
+
+          Swal.fire({
+            icon: resultCode === 'Error' ? 'error' : 'success',
+            title: mensaje,
+          }).then(() => {
+            if (resultCode !== 'Error') {
+              window.location.href = '/benefits';
+            }
+          });
+
+        } catch (error) {
+          let mensaje = 'No se pudo conectar con el servidor. Intente de nuevo más tarde.';
+          if (error.response) {
+            if (error.response.status === 400) {
+              mensaje = error.response.data?.resultMessage || 'Solicitud inválida. El ID del beneficio es requerido.';
+            } else if (error.response.status === 500) {
+              mensaje = error.response.data?.resultMessage || 'Error interno del servidor al eliminar el beneficio.';
+            }
+          }
+          Swal.fire({
+            icon: 'error',
+            title: mensaje
+          });
+        }
+      }
+    });
+  }
+
   const cancelarEdicion = () => {
     benefit.value = JSON.parse(JSON.stringify(originalBenefit.value))
     isEditable.value = false
@@ -241,16 +308,11 @@
         companyId, 
       }
 
-      const response = await axios.put(
-        `https://localhost:5000/api/benefit/${benefit.value.id}`,
-        updatedBenefit
-      )
-
-      if (response.status === 200) {
-        isEditable.value = false
-        originalBenefit.value = JSON.parse(JSON.stringify(benefit.value)) 
-        alert('Beneficio actualizado correctamente.')
-      }
+      await benefitService.updateBenefit(benefit.value.id, updatedBenefit)
+    
+      isEditable.value = false
+      originalBenefit.value = JSON.parse(JSON.stringify(benefit.value)) 
+      alert('Beneficio actualizado correctamente.')
     } catch (error) {
       if (error.response?.status === 409) {
         alert('No se puede editar el beneficio porque ya fue asignado a empleados.')
@@ -267,10 +329,7 @@
   onMounted(async () => {
     try {
       const companyId = getCurrentUserInformationFromLocalStorage()?.companyId
-      const response = await axios.get(`https://localhost:5000/api/benefit/${benefitId}`, {
-        params: { companyId }
-      })
-    const data = response.data
+      const data = await benefitService.getBenefitById(benefitId, companyId)
     data.eligibleEmployeeTypes = data.eligibleEmployeeTypes || []
     benefit.value = data
     } catch (error) {

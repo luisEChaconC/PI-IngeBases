@@ -133,7 +133,7 @@
 </template>
 
 <script>
-    import axios from 'axios';
+    import employerService from '@/services/employerService';
     export default {
         name: 'EmployerRegistration',
         props: {
@@ -202,66 +202,19 @@
 
             async registerEmployer() {
                 try {
-                    const payload = {
-                        person: {
-                            id: "",
-                            legalId: this.removeHyphens(this.employer.legalId),
-                            type: "Natural Person",
-                            province: "",
-                            canton: "",
-                            district: "",
-                            neighborhood: "",
-                            additionalDirectionDetails: ""
-                        },
-                        user: {
-                            id: "",
-                            email: this.employer.email,
-                            password: this.employer.password,
-                            isAdmin: false
-                        },
-                        naturalPerson: {
-                            id: "",
-                            firstName: this.employer.name.firstName,
-                            firstSurname: this.employer.name.firstSurname,
-                            secondSurname: this.employer.name.secondSurname,
-                            userId: ""
-                        },
-                        contact: {
-                            id: "",
-                            type: "Phone Number",
-                            phoneNumber: this.removeHyphens(this.employer.phoneNumber),
-                            email: "",
-                            personId: ""
-                        },
-                        employer: {
-                            id: "",
-                            workerId: "asdf",
-                            companyId: this.companyId
-                        }
+                    const employerData = {
+                        legalId: this.employer.legalId,
+                        email: this.employer.email,
+                        password: this.employer.password,
+                        name: this.employer.name,
+                        phoneNumber: this.employer.phoneNumber,
+                        companyId: this.companyId
                     };
                     
-                    console.log("Sending data:", JSON.stringify(payload, null, 2));
-                    
-                    const response = await axios.post('https://localhost:5000/api/Employer/CreateEmployerWithDependencies', payload);
-                    
-                    if (response.status === 201) {
-                        return true;
-                    } else {
-                        return false;
-                    }
+                    await employerService.createEmployerWithDependencies(employerData);
+                    return true;
                 } catch (error) {
-                    console.error("Error details:", error);
-                    if (error.response) {
-                        console.error("Response data:", error.response.data);
-                        console.error("Status:", error.response.status);
-                        if (error.response.data && error.response.data.errors) {
-                            console.error("Validation errors:", error.response.data.errors);
-                        }
-                    } else if (error.request) {
-                        console.error("No response received:", error.request);
-                    } else {
-                        console.error("Error:", error.message);
-                    }
+                    console.error("Error creating employer:", error);
                     return false;
                 }
             },

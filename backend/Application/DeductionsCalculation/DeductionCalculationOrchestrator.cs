@@ -72,7 +72,15 @@ namespace backend.Application.DeductionCalculation
 
             foreach (var strategy in _strategies)
             {
-                var amount = strategy.CalculateDeduction(grossSalary, contractType, gender);
+            
+                var amount = strategy.CalculateDeduction(
+               grossSalary,
+               contractType,
+               gender,
+               benefit: null,
+               employeeId: null,
+               paymentDetailsId: paymentDetailsId);
+
                 if (amount > 0)
                 {
                     totalAmountDeduced += amount;
@@ -82,7 +90,8 @@ namespace backend.Application.DeductionCalculation
                         Name = strategy.GetType().Name.Replace("DeductionStrategy", ""),
                         AmountDeduced = amount,
                         PaymentDetailsId = paymentDetailsId,
-                        DeductionType = "mandatory"
+                        DeductionType = "mandatory",
+                        BenefitId = null
                     });
                 }
             }
@@ -111,7 +120,7 @@ namespace backend.Application.DeductionCalculation
                 .Select(b => new
                 {
                     Benefit = b,
-                    Amount = _benefitStrategy.CalculateDeduction(grossSalary, contractType, gender, b, employeeId)
+                    Amount = _benefitStrategy.CalculateDeduction(grossSalary, contractType, gender, b, employeeId, paymentDetailsId)
                 })
                 .OrderBy(x => x.Amount)
                 .ToList();
@@ -141,8 +150,15 @@ namespace backend.Application.DeductionCalculation
                     Name = item.Benefit.Name,
                     AmountDeduced = item.Amount,
                     PaymentDetailsId = paymentDetailsId,
-                    DeductionType = "voluntary"
+                    DeductionType = "voluntary",
+                    BenefitId = Guid.Parse(item.Benefit.Id)
                 });
+
+                if (item.Benefit.IsDeleted)
+                {
+                    _disableBenefitForEmployeeCommand.Execute(Guid.Parse(item.Benefit.Id), employeeId);
+                    continue;
+                }
             }
         }
     }
