@@ -2,7 +2,7 @@
   <div class="container mt-5">
       <div class="position-relative mb-4">
         <router-link
-          to="/main-menu"
+          to="/home-view"
           class="btn btn-outline-secondary"
           title="Volver al menú principal"
         >
@@ -20,11 +20,11 @@
                   <option v-for="n in 5" :key="n" :value="n">{{ n }}</option>
               </select>
           </div>
-          <div class="col text-end">
-              <router-link to="/benefit/create" class="btn btn-dark">
-                  + Nuevo beneficio
-              </router-link>
-          </div>
+            <div class="col text-end" v-if="role !== 'Payroll Manager'">
+                <router-link to="/benefit/create" class="btn btn-dark">
+                    + Nuevo
+                </router-link>
+            </div>
       </div>
 
       <table class="table table-bordered">
@@ -62,6 +62,8 @@ import currentUserService from "@/services/currentUserService";
 
 
 const maxBenefits = ref(3); 
+
+const role = currentUserService.getCurrentUserInformationFromLocalStorage()?.position;
 
 const getCompanyMaxBenefits = async () => {
   try {

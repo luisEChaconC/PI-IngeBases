@@ -2,7 +2,7 @@
   <div class="container my-5">
     <div class="position-relative mb-4">
       <router-link
-          to="/main-menu"
+          to="/home-view"
           class="btn btn-outline-secondary"
           title="Volver al menú principal"
         >
@@ -51,10 +51,34 @@
                   :value="benefit"
                   v-model="tempSelection"
                   :id="'benefit-' + index"
+                  @change="onBenefitToggle(benefit)"
                 />
                 <label class="form-check-label" :for="'benefit-' + index">
                   {{ benefit.name }}
                 </label>
+                  <div
+                    v-if="benefit && benefit.type === 'API' && tempSelection.includes(benefit) && apiParametersByBenefitId[benefit.id]"
+                    class="ms-4 mt-2"
+                  >
+                  <div
+                    v-for="(paramObj, paramName) in apiParametersByBenefitId[benefit.id]"
+                    :key="benefit.id + '-' + paramName"
+                    class="mb-2"
+                  >
+                    <label class="form-label" :for="paramName">
+                      {{ traducirParametro(paramName) }}
+                    </label>
+                      <input
+                        class="form-control"
+                        :type="obtenerTipoInput(paramObj.type)"
+                        v-model="apiParametersByBenefitId[benefit.id][paramName].value"
+                        :id="paramName"
+                        :required="true"
+                        :min="paramObj.type.toLowerCase() === 'int' ? 0 : null"
+                        :step="paramObj.type.toLowerCase() === 'int' ? 1 : null"
+                      />
+                  </div>
+                  </div>
               </div>
 
               <div v-if="exceedsLimit" class="alert alert-warning mt-3" role="alert">
@@ -88,30 +112,110 @@ export default {
     const maxBenefits = ref(3);
     const modalInstance = ref(null);
     const benefitsModal = ref(null);
+    const allApis = ref([]);
+    const apiParametersByBenefitId = ref({});
     const availableBenefits = computed(() =>
       allBenefits.value.filter(
         (b) => !selectedBenefits.value.some((sb) => sb.id === b.id)
       )
     );
 
+    const getAllApis = async () => {
+      try {
+        const response = await axios.get("https://localhost:5000/api/API");
+        allApis.value = response.data;
+      } catch (error) {
+        console.error("Error obteniendo APIs:", error);
+      }
+    };
+
+    const tipoParametroPorNombre = {
+      "Association Name": "string",
+      "Date of birth": "date",
+      "Dependents": "int"
+    };
+
+    const traducirParametro = (param) => {
+      const traducciones = {
+        "Association Name": 'Nombre de la asociación',
+        "Date of birth": 'Fecha de Nacimiento',
+        "Dependents": 'Número de dependientes',
+      };
+      return traducciones[param] || param;
+    };
+
+    const onBenefitToggle = async (benefit) => {
+      if (benefit.type !== 'API') return;
+
+      if (apiParametersByBenefitId.value[benefit.id]) return;
+
+      const matchedApi = allApis.value.find(api => api.name === benefit.name);
+
+      if (!matchedApi) {
+        console.warn(`No se encontró una API con nombre ${benefit.name}`);
+        return;
+      }
+
+      try {
+        const response = await axios.get(`https://localhost:5000/api/API/${matchedApi.id}/parameters`);
+        const userDefinedParams = response.data.filter(p => p.type === 'UserDefined');
+        console.log(userDefinedParams);
+        apiParametersByBenefitId.value[benefit.id] = {};
+        userDefinedParams.forEach(param => {
+          apiParametersByBenefitId.value[benefit.id][param.name] = {
+            id: param.id,
+            value: '',
+            type: tipoParametroPorNombre[param.name] || 'string' 
+          };
+        });
+
+        console.log(apiParametersByBenefitId)
+
+        benefit.apiId = matchedApi.id;
+
+        apiParametersByBenefitId.value = { ...apiParametersByBenefitId.value };
+      } catch (error) {
+        console.error(`Error cargando parámetros para API ID ${matchedApi.id}:`, error);
+      }
+    };
+
     const getCurrentUserInformationFromLocalStorage = () => {
-      const userInformation = localStorage.getItem('currentUserInformation');
+      const userInformation = localStorage.getItem('currentUserInformation'); 
       return userInformation ? JSON.parse(userInformation) : null;
     };
 
     const getBenefits = async () => {
       try {
-        const companyId = getCurrentUserInformationFromLocalStorage()?.companyId;
+        const userInfo = getCurrentUserInformationFromLocalStorage();
+
+        const companyId = userInfo?.companyId;
+        const employeeId = userInfo?.idNaturalPerson;
+        const employee = await axios.get(`https://localhost:5000/api/EmployeeGetID/GetEmployeeById/${employeeId}`);
+        const contractType = employee?.data?.contractType;
+        console.log(contractType);
+        console.log(companyId);
         if (!companyId) {
           console.error('No se encontró companyId en localStorage.');
+          return;
+        }
+
+        if (!contractType) {
+          console.error('No se encontró contractType en localStorage.');
           return;
         }
 
         const response = await axios.get("https://localhost:5000/api/benefit", {
           params: { companyId }
         });
-        allBenefits.value = response.data;
-        console.log(allBenefits);
+
+        allBenefits.value = response.data.filter(benefit =>
+          benefit.eligibleEmployeeTypes &&
+          benefit.eligibleEmployeeTypes.some(type =>
+            type.trim().toLowerCase() === contractType.trim().toLowerCase()
+          )
+        );
+
+        console.log('Beneficios filtrados:', allBenefits.value);
       } catch (error) {
         console.error('Error getting benefits:', error);
       }
@@ -132,7 +236,20 @@ export default {
 
     const addSelectedBenefits = () => {
       if (!exceedsLimit.value) {
-        selectedBenefits.value.push(...tempSelection.value);
+        tempSelection.value.forEach(b => {
+          const copy = { ...b };
+
+          if (copy.type === 'API' && apiParametersByBenefitId.value[copy.id]) {
+            const parameters = apiParametersByBenefitId.value[copy.id];
+            copy.parameterValues = {};
+            Object.entries(parameters).forEach(([paramName, paramObj]) => {
+              copy.parameterValues[paramName] = paramObj.value;
+            });
+          }
+
+          selectedBenefits.value.push(copy);
+        });
+
         modalInstance.value.hide();
       }
     };
@@ -170,11 +287,10 @@ export default {
           benefitIds
         };
 
-        console.log("Asignando con:", payload);
-
         const response = await axios.post('https://localhost:5000/api/benefit/assign', payload);
 
         if (response.status === 200) {
+          await saveParameterValues();
           alert('Beneficios asignados exitosamente.');
         }
       } catch (error) {
@@ -201,6 +317,96 @@ export default {
       }
     };
 
+    const saveParameterValues = async () => {
+      for (const benefit of selectedBenefits.value) {
+        if (benefit.type !== 'API') {
+          continue;
+        }
+
+        const employeeId = getCurrentUserInformationFromLocalStorage()?.idNaturalPerson;
+        if (!employeeId) {
+          return;
+        }
+
+        if (!benefit.apiId) {
+          continue;
+        }
+
+        let parameters = [];
+        try {
+          const response = await axios.get(`https://localhost:5000/api/API/${benefit.apiId}/parameters`);
+          parameters = response.data;
+        } catch (error) {
+          continue;
+        }
+
+        for (const [paramName, inputValue] of Object.entries(benefit.parameterValues || {})) {
+          console.log('Procesando parámetro:', paramName, 'con valor:', inputValue);
+
+          const param = parameters.find(p => p.name === paramName);
+
+          if (!param) {
+            continue;
+          }
+
+          if (param.type === 'systemDefined') {
+            continue;
+          }
+
+          let type;
+          switch (param.name) {
+            case 'Date of birth':
+              type = 'date';
+              break;
+            case 'Dependents':
+              type = 'int';
+              break;
+            case 'Association name':
+              type = 'string';
+              break;
+            default:
+              continue;
+          }
+
+          const payload = {
+            id: crypto.randomUUID(),
+            parameterId: param.id,
+            employeeId,
+            valueType: type,
+            stringValue: type === 'string' ? inputValue : null,
+            intValue: type === 'int' ? parseInt(inputValue) : null,
+            dateValue: type === 'date' ? new Date(inputValue).toISOString() : null
+          };
+
+          console.log('Payload preparado:', payload);
+
+          try {
+            await axios.post('https://localhost:5000/api/api/parameters/values', payload);
+            console.log("✔ Parámetro guardado correctamente");
+          } catch (error) {
+            console.error('❌ Error guardando valor de parámetro:', error, payload);
+          }
+        }
+      }
+    };
+
+
+    const obtenerTipoInput = (type) => {
+      if (!type || typeof type !== 'string') return 'text';
+      switch (type.toLowerCase()) {
+        case 'int':
+        case 'number':
+          return 'number';
+        case 'date':
+          return 'date';
+        case 'email':
+          return 'email';
+        case 'boolean':
+          return 'checkbox';
+        default:
+          return 'text';
+      }
+    };
 
     const removeBenefit = (index) => {
       selectedBenefits.value.splice(index, 1);
@@ -210,6 +416,7 @@ export default {
       getBenefits();
       getAssignedBenefits();
       getCompanyMaxBenefits();
+      getAllApis();
     });
 
     return {
@@ -219,13 +426,21 @@ export default {
       maxBenefits,
       modalInstance,
       benefitsModal,
+      allApis,
+      apiParametersByBenefitId, 
       availableBenefits,
+      traducirParametro,
+      onBenefitToggle,
       exceedsLimit,
-      getBenefits,
       openModal,
       addSelectedBenefits,
-      removeBenefit,
       assignBenefits,
+      getCompanyMaxBenefits,
+      getBenefits,
+      getAssignedBenefits,
+      saveParameterValues,
+      obtenerTipoInput,
+      removeBenefit
     };
   },
 };

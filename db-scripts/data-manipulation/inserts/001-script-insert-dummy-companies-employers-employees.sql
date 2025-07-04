@@ -5,7 +5,7 @@
 -- Companies have 2 contacts (Email, Phone)
 -- Employers and Employees have 1 contact (Phone)
 -- ================================================
-
+USE PayrollSystem
 
 -- ================First Execution=================
 
@@ -49,8 +49,8 @@ SELECT TOP 1 @EmployerPersonId = Id FROM @EmployerPersonIdTable;
 INSERT INTO Users (Id, Email, Password, IsAdmin)
 VALUES (@EmployerUserId, 'carlos.mendoza@empresa1.co.cr', '^%461VsBCy', 0);
 
-INSERT INTO NaturalPersons (Id, FirstName, FirstSurname, SecondSurname, UserId)
-VALUES (@EmployerPersonId, 'Carlos', 'Mendoza', 'Jiménez', @EmployerUserId);
+INSERT INTO NaturalPersons (Id, FirstName, FirstSurname, SecondSurname, Gender, UserId)
+VALUES (@EmployerPersonId, 'Carlos', 'Mendoza', 'Jiménez', 'M', @EmployerUserId);
 
 INSERT INTO Employers (Id, CompanyId)
 VALUES (@EmployerPersonId, @CompanyPersonId);
@@ -73,11 +73,11 @@ SELECT TOP 1 @Emp1PersonId = Id FROM @EmpPersonIdTable;
 INSERT INTO Users (Id, Email, Password, IsAdmin)
 VALUES (@Emp1UserId, 'miguel.soto@empresa1.co.cr', '4NO121TyR&', 0);
 
-INSERT INTO NaturalPersons (Id, FirstName, FirstSurname, SecondSurname, UserId)
-VALUES (@Emp1PersonId, 'Miguel', 'Soto', 'Vargas', @Emp1UserId);
+INSERT INTO NaturalPersons (Id, FirstName, FirstSurname, SecondSurname, Gender, UserId)
+VALUES (@Emp1PersonId, 'Miguel', 'Soto', 'Vargas', 'M', @Emp1UserId);
 
-INSERT INTO Employees (Id, WorkerId, CompanyId, ContractType, GrossSalary, HasToReportHours)
-VALUES (@Emp1PersonId, 'WID-1-1', @CompanyPersonId, 'Part-Time', 34212.71, 1);
+INSERT INTO Employees (Id, WorkerId, CompanyId, EmployeeStartDate, ContractType, GrossSalary, HasToReportHours)
+VALUES (@Emp1PersonId, 'WID-1-1', @CompanyPersonId, '2021-03-15', 'Part-Time', 34212.71, 1);
 
 -- Employee Contact (Phone)
 INSERT INTO Contacts (Type, PhoneNumber, PersonId)
@@ -101,17 +101,17 @@ SELECT TOP 1 @Emp2PersonId = Id FROM @EmpPersonIdTable;
 INSERT INTO Users (Id, Email, Password, IsAdmin)
 VALUES (@Emp2UserId, 'gabriela.rodriguez@empresa1.co.cr', 'nL&2URZp&K', 0);
 
-INSERT INTO NaturalPersons (Id, FirstName, FirstSurname, SecondSurname, UserId)
-VALUES (@Emp2PersonId, 'Gabriela', 'Rodríguez', 'Castro', @Emp2UserId);
+INSERT INTO NaturalPersons (Id, FirstName, FirstSurname, SecondSurname, Gender, UserId)
+VALUES (@Emp2PersonId, 'Gabriela', 'Rodríguez', 'Castro', 'F', @Emp2UserId);
 
-INSERT INTO Employees (Id, WorkerId, CompanyId, ContractType, GrossSalary, HasToReportHours)
-VALUES (@Emp2PersonId, 'WID-1-2', @CompanyPersonId, 'Part-Time', 57006.88, 0);
+INSERT INTO Employees (Id, WorkerId, CompanyId, EmployeeStartDate, ContractType, GrossSalary, HasToReportHours)
+VALUES (@Emp2PersonId, 'WID-1-2', @CompanyPersonId, '2021-07-22', 'Part-Time', 57006.88, 0);
 
 -- Employee Contact (Phone)
 INSERT INTO Contacts (Type, PhoneNumber, PersonId)
 VALUES ('Phone Number', '62459713', @Emp2PersonId);
 
-
+GO
 -- ============End of First Execution==============
 
 
@@ -136,7 +136,7 @@ VALUES ('5389265343', 'Legal Entity', 'Alajuela', 'Alajuela', 'El Coyol', 'Zona 
 SELECT TOP 1 @CompanyPersonId = Id FROM @CompanyPersonIdTable;
 
 INSERT INTO Companies (Id, Name, Description, PaymentType, MaxBenefitsPerEmployee, CreationAuthor, LastModificationAuthor)
-VALUES (@CompanyPersonId, 'Café Dorado S.A.', 'Productora y exportadora de café de alta calidad desde Costa Rica.', 'Monthly', 3, 'System', 'System');
+VALUES (@CompanyPersonId, 'Café Dorado S.A.', 'Productora y exportadora de café de alta calidad desde Costa Rica.', 'Biweekly', 3, 'System', 'System');
 
 -- Company Contacts
 INSERT INTO Contacts (Type, Email, PersonId)
@@ -158,8 +158,8 @@ SELECT TOP 1 @EmployerPersonId = Id FROM @EmployerPersonIdTable;
 INSERT INTO Users (Id, Email, Password, IsAdmin)
 VALUES (@EmployerUserId, 'valeria.morales@empresa2.co.cr', '$1zPJusvwK', 0);
 
-INSERT INTO NaturalPersons (Id, FirstName, FirstSurname, SecondSurname, UserId)
-VALUES (@EmployerPersonId, 'Valeria', 'Morales', 'Quesada', @EmployerUserId);
+INSERT INTO NaturalPersons (Id, FirstName, FirstSurname, SecondSurname, Gender, UserId)
+VALUES (@EmployerPersonId, 'Valeria', 'Morales', 'Quesada', 'F', @EmployerUserId);
 
 INSERT INTO Employers (Id, CompanyId)
 VALUES (@EmployerPersonId, @CompanyPersonId);
@@ -182,11 +182,11 @@ SELECT TOP 1 @Emp1PersonId = Id FROM @EmpPersonIdTable;
 INSERT INTO Users (Id, Email, Password, IsAdmin)
 VALUES (@Emp1UserId, 'ricardo.blanco@empresa2.co.cr', '!^2$PLf1f^', 0);
 
-INSERT INTO NaturalPersons (Id, FirstName, FirstSurname, SecondSurname, UserId)
-VALUES (@Emp1PersonId, 'Ricardo', 'Blanco', 'Navarro', @Emp1UserId);
+INSERT INTO NaturalPersons (Id, FirstName, FirstSurname, SecondSurname, Gender, UserId)
+VALUES (@Emp1PersonId, 'Ricardo', 'Blanco', 'Navarro', 'M', @Emp1UserId);
 
-INSERT INTO Employees (Id, WorkerId, CompanyId, ContractType, GrossSalary, HasToReportHours)
-VALUES (@Emp1PersonId, 'WID-2-1', @CompanyPersonId, 'Part-Time', 32226.77, 1);
+INSERT INTO Employees (Id, WorkerId, CompanyId, EmployeeStartDate, ContractType, GrossSalary, HasToReportHours)
+VALUES (@Emp1PersonId, 'WID-2-1', @CompanyPersonId, '2021-11-08', 'Part-Time', 32226.77, 1);
 
 -- Employee Contact (Phone)
 INSERT INTO Contacts (Type, PhoneNumber, PersonId)
@@ -209,17 +209,17 @@ SELECT TOP 1 @Emp2PersonId = Id FROM @EmpPersonIdTable;
 INSERT INTO Users (Id, Email, Password, IsAdmin)
 VALUES (@Emp2UserId, 'laura.fallas@empresa2.co.cr', '4^PQ3nk$)1', 0);
 
-INSERT INTO NaturalPersons (Id, FirstName, FirstSurname, SecondSurname, UserId)
-VALUES (@Emp2PersonId, 'Laura', 'Fallas', 'Méndez', @Emp2UserId);
+INSERT INTO NaturalPersons (Id, FirstName, FirstSurname, SecondSurname, Gender, UserId)
+VALUES (@Emp2PersonId, 'Laura', 'Fallas', 'Méndez', 'F', @Emp2UserId);
 
-INSERT INTO Employees (Id, WorkerId, CompanyId, ContractType, GrossSalary, HasToReportHours)
-VALUES (@Emp2PersonId, 'WID-2-2', @CompanyPersonId, 'Hourly', 34571.93, 1);
+INSERT INTO Employees (Id, WorkerId, CompanyId, EmployeeStartDate, ContractType, GrossSalary, HasToReportHours)
+VALUES (@Emp2PersonId, 'WID-2-2', @CompanyPersonId, '2022-01-17', 'Professional Services', 34571.93, 1);
 
 -- Employee Contact (Phone)
 INSERT INTO Contacts (Type, PhoneNumber, PersonId)
 VALUES ('Phone Number', '83731394', @Emp2PersonId);
 
-
+GO
 -- ============End of Second Execution============
 
 
@@ -242,7 +242,7 @@ VALUES ('7472437759', 'Legal Entity', 'Guanacaste', 'Liberia', 'Centro', 'Diagon
 SELECT TOP 1 @CompanyPersonId = Id FROM @CompanyPersonIdTable;
 
 INSERT INTO Companies (Id, Name, Description, PaymentType, MaxBenefitsPerEmployee, CreationAuthor, LastModificationAuthor)
-VALUES (@CompanyPersonId, 'EcoTurismo Guanacaste', 'Servicios de turismo ecológico y sostenible en la región de Guanacaste.', 'Monthly', 3, 'System', 'System');
+VALUES (@CompanyPersonId, 'EcoTurismo Guanacaste', 'Servicios de turismo ecológico y sostenible en la región de Guanacaste.', 'Weekly', 3, 'System', 'System');
 
 -- Company Contacts
 INSERT INTO Contacts (Type, Email, PersonId)
@@ -264,8 +264,8 @@ SELECT TOP 1 @EmployerPersonId = Id FROM @EmployerPersonIdTable;
 INSERT INTO Users (Id, Email, Password, IsAdmin)
 VALUES (@EmployerUserId, 'mariana.villalobos@empresa3.co.cr', 'B#!8C2rQUn', 0);
 
-INSERT INTO NaturalPersons (Id, FirstName, FirstSurname, SecondSurname, UserId)
-VALUES (@EmployerPersonId, 'Mariana', 'Villalobos', 'Solano', @EmployerUserId);
+INSERT INTO NaturalPersons (Id, FirstName, FirstSurname, SecondSurname, Gender, UserId)
+VALUES (@EmployerPersonId, 'Mariana', 'Villalobos', 'Solano', 'F', @EmployerUserId);
 
 INSERT INTO Employers (Id, CompanyId)
 VALUES (@EmployerPersonId, @CompanyPersonId);
@@ -288,11 +288,11 @@ SELECT TOP 1 @Emp1PersonId = Id FROM @EmpPersonIdTable;
 INSERT INTO Users (Id, Email, Password, IsAdmin)
 VALUES (@Emp1UserId, 'alejandro.rojas@empresa3.co.cr', 'TB2gEUhr&M', 0);
 
-INSERT INTO NaturalPersons (Id, FirstName, FirstSurname, SecondSurname, UserId)
-VALUES (@Emp1PersonId, 'Alejandro', 'Rojas', 'Varela', @Emp1UserId);
+INSERT INTO NaturalPersons (Id, FirstName, FirstSurname, SecondSurname, Gender, UserId)
+VALUES (@Emp1PersonId, 'Alejandro', 'Rojas', 'Varela', 'M', @Emp1UserId);
 
-INSERT INTO Employees (Id, WorkerId, CompanyId, ContractType, GrossSalary, HasToReportHours)
-VALUES (@Emp1PersonId, 'WID-3-1', @CompanyPersonId, 'Part-Time', 39713.54, 0);
+INSERT INTO Employees (Id, WorkerId, CompanyId, EmployeeStartDate, ContractType, GrossSalary, HasToReportHours)
+VALUES (@Emp1PersonId, 'WID-3-1', @CompanyPersonId, '2022-05-03', 'Part-Time', 39713.54, 0);
 
 -- Employee Contact (Phone)
 INSERT INTO Contacts (Type, PhoneNumber, PersonId)
@@ -315,42 +315,15 @@ SELECT TOP 1 @Emp2PersonId = Id FROM @EmpPersonIdTable;
 INSERT INTO Users (Id, Email, Password, IsAdmin)
 VALUES (@Emp2UserId, 'sofia.araya@empresa3.co.cr', '9*#0A2cgyt', 0);
 
-INSERT INTO NaturalPersons (Id, FirstName, FirstSurname, SecondSurname, UserId)
-VALUES (@Emp2PersonId, 'Sofía', 'Araya', 'Barrantes', @Emp2UserId);
+INSERT INTO NaturalPersons (Id, FirstName, FirstSurname, SecondSurname, Gender, UserId)
+VALUES (@Emp2PersonId, 'Sofía', 'Araya', 'Barrantes', 'F', @Emp2UserId);
 
-INSERT INTO Employees (Id, WorkerId, CompanyId, ContractType, GrossSalary, HasToReportHours)
-VALUES (@Emp2PersonId, 'WID-3-2', @CompanyPersonId, 'Full-Time', 58975.01, 1);
+INSERT INTO Employees (Id, WorkerId, CompanyId, EmployeeStartDate, ContractType, GrossSalary, HasToReportHours)
+VALUES (@Emp2PersonId, 'WID-3-2', @CompanyPersonId, '2022-09-12', 'Full-Time', 58975.01, 1);
 
 -- Employee Contact (Phone)
 INSERT INTO Contacts (Type, PhoneNumber, PersonId)
 VALUES ('Phone Number', '77711478', @Emp2PersonId);
 
+GO
 -- ============End of Third Execution============
-
-
--- ============== Fourth Execution ==============
-
-DECLARE @CompanyId1 UNIQUEIDENTIFIER
-DECLARE @CompanyId2 UNIQUEIDENTIFIER
-DECLARE @CompanyId3 UNIQUEIDENTIFIER
-
--- Retrieve company IDs based on their names
-SELECT @CompanyId1 = Id FROM Companies WHERE Name = 'TecnoSoluciones CR'
-SELECT @CompanyId2 = Id FROM Companies WHERE Name = 'Café Dorado S.A.'
-SELECT @CompanyId3 = Id FROM Companies WHERE Name = 'EcoTurismo Guanacaste'
-
-INSERT INTO Benefits (CompanyId, Name, Description, IsActive, Type, LinkAPI, FixedPercentage, FixedAmount, RequiredMonthsWorked)
-VALUES 
-    (@CompanyId1, 'Seguro Médico', 'Cobertura médica completa', 1, 'FixedAmount', NULL, NULL, 5000, 6),
-    (@CompanyId1, 'Fondo de Ahorro', 'Ahorro mensual para empleados', 1, 'FixedPercentage', NULL, 10, NULL, 12),
-    (@CompanyId1, 'Servicio de Transporte', 'Transporte desde casa al trabajo', 1, 'FixedAmount', NULL, NULL, 2000, 3),
-    (@CompanyId2, 'API de Bonos', 'Conexión a sistema de bonos externo', 1, 'API', 'https://api.ejemplo.com/bonos', NULL, NULL, 0),
-    (@CompanyId2, 'Subsidio Alimenticio', 'Vale de comida mensual', 1, 'FixedAmount', NULL, NULL, 1500, 1),
-    (@CompanyId2, 'Seguro de Vida', 'Seguro para casos de accidente o fallecimiento', 1, 'FixedPercentage', NULL, 5, NULL, 6),
-    (@CompanyId3, 'API de Capacitación', 'Sistema externo de formación continua', 1, 'API', 'https://api.ejemplo.com/cursos', NULL, NULL, 0),
-    (@CompanyId3, 'Bono Anual', 'Bono al finalizar el año fiscal', 1, 'FixedPercentage', NULL, 15, NULL, 24),
-    (@CompanyId3, 'Subsidio para Educación', 'Apoyo para estudios universitarios', 1, 'FixedAmount', NULL, NULL, 10000, 18),
-    (@CompanyId3, 'API de Evaluación de Desempeño', 'Evaluación automática de desempeño', 1, 'API', 'https://api.ejemplo.com/evaluacion', NULL, NULL, 0);
-
-
--- ============End of Fourth Execution============
